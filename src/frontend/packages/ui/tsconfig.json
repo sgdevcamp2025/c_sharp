@@ -2,11 +2,11 @@
   "extends": "@jootalkpia/typescript-config/react-library.json",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "lib", "postcss.config.js"],
   "exclude": ["node_modules", "dist"]
 }
