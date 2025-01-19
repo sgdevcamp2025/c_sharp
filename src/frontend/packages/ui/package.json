@@ -1,5 +1,5 @@
 {
-  "name": "@repo/ui",
+  "name": "@jootalkpia/ui",
   "version": "0.0.0",
   "private": true,
   "exports": {
@@ -13,8 +13,8 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@jootalkpia/eslint-config": "workspace:*",
+    "@jootalkpia/typescript-config": "workspace:*",
     "@turbo/gen": "^1.12.4",
     "@types/node": "^20.11.24",
     "@types/react": "18.3.0",
