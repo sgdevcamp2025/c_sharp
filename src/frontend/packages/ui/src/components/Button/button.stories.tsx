@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from './button';
+import { ChatBubbleIcon } from '@radix-ui/react-icons';
+
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
   component: Button,
@@ -17,7 +19,7 @@ const meta: Meta<typeof Button> = {
         'outline',
         'secondary',
         'ghost',
-        'link',
+        'kakao',
       ],
     },
     size: { control: 'radio', options: ['sm', 'md', 'lg', 'icon'] },
@@ -58,9 +60,28 @@ export const Ghost: Story = {
     children: 'Ghost Button',
   },
 };
-export const Link: Story = {
+export const Kakao: Story = {
   args: {
-    variant: 'link',
-    children: 'Link Button',
+    variant: 'kakao',
+    size: 'lg',
   },
+  render: (args) => (
+    <Button {...args}>
+      <ChatBubbleIcon /> KaKao을(를) 사용하여 로그인
+    </Button>
+  ),
+};
+
+export const Icon: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: 20 }}>
+      <Button variant="outline" size="icon">
+        <ChatBubbleIcon />
+      </Button>
+
+      <Button variant="secondary" size="icon">
+        <ChatBubbleIcon />
+      </Button>
+    </div>
+  ),
 };
