@@ -1,7 +1,7 @@
--- User 테이블 생성
-CREATE TABLE IF NOT EXISTS user (
-                                    user_id SERIAL PRIMARY KEY,
-                                    platform VARCHAR(50) NOT NULL,
+-- Users 테이블 생성
+CREATE TABLE IF NOT EXISTS users (
+                                     user_id SERIAL PRIMARY KEY,
+                                     platform VARCHAR(50) NOT NULL,
     social_id VARCHAR(50) NOT NULL UNIQUE,
     nickname VARCHAR(100) NOT NULL,
     email VARCHAR(320) NOT NULL UNIQUE,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS channel (
 -- UserChannel 테이블 생성
 CREATE TABLE IF NOT EXISTS user_channel (
                                             user_channel_id SERIAL PRIMARY KEY,
-                                            user_id BIGINT NOT NULL REFERENCES user(user_id) ON DELETE CASCADE,
+                                            user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     channel_id BIGINT NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
     mute BOOLEAN NOT NULL DEFAULT FALSE,
     last_read_ts TIMESTAMP,
