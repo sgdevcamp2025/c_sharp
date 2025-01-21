@@ -14,5 +14,6 @@ feign:
     path: /uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice
     tr-id: FHKST03010200
     custtype : P
-
-
+    etc-cls-code : ""
+    market-div-code : "J"
+    pw-data-incu-yn: "N"
