@@ -14,7 +14,7 @@ const ChatTextarea = ({ onSend, onAdd }) => {
     >
       <Textarea placeholder="Type your message..." />
       <div className="flex justify-between w-full px-1">
-        <Button onClick={onAdd} size="icon" variant="outline">
+        <Button onClick={onAdd} size="sm" variant="outline">
           +
         </Button>
         <Button onClick={onSend} size="sm">
