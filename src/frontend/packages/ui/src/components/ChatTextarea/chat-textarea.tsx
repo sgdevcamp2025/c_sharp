@@ -7,10 +7,14 @@ import { cn } from '@workspace/ui/lib/utils';
 
 const ChatTextarea = ({ onSend, onAdd }) => {
   return (
-    <div className={cn('flex flex-col items-center w-full rounded-md')}>
+    <div
+      className={cn(
+        'flex flex-col items-center w-full rounded-md border border-gray-300 px-0.5 py-1'
+      )}
+    >
       <Textarea placeholder="Type your message..." />
-      <div className="flex justify-between w-full">
-        <Button onClick={onAdd} size="icon">
+      <div className="flex justify-between w-full px-1">
+        <Button onClick={onAdd} size="icon" variant="outline">
           +
         </Button>
         <Button onClick={onSend} size="sm">
