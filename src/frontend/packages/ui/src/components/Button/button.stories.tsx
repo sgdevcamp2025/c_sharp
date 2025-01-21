@@ -22,7 +22,7 @@ const meta: Meta<typeof Button> = {
         'kakao',
       ],
     },
-    size: { control: 'radio', options: ['sm', 'md', 'lg', 'icon'] },
+    size: { control: 'radio', options: ['sm', 'lg', 'icon'] },
     asChild: { control: 'boolean' },
     onClick: { action: 'clicked', type: 'function' },
   },
