@@ -4,7 +4,7 @@ import { MessageCircle } from 'lucide-react';
 import { Button } from './button';
 
 const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
+  title: 'Widget/Button',
   component: Button,
   parameters: {
     layout: 'centered',
