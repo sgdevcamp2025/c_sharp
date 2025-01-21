@@ -22,24 +22,6 @@ const meta: Meta<typeof Badge> = {
 export default meta;
 type Story = StoryObj<typeof Badge>;
 
-export const Default: Story = {
-  args: {
-    variant: 'default',
-    children: 'Badge',
-  },
-};
-export const Outline: Story = {
-  args: {
-    variant: 'outline',
-    children: 'Outline Badge',
-  },
-};
-export const Secondary: Story = {
-  args: {
-    variant: 'secondary',
-    children: 'Secondary Badge',
-  },
-};
 export const Date: Story = {
   args: {
     variant: 'secondary',
