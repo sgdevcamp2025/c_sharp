@@ -28,7 +28,7 @@ public class UserChannel {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Users users;
 
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
