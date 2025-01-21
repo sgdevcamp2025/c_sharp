@@ -6,6 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record MinutePriceProperties(
         String path,
         String trId,
-        String custtype
+        String custtype,
+        String etcClsCode,
+        String marketDivCode,
+        String pwDataIncuYn
 ) {
 }
