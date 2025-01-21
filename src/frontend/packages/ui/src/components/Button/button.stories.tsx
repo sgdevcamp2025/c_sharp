@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { MessageCircle } from 'lucide-react';
+
 import { Button } from './button';
+
 const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
+  title: 'Widget/Button',
   component: Button,
   parameters: {
     layout: 'centered',
@@ -17,10 +20,10 @@ const meta: Meta<typeof Button> = {
         'outline',
         'secondary',
         'ghost',
-        'link',
+        'kakao',
       ],
     },
-    size: { control: 'radio', options: ['sm', 'md', 'lg', 'icon'] },
+    size: { control: 'radio', options: ['sm', 'lg', 'icon'] },
     asChild: { control: 'boolean' },
     onClick: { action: 'clicked', type: 'function' },
   },
@@ -58,9 +61,28 @@ export const Ghost: Story = {
     children: 'Ghost Button',
   },
 };
-export const Link: Story = {
+export const Kakao: Story = {
   args: {
-    variant: 'link',
-    children: 'Link Button',
+    variant: 'kakao',
+    size: 'lg',
   },
+  render: (args) => (
+    <Button {...args}>
+      <MessageCircle /> KaKao을(를) 사용하여 로그인
+    </Button>
+  ),
+};
+
+export const Icon: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: 20 }}>
+      <Button variant="outline" size="icon">
+        <MessageCircle />
+      </Button>
+
+      <Button variant="secondary" size="icon">
+        <MessageCircle />
+      </Button>
+    </div>
+  ),
 };

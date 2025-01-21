@@ -6,7 +6,9 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "storybook": "pnpm --filter @workspace/ui run storybook",
+    "build-storybook": "pnpm --filter @workspace/ui run build-storybook"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

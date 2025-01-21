@@ -16,6 +16,7 @@ const config = {
         mono: ['var(--font-mono)', ...fontFamily.mono],
       },
       colors: {
+        kakao: '#FEE500',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
