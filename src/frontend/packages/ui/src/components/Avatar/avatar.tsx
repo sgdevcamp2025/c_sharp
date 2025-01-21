@@ -14,7 +14,7 @@ const avatarVariants = cva('relative flex h-10 w-10 shrink-0 overflow-hidden', {
     },
   },
   defaultVariants: {
-    variant: 'square',
+    variant: 'default',
   },
 });
 interface AvatarProps
