@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
+@ConfigurationPropertiesScan
 @EnableFeignClients
 @SpringBootApplication
 public class StockServerApplication {
