@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  workspace-server:
+    image: mirlee/workspace_server
+    container_name: workspace_server
+    ports:
+      - "8080:8080"
+    environment:
+      DB_USER: ${DB_USER}           # PostgreSQL 사용자
+      DB_PASSWORD: ${DB_PASSWORD}   # PostgreSQL 비밀번호
+      DB_NAME: ${DB_NAME}           # 공통 데이터베이스 이름
+      DB_HOST: db                   # PostgreSQL 컨테이너 이름 (서비스 이름과 동일)
+      DB_PORT: ${DB_PORT}           # PostgreSQL 기본 포트
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: jootalkpia-db
+    environment:
+      POSTGRES_USER: ${DB_USER}           # PostgreSQL 사용자
+      POSTGRES_PASSWORD: ${DB_PASSWORD}   # PostgreSQL 비밀번호
+      POSTGRES_DB: ${DB_NAME}             # 공통 데이터베이스 이름
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"                       # 로컬 포트 5432 -> 컨테이너 포트 5432
+
+volumes:
+  postgres_data:
