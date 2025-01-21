@@ -162,6 +162,9 @@ importers:
       '@chromatic-com/storybook':
         specifier: ^3.2.4
         version: 3.2.4(react@19.0.0)(storybook@8.6.0-alpha.0(prettier@3.4.2))
+      '@storybook/addon-actions':
+        specifier: ^8.5.0
+        version: 8.5.0(storybook@8.6.0-alpha.0(prettier@3.4.2))
       '@storybook/addon-essentials':
         specifier: 8.6.0-alpha.0
         version: 8.6.0-alpha.0(@types/react@19.0.7)(storybook@8.6.0-alpha.0(prettier@3.4.2))
@@ -913,6 +916,11 @@ packages:
     resolution: {integrity: sha512-ul8rnCsUumNln5YWwz0ted2ZHFhzhRRnkpBZ+YRuHoRAlUji9KChpOUOndY7uykrPEPXVbHLlsdo6v5yXo/TXw==}
     cpu: [x64]
     os: [win32]
+
+  '@storybook/addon-actions@8.5.0':
+    resolution: {integrity: sha512-6CW9+17rk5eNx6I8EKqCxRKtsJFTR/lHL+xiJ6/iBWApIm8sg63vhXvUTJ58UixmIkT5oLh0+ESNPh+x10D8fw==}
+    peerDependencies:
+      storybook: ^8.5.0
 
   '@storybook/addon-actions@8.6.0-alpha.0':
     resolution: {integrity: sha512-ebY4n9twI05gWuu3Qv1o6LscFAY7pBbt3Ted22SfGH5YTvRvdstcU/4M7kqXt26X5LZeDfKCtIddnIvv/wMXsw==}
@@ -4142,6 +4150,15 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.31.0':
     optional: true
+
+  '@storybook/addon-actions@8.5.0(storybook@8.6.0-alpha.0(prettier@3.4.2))':
+    dependencies:
+      '@storybook/global': 5.0.0
+      '@types/uuid': 9.0.8
+      dequal: 2.0.3
+      polished: 4.3.1
+      storybook: 8.6.0-alpha.0(prettier@3.4.2)
+      uuid: 9.0.1
 
   '@storybook/addon-actions@8.6.0-alpha.0(storybook@8.6.0-alpha.0(prettier@3.4.2))':
     dependencies:
