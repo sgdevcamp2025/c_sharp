@@ -1,6 +1,6 @@
 logging:
   level:
-    com.example.stock_server : debug
+    com.jootalkpia.stock_server: debug
     org.springframework.web.servlet : debug
 
 feign:

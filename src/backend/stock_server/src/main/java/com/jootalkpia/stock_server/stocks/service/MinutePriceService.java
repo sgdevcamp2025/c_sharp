@@ -1,9 +1,9 @@
-package com.example.stock_server.stocks.service;
+package com.jootalkpia.stock_server.stocks.service;
 
-import com.example.stock_server.stocks.advice.MinutePriceCaller;
-import com.example.stock_server.stocks.dto.MinutePriceDto;
-import com.example.stock_server.support.property.BaseProperties;
-import com.example.stock_server.support.property.MinutePriceProperties;
+import com.jootalkpia.stock_server.stocks.advice.MinutePriceCaller;
+import com.jootalkpia.stock_server.stocks.dto.MinutePriceDto;
+import com.jootalkpia.stock_server.support.property.BaseProperties;
+import com.jootalkpia.stock_server.support.property.MinutePriceProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

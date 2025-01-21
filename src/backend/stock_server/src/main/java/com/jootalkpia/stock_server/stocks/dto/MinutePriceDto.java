@@ -1,4 +1,4 @@
-package com.example.stock_server.stocks.dto;
+package com.jootalkpia.stock_server.stocks.dto;
 
 import java.util.ArrayList;
 

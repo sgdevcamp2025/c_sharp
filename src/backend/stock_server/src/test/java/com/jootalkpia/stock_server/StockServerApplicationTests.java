@@ -1,4 +1,4 @@
-package com.example.stock_server;
+package com.jootalkpia.stock_server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

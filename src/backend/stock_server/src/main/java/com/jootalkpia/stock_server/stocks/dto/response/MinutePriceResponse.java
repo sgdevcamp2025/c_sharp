@@ -1,6 +1,6 @@
-package com.example.stock_server.stocks.dto.response;
+package com.jootalkpia.stock_server.stocks.dto.response;
 
-import com.example.stock_server.stocks.dto.MinutePriceDto;
+import com.jootalkpia.stock_server.stocks.dto.MinutePriceDto;
 
 public record MinutePriceResponse(
         String code,

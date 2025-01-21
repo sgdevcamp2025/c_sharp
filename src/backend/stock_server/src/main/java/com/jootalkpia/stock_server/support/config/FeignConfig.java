@@ -1,4 +1,4 @@
-package com.example.stock_server.support.config;
+package com.jootalkpia.stock_server.support.config;
 
 import feign.Logger;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
-package com.example.stock_server.stocks.advice;
+package com.jootalkpia.stock_server.stocks.advice;
 
-import com.example.stock_server.stocks.dto.MinutePriceDto;
-import com.example.stock_server.support.config.FeignConfig;
+import com.jootalkpia.stock_server.stocks.dto.MinutePriceDto;
+import com.jootalkpia.stock_server.support.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

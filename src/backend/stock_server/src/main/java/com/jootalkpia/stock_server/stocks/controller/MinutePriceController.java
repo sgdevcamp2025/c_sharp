@@ -1,7 +1,7 @@
-package com.example.stock_server.stocks.controller;
+package com.jootalkpia.stock_server.stocks.controller;
 
-import com.example.stock_server.stocks.dto.response.MinutePriceResponse;
-import com.example.stock_server.stocks.service.MinutePriceService;
+import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceResponse;
+import com.jootalkpia.stock_server.stocks.service.MinutePriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

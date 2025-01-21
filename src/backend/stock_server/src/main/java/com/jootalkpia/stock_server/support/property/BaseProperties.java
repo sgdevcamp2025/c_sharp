@@ -1,4 +1,4 @@
-package com.example.stock_server.support.property;
+package com.jootalkpia.stock_server.support.property;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
