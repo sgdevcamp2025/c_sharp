@@ -46,14 +46,14 @@ const Template2: StoryFn = (args) => (
         defaultSize={100}
         className="flex items-center justify-center bg-gray-200 p-4"
       >
-        Stock Chart
+        ChatList
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel
         defaultSize={250}
         className="flex items-center justify-center bg-gray-300 p-4"
       >
-        Stock Details
+        Chat
       </ResizablePanel>
     </ResizablePanelGroup>
   </div>
