@@ -1,0 +1,19 @@
+logging:
+  level:
+    com.jootalkpia.stock_server: debug
+    org.springframework.web.servlet : debug
+
+feign:
+  base-url: https://openapivts.koreainvestment.com:29443
+  appkey: PSmlW5hwZEV1I6mn2J10VqmeYJmrLwGMAvnZ
+  appsecret: aM9avMF8c5p36+mHxAKYSjycRWyxOLqgIdMTkmXjXPA2ol+kaOknD5OyYNp4X3Sb/YmWcML/7DX2WDE9zo31jiDDeOFnXIW1JGbUWtrh/UyiIriBuJghedUsvUTDaVH9WjuoZqR4FOnauNeAwppxrlvWI7UxG4zEoiEgbrUxpJfWBrE3RHo=
+  stock-token:
+    path: /oauth2/tokenP
+    grant-type: client_credentials
+  minute-price:
+    path: /uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice
+    tr-id: FHKST03010200
+    custtype : P
+    etc-cls-code : ""
+    market-div-code : "J"
+    pw-data-incu-yn: "N"
