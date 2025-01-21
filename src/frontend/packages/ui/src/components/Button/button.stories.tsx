@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { MessageCircle } from 'lucide-react';
+
 import { Button } from './button';
-import { ChatBubbleIcon } from '@radix-ui/react-icons';
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
@@ -67,7 +68,7 @@ export const Kakao: Story = {
   },
   render: (args) => (
     <Button {...args}>
-      <ChatBubbleIcon /> KaKao을(를) 사용하여 로그인
+      <MessageCircle /> KaKao을(를) 사용하여 로그인
     </Button>
   ),
 };
@@ -76,11 +77,11 @@ export const Icon: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: 20 }}>
       <Button variant="outline" size="icon">
-        <ChatBubbleIcon />
+        <MessageCircle />
       </Button>
 
       <Button variant="secondary" size="icon">
-        <ChatBubbleIcon />
+        <MessageCircle />
       </Button>
     </div>
   ),
