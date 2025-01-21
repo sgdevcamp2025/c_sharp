@@ -22,7 +22,7 @@ type Story = StoryObj<typeof Table>;
 
 export const Default: Story = {
   render: () => (
-    <div className="flex w-[600px] flex-wra">
+    <div className="flex w-[600px] flex-wrap">
       <Table>
         <TableHeader>
           <TableRow>
