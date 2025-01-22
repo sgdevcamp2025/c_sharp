@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:15
+    image: mirlee/postgresql-db:v1.2    # 직접 빌드한 이미지 사용
     container_name: jootalkpia-db
     environment:
       POSTGRES_USER: ${DB_USER}           # PostgreSQL 사용자
       POSTGRES_PASSWORD: ${DB_PASSWORD}   # PostgreSQL 비밀번호
       POSTGRES_DB: ${DB_NAME}             # 공통 데이터베이스 이름
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data # 데이터 저장 볼륨
     ports:
       - "5432:5432"                       # 로컬 포트 5432 -> 컨테이너 포트 5432
 
