@@ -19,6 +19,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: List files to check directory structure
+        run: ls -R
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
