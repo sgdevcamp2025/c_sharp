@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd src/frontend
-          pnpm install --strict-peer-dependencies=false --frozen-lockfile --prod
+          pnpm install --strict-peer-dependencies=false --frozen-lockfile
           pnpm add turbo --save-dev -w
 
       - name: Lint code
