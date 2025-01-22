@@ -51,13 +51,6 @@ jobs:
           pnpm install --strict-peer-dependencies=false --frozen-lockfile
           pnpm add turbo --save-dev -w
 
-      - name: Danger
-        run: |
-          cd src/frontend
-          pnpm danger ci --config tsconfig.danger.json
-        env:
-          DANGER_GITHUB_API_TOKEN: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
-
   type-check:
     needs: [changes]
     runs-on: ubuntu-latest
