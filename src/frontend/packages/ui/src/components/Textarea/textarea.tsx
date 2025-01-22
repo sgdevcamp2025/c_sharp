@@ -4,10 +4,7 @@ import * as React from 'react';
 
 import { cn } from '@workspace/ui/lib/utils';
 
-const Textarea = React.forwardRef<
-  HTMLTextAreaElement,
-  React.ComponentProps<'textarea'>
->(({ className, ...props }, ref) => {
+const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'textarea'>>(({ className, ...props }, ref) => {
   const autoResizeTextarea = () => {
     const textarea = document.querySelector('textarea');
 
@@ -22,7 +19,7 @@ const Textarea = React.forwardRef<
     <textarea
       className={cn(
         'flex min-h-[80px] h-auto w-full rounded-md bg-transparent px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-        className
+        className,
       )}
       maxLength={2000}
       onKeyDown={autoResizeTextarea}
