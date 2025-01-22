@@ -8,9 +8,6 @@ on:
       - main
     paths:
       - 'src/frontend/**'
-  push:
-    branches:
-      - fe-ci/cicd
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
