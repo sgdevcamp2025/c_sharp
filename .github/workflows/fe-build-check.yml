@@ -48,8 +48,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd src/frontend
-          pnpm install --strict-peer-dependencies=false --frozen-lockfile --prod  # 충돌을 해결하는 옵션
-          pnpm add turbo --save-dev -w  # turbo를 루트 devDependencies에 추가
+          pnpm install --strict-peer-dependencies=false --frozen-lockfile --prod
 
       - name: Lint code
         run: |
