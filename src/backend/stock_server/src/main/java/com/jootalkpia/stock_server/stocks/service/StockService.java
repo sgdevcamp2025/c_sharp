@@ -13,6 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -35,7 +38,10 @@ public class StockService {
         token = tokenResponse.tokenType() + TOKEN_SEPARATOR + tokenResponse.accessToken();
     }
 
-    private MinutePriceSimpleResponse getStockPrice(String code, String time) {
+    private MinutePriceSimpleResponse getStockPrice(String code) {
+        LocalDateTime now = LocalDateTime.now();
+        String currentTime = now.format(DateTimeFormatter.ofPattern("HHmmss"));
+
         MinutePriceResponse response = stockCaller.getMinutePrice(
                 fakeToken,
                 baseProperties.appKey(),
@@ -45,7 +51,7 @@ public class StockService {
                 minutePriceProperties.etcClsCode(),
                 minutePriceProperties.marketDivCode(),
                 code,
-                time,
+                currentTime,
                 minutePriceProperties.pwDataIncuYn()
         );
 
