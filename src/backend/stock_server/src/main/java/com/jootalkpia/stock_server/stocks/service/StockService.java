@@ -1,16 +1,21 @@
 package com.jootalkpia.stock_server.stocks.service;
 
 import com.jootalkpia.stock_server.stocks.advice.StockCaller;
+import com.jootalkpia.stock_server.stocks.domain.Schedule;
+import com.jootalkpia.stock_server.stocks.domain.StockCode;
 import com.jootalkpia.stock_server.stocks.dto.request.TokenRequestBody;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceSimpleResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.TokenResponse;
+import com.jootalkpia.stock_server.support.config.TaskSchedulerConfiguration;
 import com.jootalkpia.stock_server.support.property.BaseProperties;
 import com.jootalkpia.stock_server.support.property.MinutePriceProperties;
 import com.jootalkpia.stock_server.support.property.TokenProperties;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.config.CronTask;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,8 +36,18 @@ public class StockService {
     private final BaseProperties baseProperties;
     private final MinutePriceProperties minutePriceProperties;
     private final TokenProperties tokenProperties;
+    private final TaskSchedulerConfiguration taskSchedulerConfiguration;
 
-    @Scheduled(cron = "0 0 0 * **")
+    @PostConstruct
+    public void initScheduledTasks() {
+        ScheduledTaskRegistrar taskRegistrar = new ScheduledTaskRegistrar();
+        taskSchedulerConfiguration.configureTasks(taskRegistrar);
+
+        taskRegistrar.addCronTask(new CronTask(this::refreshToken, Schedule.MIDNIGHT.getTime()));
+
+        taskRegistrar.afterPropertiesSet();
+    }
+
     private void refreshToken() {
         TokenResponse tokenResponse = stockCaller.getToken(TokenRequestBody.from(baseProperties, tokenProperties));
         token = tokenResponse.tokenType() + TOKEN_SEPARATOR + tokenResponse.accessToken();
