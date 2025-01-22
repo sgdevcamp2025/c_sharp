@@ -43,10 +43,16 @@ jobs:
           pnpm install --frozen-lockfile --prod
 
       - name: Lint code
-        run: pnpm lint
+        run: |
+          cd src/frontend 
+          pnpm lint
 
       - name: Build project
-        run: pnpm build
+        run: |
+          cd src/frontend
+          pnpm build
 
       - name: Build Storybook
-        run: pnpm run build-storybook
+        run: |
+          cd src/frontend
+          pnpm build-storybook
