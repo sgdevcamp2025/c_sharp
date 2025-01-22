@@ -5,29 +5,29 @@ import java.util.ArrayList;
 public record MinutePriceResponse(
         Output1 output1,
         ArrayList<Output2> output2,
-        String rt_cd,
-        String msg_cd,
+        String rtCd,
+        String msgCd,
         String msg1
 ) {
     public record Output1(
-            String prdy_vrss,
-            String prdy_vrss_sign,
-            String prdy_ctrt,
-            String stck_prdy_clpr,
-            String acml_vol,
-            String acml_tr_pbmn,
-            String hts_kor_isnm,
-            String stck_prpr
+            String prdyVrss,
+            String prdyVrssSign,
+            String prdyCtrt,
+            String stckPrdyClpr,
+            String acmlVol,
+            String acmlTrPbmn,
+            String htsKorIsnm,
+            String stckPrpr
     ) {}
 
     public record Output2(
-            String stck_bsop_date,
-            String stck_cntg_hour,
-            String stck_prpr,
-            String stck_oprc,
-            String stck_hgpr,
-            String stck_lwpr,
-            String cntg_vol,
-            String acml_tr_pbmn
+            String stckBsopDate,
+            String stckCntgHour,
+            String stckPrpr,
+            String stckOprc,
+            String stckHgpr,
+            String stckLwpr,
+            String cntgVol,
+            String acmlTrPbmn
     ) {}
 }
