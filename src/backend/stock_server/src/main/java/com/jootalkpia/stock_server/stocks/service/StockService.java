@@ -45,9 +45,19 @@ public class StockService {
 
         taskRegistrar.addCronTask(new CronTask(this::refreshToken, Schedule.MIDNIGHT.getTime()));
 
+        for (StockCode stockCode : StockCode.values()) {
+            createMinutePriceTask(stockCode, taskRegistrar);
+        }
+
         taskRegistrar.afterPropertiesSet();
     }
 
+    private void createMinutePriceTask(StockCode stockCode, ScheduledTaskRegistrar taskRegistrar) {
+        for (Schedule schedule : Schedule.values()) {
+            taskRegistrar.addCronTask(new CronTask(() -> getStockPrice(stockCode.getCode()), schedule.getTime()));
+        }
+    }
+    
     private void refreshToken() {
         TokenResponse tokenResponse = stockCaller.getToken(TokenRequestBody.from(baseProperties, tokenProperties));
         token = tokenResponse.tokenType() + TOKEN_SEPARATOR + tokenResponse.accessToken();
