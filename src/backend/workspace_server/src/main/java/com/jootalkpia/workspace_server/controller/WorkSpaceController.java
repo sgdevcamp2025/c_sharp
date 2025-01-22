@@ -3,8 +3,10 @@ package com.jootalkpia.workspace_server.controller;
 
 import com.jootalkpia.workspace_server.dto.ChannelListDTO;
 import com.jootalkpia.workspace_server.service.WorkSpaceService;
+import com.jootalkpia.workspace_server.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,12 +21,11 @@ public class WorkSpaceController {
     private final WorkSpaceService workSpaceService;
 
     @GetMapping("/{workspaceId}/channels")
-    public ChannelListDTO getChannels(@PathVariable Long workspaceId) {
+    public ResponseEntity<ChannelListDTO> getChannels(@PathVariable Long workspaceId) {
         // 유효성 검증
+        ValidationUtils.validateWorkSpaceId(workspaceId);
 
         ChannelListDTO channelListDTO = workSpaceService.getChannels(workspaceId);
-
+        return ResponseEntity.ok().body(channelListDTO);
     }
-
-
 }
