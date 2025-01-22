@@ -11,7 +11,7 @@ public class ValidationUtils {
 
     public static void validateWorkSpaceId(Long workSpaceId) {
         if (workSpaceId == null || workSpaceId <= 0) {
-            throw new CustomException(ErrorCode.INVALID_PARAMETER);
+            throw new CustomException(ErrorCode.INVALID_PARAMETER.getCode(), ErrorCode.INVALID_PARAMETER.getMsg());
         }
     }
 }

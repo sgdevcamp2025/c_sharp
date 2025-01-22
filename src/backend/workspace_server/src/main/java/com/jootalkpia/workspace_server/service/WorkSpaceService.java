@@ -19,10 +19,8 @@ public class WorkSpaceService {
 
     private final ChannelRepository channelRepository;
     private final UserChannelRepository userChannelRepository;
-    // 임시 userId
-    private final Long userId = 1L;//AuthenticationContext.getUserInfo().id();
 
-    public ChannelListDTO getChannels(Long workspaceId) {
+    public ChannelListDTO getChannels(Long userId, Long workspaceId) {
         // workspaceId로 모든 채널 조회
         List<Channels> channelList = channelRepository.findByWorkSpaceWorkspaceId(workspaceId);
 
@@ -36,7 +34,7 @@ public class WorkSpaceService {
             simpleChannel.setChannelName(channels.getName());
             simpleChannel.setCreatedAt(channels.getCreatedAt());
 
-            if (isJoinedChannel(channels)) {
+            if (isJoinedChannel(userId, channels)) {
                 joinedChannels.add(simpleChannel);
             } else {
                 unjoinedChannels.add(simpleChannel);
@@ -50,7 +48,7 @@ public class WorkSpaceService {
         return channelListDTO;
     }
 
-    private boolean isJoinedChannel(Channels channels) {
+    private boolean isJoinedChannel(Long userId, Channels channels) {
         return userChannelRepository.findByUsersUserIdAndChannelsChannelId(userId, channels.getChannelId()).isPresent();
     }
 }

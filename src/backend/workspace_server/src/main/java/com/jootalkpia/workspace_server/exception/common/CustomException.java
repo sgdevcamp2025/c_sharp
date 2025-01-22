@@ -1,16 +1,13 @@
 package com.jootalkpia.workspace_server.exception.common;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CustomException extends RuntimeException {
 
-    private final ErrorCode code;
+    private final String code;
+    private final String message;
 
-    public CustomException(ErrorCode code, String message) {
-        super(message);
-        this.code = code;
-    }
 }

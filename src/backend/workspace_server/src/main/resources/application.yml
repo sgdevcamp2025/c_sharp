@@ -2,17 +2,16 @@ spring:
   application:
     name: workspace_server # 애플리케이션 이름
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME} # PostgreSQL 연결 URL
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:jootalkpia}
     username: ${DB_USER}                                    # 데이터베이스 사용자
     password: ${DB_PASSWORD}                                # 데이터베이스 비밀번호
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update       # 엔티티 변경 시 데이터베이스 스키마 업데이트
-    show-sql: true           # 실행되는 SQL 쿼리 출력
+      ddl-auto: update
     properties:
       hibernate:
-        format_sql: true     # SQL 포맷팅
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   logging:
     level:
       org.hibernate.SQL: DEBUG # Hibernate SQL 로그 출력

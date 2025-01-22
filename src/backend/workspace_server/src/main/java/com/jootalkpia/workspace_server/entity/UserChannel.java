@@ -40,9 +40,6 @@ public class UserChannel {
     @Column(name = "mute", nullable = false)
     private Boolean mute;
 
-    @Column(name = "created_at")
-    private LocalDateTime lastReadTs;
-
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;

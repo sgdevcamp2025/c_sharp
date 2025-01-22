@@ -19,13 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkSpaceController {
 
     private final WorkSpaceService workSpaceService;
+    // 임시 userId
+    private final Long userId = 1L;//AuthenticationContext.getUserInfo().id();
 
     @GetMapping("/{workspaceId}/channels")
     public ResponseEntity<ChannelListDTO> getChannels(@PathVariable Long workspaceId) {
         // 유효성 검증
         ValidationUtils.validateWorkSpaceId(workspaceId);
 
-        ChannelListDTO channelListDTO = workSpaceService.getChannels(workspaceId);
+        ChannelListDTO channelListDTO = workSpaceService.getChannels(userId, workspaceId);
         return ResponseEntity.ok().body(channelListDTO);
     }
 }
