@@ -37,7 +37,8 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prod
+        run: cd c_sharp/src/frontend
+          pnpm install --frozen-lockfile --prod
 
       - name: Lint code
         run: pnpm lint
