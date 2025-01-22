@@ -73,6 +73,7 @@ jobs:
       - name: Typescript Check
         run: |
           cd src/frontend
+          pnpm install
           pnpm typescript
         env:
           NODE_OPTIONS: --max-old-space-size=4096
@@ -89,7 +90,7 @@ jobs:
       - name: Prettier check
         run: |
           cd src/frontend
-          pnpm prettier --check
+          pnpm format --check
 
       - name: Lint
         run: |
