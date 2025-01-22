@@ -1,0 +1,119 @@
+name: FRONTEND-CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - dev
+      - main
+    paths:
+      - 'src/frontend/**'
+  push:
+    branches:
+      - fe-ci/cicd
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    if: ${{ github.actor != 'l10nbot' }} # Avoid running for 'l10nbot'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - uses: actions/cache@v4
+        id: cache
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: |
+          cd src/frontend
+          pnpm install --strict-peer-dependencies=false --frozen-lockfile
+          pnpm add turbo --save-dev -w
+
+      - name: Danger
+        run: pnpm danger ci
+        env:
+          DANGER_GITHUB_API_TOKEN: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
+
+  type-check:
+    needs: [changes]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Typescript Check
+        run: pnpm typescript
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+  lint:
+    needs: [changes]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Prettier check
+        run: pnpm prettier --check
+
+      - name: Lint
+        run: pnpm lint
+
+  build:
+    needs: [changes, lint, type-check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Build project
+        run: |
+          cd src/frontend
+          pnpm build
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
+
+      - name: Build Storybook
+        run: |
+          cd src/frontend
+          pnpm build-storybook
+
+  required:
+    needs: [changes, lint, type-check, build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: fail if conditional jobs failed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'skipped') || contains(needs.*.result, 'cancelled')
+        run: exit 1
