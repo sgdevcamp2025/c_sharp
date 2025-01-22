@@ -48,11 +48,12 @@ jobs:
         run: |
           cd src/frontend
           pnpm install --strict-peer-dependencies=false --frozen-lockfile --prod
+          pnpm add turbo --save-dev
 
-      # - name: Lint code
-      #   run: |
-      #     cd src/frontend
-      #     pnpm lint
+      - name: Lint code
+        run: |
+          cd src/frontend
+          pnpm lint
 
       - name: Build project
         run: |
