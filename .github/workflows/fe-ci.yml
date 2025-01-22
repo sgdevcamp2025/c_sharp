@@ -110,6 +110,7 @@ jobs:
       - name: Build project
         run: |
           cd src/frontend
+          pnpm install
           pnpm build
         env:
           NODE_OPTIONS: --max_old_space_size=4096
@@ -117,6 +118,7 @@ jobs:
       - name: Build Storybook
         run: |
           cd src/frontend
+          pnpm install
           pnpm build-storybook
 
   required:
