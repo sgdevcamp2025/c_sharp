@@ -1,59 +1,42 @@
-name: PR Build Check
+name: Build and Lint
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - dev
-      - main
-
   push:
-    branches:
-      - fe-ci/cicd
+    branches: ['main', 'fe-ci/cd']
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
-  pr-push-check:
+  build:
+    name: Build and Test
+    timeout-minutes: 15
     runs-on: ubuntu-latest
+    # To use Remote Caching, uncomment the next lines and follow the steps below.
+    # env:
+    #  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+    #  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
     steps:
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-      - name: Setup Node.js
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20.17.0'
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - uses: actions/cache@v4
-        id: cache
-        with:
-          path: |
-            node_modules
-            .pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: 20
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: |
-          cd src/frontend
-          pnpm install --frozen-lockfile --prod
-          pnpm add turbo --save-dev -w
+        run: pnpm install
 
-      - name: Lint code
-        run: |
-          cd src/frontend 
-          pnpm lint
+      - name: Build
+        run: pnpm build
 
-      - name: Build project
-        run: |
-          cd src/frontend
-          pnpm build
-
-      - name: Build Storybook
-        run: |
-          cd src/frontend
-          pnpm build-storybook
+      - name: Lint
+        run: pnpm lint
