@@ -19,7 +19,7 @@ export const Default: Story = {
   render: () => <Separator />,
 };
 
-export const HuddleSeparator: Story = {
+export const ThreadSeparator: Story = {
   render: () => (
     <div className="flex items-center space-x-2 w-96">
       <span className="text-sm whitespace-nowrap flex-shrink-0">
