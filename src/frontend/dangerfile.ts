@@ -10,9 +10,7 @@ if (changedFiles.some((file) => file.includes('src/frontend'))) {
 
 // 예시: 특정 파일이 포함된 경우 실패를 표시
 if (changedFiles.some((file) => file.includes('README.md'))) {
-  fail(
-    'The README.md file was modified. Please check for outdated documentation.'
-  );
+  fail('The README.md file was modified. Please check for outdated documentation.');
 }
 
 // 예시: 특정 파일 변경을 알림으로 표시

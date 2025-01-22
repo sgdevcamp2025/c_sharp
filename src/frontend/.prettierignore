@@ -45,3 +45,5 @@ jest.setup.js
 # 포맷팅을 제외할 파일들
 .prettierrc
 storybook-static
+
+README.md

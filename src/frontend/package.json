@@ -9,7 +9,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "storybook": "pnpm --filter @workspace/ui run storybook",
     "build-storybook": "pnpm --filter @workspace/ui run build-storybook",
-    "danger": "danger ci"
+    "danger": "danger ci --config tsconfig.danger.json",
+    "typescript": "tsc --noEmit"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
