@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: mirlee/postgresql-db:v1.2    # 직접 빌드한 이미지 사용
+    image: mirlee/postgresql-db:v1.3    # 직접 빌드한 이미지 사용
     container_name: jootalkpia-db
     environment:
       POSTGRES_USER: ${DB_USER}           # PostgreSQL 사용자
