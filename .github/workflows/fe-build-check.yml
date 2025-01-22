@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd src/frontend
-          pnpm install --frozen-lockfile --prod  # pnpm-lock.yaml 파일을 생성하고 의존성 설치
+          pnpm install --legacy-peer-deps --frozen-lockfile --prod 
           pnpm add turbo --save-dev -w
 
       - name: Lint code
