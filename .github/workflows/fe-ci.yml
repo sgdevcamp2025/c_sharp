@@ -90,6 +90,7 @@ jobs:
       - name: Prettier check
         run: |
           cd src/frontend
+          pnpm install
           pnpm format --check
 
       - name: Lint
