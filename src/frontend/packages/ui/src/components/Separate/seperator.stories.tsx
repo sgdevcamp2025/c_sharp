@@ -16,13 +16,23 @@ export default meta;
 type Story = StoryObj<typeof Separator>;
 
 export const Default: Story = {
+  parameters: {
+    backgrounds: {
+      default: 'dark',
+    },
+  },
   render: () => <Separator />,
 };
 
 export const ThreadSeparator: Story = {
+  parameters: {
+    backgrounds: {
+      default: 'dark',
+    },
+  },
   render: () => (
     <div className="flex items-center space-x-2 w-96">
-      <span className="text-sm whitespace-nowrap flex-shrink-0">
+      <span className="text-sm whitespace-nowrap flex-shrink-0 text-white">
         4개의 댓글
       </span>
       <Separator />
@@ -31,6 +41,11 @@ export const ThreadSeparator: Story = {
 };
 
 export const ChatSeparator: Story = {
+  parameters: {
+    backgrounds: {
+      default: 'dark',
+    },
+  },
   render: () => (
     <div className="flex items-center space-x-2 w-96">
       <Separator />
