@@ -8,7 +8,7 @@ on:
       - main
   push:
     branches:
-      - fe-fe/cicd
+      - fe-ci/cicd
 
 jobs:
   pr-push-check:
