@@ -20,6 +20,13 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Debug Environment Variables
+        run: |
+          echo "Checking GITHUB Token..."
+          echo "Token Length: ${#DANGER_GITHUB_API_TOKEN}"
+        env:
+          DANGER_GITHUB_API_TOKEN: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
+
       - name: Check out code
         uses: actions/checkout@v4
         with:
