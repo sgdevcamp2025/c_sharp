@@ -57,7 +57,8 @@ public class StockService {
             taskRegistrar.addCronTask(new CronTask(() -> getStockPrice(stockCode.getCode()), schedule.getTime()));
         }
     }
-    
+
+    @PostConstruct
     private void refreshToken() {
         TokenResponse tokenResponse = stockCaller.getToken(TokenRequestBody.from(baseProperties, tokenProperties));
         token = tokenResponse.tokenType() + TOKEN_SEPARATOR + tokenResponse.accessToken();
