@@ -6,10 +6,8 @@ on:
     branches:
       - dev
       - main
-
-  push:
-    branches:
-      - fe-ci/cicd
+    paths:
+      - 'src/frontend/**'
 
 jobs:
   build:
