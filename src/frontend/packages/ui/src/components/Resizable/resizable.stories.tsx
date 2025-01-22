@@ -1,10 +1,6 @@
 import React from 'react';
 import { Meta, StoryObj, StoryFn } from '@storybook/react';
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from './resizable';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './resizable';
 
 export default {
   title: 'Widget/Resizable',
@@ -41,7 +37,10 @@ export const Default: Story = {
 
 const Template2: StoryFn = (args) => (
   <div className="h-96 w-96 p-8">
-    <ResizablePanelGroup direction="horizontal" {...args}>
+    <ResizablePanelGroup
+      direction="horizontal"
+      {...args}
+    >
       <ResizablePanel
         defaultSize={100}
         className="flex items-center justify-center bg-gray-200 p-4"

@@ -14,14 +14,7 @@ const meta: Meta<typeof Button> = {
     children: { control: 'text', defaultValue: 'Button' },
     variant: {
       control: 'select',
-      options: [
-        'primary',
-        'destructive',
-        'outline',
-        'secondary',
-        'ghost',
-        'kakao',
-      ],
+      options: ['primary', 'destructive', 'outline', 'secondary', 'ghost', 'kakao'],
     },
     size: { control: 'radio', options: ['sm', 'lg', 'icon'] },
     asChild: { control: 'boolean' },
@@ -76,11 +69,17 @@ export const Kakao: Story = {
 export const Icon: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: 20 }}>
-      <Button variant="outline" size="icon">
+      <Button
+        variant="outline"
+        size="icon"
+      >
         <MessageCircle />
       </Button>
 
-      <Button variant="secondary" size="icon">
+      <Button
+        variant="secondary"
+        size="icon"
+      >
         <MessageCircle />
       </Button>
     </div>
