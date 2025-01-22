@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS work_space (
     );
 
 -- Channel 테이블 생성
-CREATE TABLE IF NOT EXISTS channel (
+CREATE TABLE IF NOT EXISTS channels (
                                        channel_id SERIAL PRIMARY KEY,
                                        workspace_id BIGINT NOT NULL REFERENCES work_space(workspace_id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS channel (
 CREATE TABLE IF NOT EXISTS user_channel (
                                             user_channel_id SERIAL PRIMARY KEY,
                                             user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    channel_id BIGINT NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
+    channel_id BIGINT NOT NULL REFERENCES channels(channel_id) ON DELETE CASCADE,
     mute BOOLEAN NOT NULL DEFAULT FALSE,
     last_read_ts TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
