@@ -6,9 +6,14 @@ on:
     branches:
       - dev
       - main
+    paths:
+      - 'c_sharp/src/frontend/**'
+
   push:
     branches:
       - fe-ci/cicd
+    paths:
+      - 'c_sharp/src/frontend/**'
 
 jobs:
   pr-push-check:
@@ -37,7 +42,8 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: cd c_sharp/src/frontend
+        run: |
+          cd c_sharp/src/frontend
           pnpm install --frozen-lockfile --prod
 
       - name: Lint code
