@@ -71,7 +71,9 @@ jobs:
           version: 8
 
       - name: Typescript Check
-        run: pnpm typescript
+        run: |
+          cd src/frontend
+          pnpm typescript
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
@@ -85,10 +87,14 @@ jobs:
           version: 8
 
       - name: Prettier check
-        run: pnpm prettier --check
+        run: |
+          cd src/frontend
+          pnpm prettier --check
 
       - name: Lint
-        run: pnpm lint
+        run: |
+          cd src/frontend  
+          pnpm lint
 
   build:
     needs: [changes, lint, type-check]
