@@ -18,9 +18,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "channel")
+@Table(name = "channels")
 @Getter
-public class Channel {
+public class Channels {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "channel_id", nullable = false)
@@ -30,8 +30,8 @@ public class Channel {
     @JoinColumn(name = "workspace_id", nullable = false)
     private WorkSpace workSpace;
 
-    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserChannel> userChannels = new ArrayList<>();
+    @OneToMany(mappedBy = "channels", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserChannel> userChannel = new ArrayList<>();
 
     @Column(name = "name", length = 100, nullable = false)
     private String name;

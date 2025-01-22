@@ -32,7 +32,7 @@ public class UserChannel {
 
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
-    private Channel channel;
+    private Channels channels;
 
     @OneToMany(mappedBy = "userChannel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Mention> mentions = new ArrayList<>();

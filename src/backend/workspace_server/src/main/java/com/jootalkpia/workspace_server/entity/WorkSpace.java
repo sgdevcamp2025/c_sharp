@@ -31,7 +31,7 @@ public class WorkSpace {
     private String stockName;
 
     @OneToMany(mappedBy = "workSpace", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Channel> channels = new ArrayList<>();
+    private List<Channels> channels = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
