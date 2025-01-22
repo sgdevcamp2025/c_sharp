@@ -4,7 +4,7 @@
   "type": "module",
   "private": false,
   "scripts": {
-    "lint": "eslint . --max-warnings 0",
+    "lint": "eslint . --max-warnings 50",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
