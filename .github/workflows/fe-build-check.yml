@@ -41,6 +41,7 @@ jobs:
         run: |
           cd src/frontend
           pnpm install --frozen-lockfile --prod
+          pnpm add turbo --dev
 
       - name: Lint code
         run: |
