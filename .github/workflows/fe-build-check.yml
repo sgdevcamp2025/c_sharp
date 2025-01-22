@@ -6,14 +6,10 @@ on:
     branches:
       - dev
       - main
-    paths:
-      - 'c_sharp/src/frontend/**'
 
   push:
     branches:
       - fe-ci/cicd
-    paths:
-      - 'c_sharp/src/frontend/**'
 
 jobs:
   pr-push-check:
