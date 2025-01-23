@@ -26,7 +26,10 @@ export const Default: Story = {
   },
   render: () => (
     <div className="flex flex-wrap w-96">
-      <ChatTextarea onSend={action('Send')} onAdd={action('Add')} />
+      <ChatTextarea
+        onSend={action('Send')}
+        onAdd={action('Add')}
+      />
     </div>
   ),
 };

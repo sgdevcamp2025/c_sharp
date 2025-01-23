@@ -16,5 +16,6 @@
     "skipLibCheck": true,
     "strict": false,
     "target": "ES2022"
-  }
+  },
+  "include": ["../../dangerfile.ts"]
 }

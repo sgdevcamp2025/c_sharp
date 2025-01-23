@@ -5,17 +5,51 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**"]
+    },
+    "build-storybook": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["packages/ui/storybook-static/**"],
+      "cache": true,
+      "persistent": false
+    },
+    "storybook": {
+      "dependsOn": ["^storybook"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["packages/ui/storybook-static/**"],
+      "cache": true,
+      "persistent": false
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx}"],
+      "cache": false,
+      "persistent": false
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig.json", "packages/**/tsconfig.json"],
+      "outputs": ["packages/**/dist/**"],
+      "cache": true,
+      "persistent": false
     },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "format": {
+      "dependsOn": ["^format"],
+      "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx,json,md}"],
+      "cache": false,
+      "persistent": true
+    },
+    "typescript": {
+      "dependsOn": ["^typescript"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig.json", "packages/**/tsconfig.json"],
+      "outputs": ["packages/**/dist/**"],
+      "cache": true,
+      "persistent": false
     }
   }
 }

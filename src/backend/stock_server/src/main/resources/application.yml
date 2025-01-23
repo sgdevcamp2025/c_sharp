@@ -1,3 +1,8 @@
+spring:
+  config:
+    import:
+      - optional:file:env/dev-db.env[.properties]
+
 logging:
   level:
     com.jootalkpia.stock_server: debug
@@ -5,8 +10,8 @@ logging:
 
 feign:
   base-url: https://openapivts.koreainvestment.com:29443
-  appkey: PSmlW5hwZEV1I6mn2J10VqmeYJmrLwGMAvnZ
-  appsecret: aM9avMF8c5p36+mHxAKYSjycRWyxOLqgIdMTkmXjXPA2ol+kaOknD5OyYNp4X3Sb/YmWcML/7DX2WDE9zo31jiDDeOFnXIW1JGbUWtrh/UyiIriBuJghedUsvUTDaVH9WjuoZqR4FOnauNeAwppxrlvWI7UxG4zEoiEgbrUxpJfWBrE3RHo=
+  appkey: ${STOCK_APP_KEY}
+  appsecret: ${STOCK_APP_SECRET}
   stock-token:
     path: /oauth2/tokenP
     grant-type: client_credentials
