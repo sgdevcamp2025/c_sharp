@@ -1,6 +1,7 @@
 package com.jootalkpia.workspace_server.controller;
 
 
+import com.jootalkpia.aop.JootalkpiaAuthenticationContext;
 import com.jootalkpia.workspace_server.dto.ChannelListDTO;
 import com.jootalkpia.workspace_server.service.WorkSpaceService;
 import com.jootalkpia.workspace_server.util.ValidationUtils;
@@ -19,13 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkSpaceController {
 
     private final WorkSpaceService workSpaceService;
-    // 임시 userId
-    private final Long userId = 1L;//AuthenticationContext.getUserInfo().id();
+    private final Long userId = JootalkpiaAuthenticationContext.getUserInfo().userId();
 
     @GetMapping("/{workspaceId}/channels")
     public ResponseEntity<ChannelListDTO> getChannels(@PathVariable Long workspaceId) {
         // 유효성 검증
         ValidationUtils.validateWorkSpaceId(workspaceId);
+        log.info("Getting channels for workspace with id: {}", workspaceId);
 
         ChannelListDTO channelListDTO = workSpaceService.getChannels(userId, workspaceId);
         return ResponseEntity.ok().body(channelListDTO);

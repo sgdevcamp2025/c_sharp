@@ -1,3 +1,6 @@
+server:
+  port: 8080                  # 애플리케이션 실행 포트
+
 spring:
   application:
     name: workspace_server # 애플리케이션 이름
@@ -16,10 +19,6 @@ spring:
     level:
       org.hibernate.SQL: DEBUG # Hibernate SQL 로그 출력
       org.hibernate.type.descriptor.sql: TRACE # SQL 매개변수 출력
-
-server:
-  port: 8080                  # 애플리케이션 실행 포트
-
 management:
   endpoints:
     web:
