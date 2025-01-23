@@ -1,0 +1,3 @@
+passport:
+  algorithm: ${PASSPORT_ALGORITHM}
+  key: ${PASSPORT_KEY}
