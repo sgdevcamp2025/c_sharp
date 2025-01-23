@@ -39,7 +39,6 @@ public class Channels extends BaseEntity{
     @Column(name = "name", length = 100, nullable = false, unique = true)
     private String name;
 
-
     @Builder
     public Channels(WorkSpace workSpace, String name) {
         this.workSpace = workSpace;

@@ -13,6 +13,7 @@ public enum ErrorCode {
     VALIDATION_FAILED("W40002", "유효성 검증에 실패했습니다."),
     MISSING_PARAMETER("W40003", "필수 파라미터가 누락되었습니다."),
     INVALID_PARAMETER("W40004", "잘못된 파라미터가 포함되었습니다."),
+    DUPLICATE_CHANNEL_NAME("W40005", "동일한 채널명이 이미 해당 워크스페이스에 존재합니다."),
 
     // 404 Not Found
     WORKSPACE_NOT_FOUND("W40401", "등록되지 않은 워크스페이스입니다."),

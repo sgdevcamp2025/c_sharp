@@ -70,6 +70,10 @@ public class WorkSpaceService {
         // WorkSpace 객체 조회
         WorkSpace workSpace = fetchWorkSpace(workspaceId);
 
+        // 채널명 unique한지 확인
+        if (isChannelNameDuplicate(workspaceId, channelName)) {
+            throw new CustomException(ErrorCode.DUPLICATE_CHANNEL_NAME.getCode(), ErrorCode.DUPLICATE_CHANNEL_NAME.getMsg());
+        }
         Channels channel = Channels.builder()
                 .workSpace(workSpace)
                 .name(channelName)
@@ -78,6 +82,16 @@ public class WorkSpaceService {
         channelRepository.save(channel);
 
         return new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt());
+    }
+
+    private boolean isChannelNameDuplicate(Long workspaceId, String channelName) {
+        List<Channels> channelList = fetchAllChannels(workspaceId);
+        for (Channels channel : channelList) {
+            if (channel.getName().equals(channelName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private WorkSpace fetchWorkSpace(Long workspaceId) {
