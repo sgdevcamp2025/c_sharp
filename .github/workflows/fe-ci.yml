@@ -6,11 +6,8 @@ on:
     branches:
       - dev
       - main
-    # paths:
-    #   - 'src/frontend/**'
-  push:
-    branches:
-      - fe-ci/refac-pipleline
+    paths:
+      - 'src/frontend/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -54,7 +51,7 @@ jobs:
       - name: CI
         run: |
           cd src/frontend
-          pnpm turbo typescript lint format build build-storybook --parallel --affected
+          pnpm turbo typescript lint format build build-storybook --parallel
 
   required:
     needs: [changes]
