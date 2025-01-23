@@ -8,6 +8,10 @@ import lombok.RequiredArgsConstructor;
 public class CustomException extends RuntimeException {
 
     private final String code;
-    private final String message;
+
+    public CustomException(String code, String message) {
+        super(message);
+        this.code = code;
+    }
 
 }
