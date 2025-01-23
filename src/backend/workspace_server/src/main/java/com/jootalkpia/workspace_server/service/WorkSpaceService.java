@@ -4,10 +4,12 @@ package com.jootalkpia.workspace_server.service;
 import com.jootalkpia.workspace_server.dto.ChannelListDTO;
 import com.jootalkpia.workspace_server.dto.SimpleChannel;
 import com.jootalkpia.workspace_server.entity.Channels;
+import com.jootalkpia.workspace_server.entity.WorkSpace;
 import com.jootalkpia.workspace_server.exception.common.CustomException;
 import com.jootalkpia.workspace_server.exception.common.ErrorCode;
 import com.jootalkpia.workspace_server.repository.ChannelRepository;
 import com.jootalkpia.workspace_server.repository.UserChannelRepository;
+import com.jootalkpia.workspace_server.repository.WorkSpaceRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class WorkSpaceService {
 
     private final ChannelRepository channelRepository;
     private final UserChannelRepository userChannelRepository;
+    private final WorkSpaceRepository workSpaceRepository;
 
     public ChannelListDTO getChannels(Long userId, Long workspaceId) {
         // workspaceId로 모든 채널 조회
@@ -34,10 +37,7 @@ public class WorkSpaceService {
         List<SimpleChannel> unjoinedChannels = new ArrayList<>();
 
         for (Channels channels : channelList) {
-            SimpleChannel simpleChannel = new SimpleChannel();
-            simpleChannel.setChannelId(channels.getChannelId());
-            simpleChannel.setChannelName(channels.getName());
-            simpleChannel.setCreatedAt(channels.getCreatedAt());
+            SimpleChannel simpleChannel = new SimpleChannel(channels.getChannelId(), channels.getName(), channels.getCreatedAt());
 
             if (isJoinedChannel(userId, channels)) {
                 joinedChannels.add(simpleChannel);
@@ -55,5 +55,20 @@ public class WorkSpaceService {
 
     private boolean isJoinedChannel(Long userId, Channels channels) {
         return userChannelRepository.findByUsersUserIdAndChannelsChannelId(userId, channels.getChannelId()).isPresent();
+    }
+
+    public SimpleChannel createChannel(Long workspaceId, String channelName) {
+        // WorkSpace 객체 조회
+        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new CustomException(ErrorCode.WORKSPACE_NOT_FOUND.getCode(), ErrorCode.WORKSPACE_NOT_FOUND.getMsg()));
+
+        Channels channel = Channels.builder()
+                .workSpace(workSpace)
+                .name(channelName)
+                .build();
+
+        channelRepository.save(channel);
+
+        return new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt());
     }
 }

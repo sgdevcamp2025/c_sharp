@@ -15,7 +15,7 @@ public enum ErrorCode {
     INVALID_PARAMETER("W40004", "잘못된 파라미터가 포함되었습니다."),
 
     // 404 Not Found
-    _NOT_FOUND("W40401", "등록되지 않은 ~~입니다."),
+    WORKSPACE_NOT_FOUND("W40401", "등록되지 않은 워크스페이스입니다."),
 
 
     // 500 Internal Server Error
