@@ -8,6 +8,9 @@ on:
       - main
     paths:
       - 'src/frontend/**'
+  push:
+    branches:
+      - fe-ci/refac-pipeline
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -51,68 +54,73 @@ jobs:
           pnpm install --strict-peer-dependencies=false --frozen-lockfile
           pnpm add turbo --save-dev -w
 
-  type-check:
-    needs: [changes]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
-
-      - name: Typescript Check
+      - name: CI
         run: |
           cd src/frontend
-          pnpm install
-          pnpm typescript
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
+          pnpm turbo typescript lint format build build-storybook --parallel
 
-  lint:
-    needs: [changes]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
+  # type-check:
+  #   needs: [changes]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 8
 
-      - name: Prettier check
-        run: |
-          cd src/frontend
-          pnpm install
-          pnpm format --check
+  #     - name: Typescript Check
+  #       run: |
+  #         cd src/frontend
+  #         pnpm install
+  #         pnpm typescript
+  #       env:
+  #         NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Lint
-        run: |
-          cd src/frontend  
-          pnpm lint
+  # lint:
+  #   needs: [changes]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 8
 
-  build:
-    needs: [changes, lint, type-check]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
+  #     - name: Prettier check
+  #       run: |
+  #         cd src/frontend
+  #         pnpm install
+  #         pnpm format --check
 
-      - name: Build project
-        run: |
-          cd src/frontend
-          pnpm install
-          pnpm build
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
+  #     - name: Lint
+  #       run: |
+  #         cd src/frontend
+  #         pnpm lint
 
-      - name: Build Storybook
-        run: |
-          cd src/frontend
-          pnpm install
-          pnpm build-storybook
+  # build:
+  #   needs: [changes, lint, type-check]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 8
+
+  #     - name: Build project
+  #       run: |
+  #         cd src/frontend
+  #         pnpm install
+  #         pnpm build
+  #       env:
+  #         NODE_OPTIONS: --max_old_space_size=4096
+
+  #     - name: Build Storybook
+  #       run: |
+  #         cd src/frontend
+  #         pnpm install
+  #         pnpm build-storybook
 
   required:
-    needs: [changes, lint, type-check, build]
+    needs: [changes]
     if: always()
     runs-on: ubuntu-latest
     steps:
