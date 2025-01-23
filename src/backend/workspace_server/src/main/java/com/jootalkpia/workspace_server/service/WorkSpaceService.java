@@ -27,40 +27,48 @@ public class WorkSpaceService {
 
     public ChannelListDTO getChannels(Long userId, Long workspaceId) {
         // workspaceId로 모든 채널 조회
+        List<Channels> channelList = fetchAllChannels(workspaceId);
+
+        // 채널 분류
+        List<SimpleChannel> joinedChannels = classifyChannels(userId, channelList, true);
+        List<SimpleChannel> unjoinedChannels = classifyChannels(userId, channelList, false);
+
+        return createChannelListDTO(joinedChannels, unjoinedChannels);
+    }
+
+    private List<Channels> fetchAllChannels(Long workspaceId) {
         List<Channels> channelList = channelRepository.findByWorkSpaceWorkspaceId(workspaceId);
         if (channelList.isEmpty()) {
             throw new CustomException(ErrorCode.DATABASE_ERROR.getCode(), ErrorCode.DATABASE_ERROR.getMsg());
         }
+        return channelList;
+    }
 
-        // 가입된 채널과 가입되지 않은 채널을 분류
-        List<SimpleChannel> joinedChannels = new ArrayList<>();
-        List<SimpleChannel> unjoinedChannels = new ArrayList<>();
-
-        for (Channels channels : channelList) {
-            SimpleChannel simpleChannel = new SimpleChannel(channels.getChannelId(), channels.getName(), channels.getCreatedAt());
-
-            if (isJoinedChannel(userId, channels)) {
-                joinedChannels.add(simpleChannel);
-            } else {
-                unjoinedChannels.add(simpleChannel);
+    private List<SimpleChannel> classifyChannels(Long userId, List<Channels> channelList, boolean isJoined) {
+        List<SimpleChannel> classifiedChannels = new ArrayList<>();
+        for (Channels channel : channelList) {
+            boolean joined = isJoinedChannel(userId, channel);
+            if (joined == isJoined) {
+                classifiedChannels.add(new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt()));
             }
         }
-
-        ChannelListDTO channelListDTO = new ChannelListDTO();
-        channelListDTO.setJoinedChannels(joinedChannels);
-        channelListDTO.setUnjoinedChannels(unjoinedChannels);
-
-        return channelListDTO;
+        return classifiedChannels;
     }
 
     private boolean isJoinedChannel(Long userId, Channels channels) {
         return userChannelRepository.findByUsersUserIdAndChannelsChannelId(userId, channels.getChannelId()).isPresent();
     }
 
+    private ChannelListDTO createChannelListDTO(List<SimpleChannel> joinedChannels, List<SimpleChannel> unjoinedChannels) {
+        ChannelListDTO channelListDTO = new ChannelListDTO();
+        channelListDTO.setJoinedChannels(joinedChannels);
+        channelListDTO.setUnjoinedChannels(unjoinedChannels);
+        return channelListDTO;
+    }
+
     public SimpleChannel createChannel(Long workspaceId, String channelName) {
         // WorkSpace 객체 조회
-        WorkSpace workSpace = workSpaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new CustomException(ErrorCode.WORKSPACE_NOT_FOUND.getCode(), ErrorCode.WORKSPACE_NOT_FOUND.getMsg()));
+        WorkSpace workSpace = fetchWorkSpace(workspaceId);
 
         Channels channel = Channels.builder()
                 .workSpace(workSpace)
@@ -70,5 +78,10 @@ public class WorkSpaceService {
         channelRepository.save(channel);
 
         return new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt());
+    }
+
+    private WorkSpace fetchWorkSpace(Long workspaceId) {
+        return workSpaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new CustomException(ErrorCode.WORKSPACE_NOT_FOUND.getCode(), ErrorCode.WORKSPACE_NOT_FOUND.getMsg()));
     }
 }

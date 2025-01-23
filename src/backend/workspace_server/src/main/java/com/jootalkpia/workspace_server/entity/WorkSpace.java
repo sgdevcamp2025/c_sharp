@@ -18,7 +18,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "work_space")
 @Getter
-public class WorkSpace {
+public class WorkSpace extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "workspace_id", nullable = false)
@@ -33,11 +33,4 @@ public class WorkSpace {
     @OneToMany(mappedBy = "workSpace", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Channels> channels = new ArrayList<>();
 
-    @CreationTimestamp
-    @Column(name = "createdAt", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updatedAt")
-    private LocalDateTime updatedAt;
 }
