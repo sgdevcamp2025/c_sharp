@@ -28,22 +28,24 @@ jobs:
         with:
           fetch-depth: 2
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
-
-      - uses: actions/cache@v4
-        id: cache
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -58,66 +60,6 @@ jobs:
         run: |
           cd src/frontend
           pnpm turbo typescript lint format build build-storybook --parallel
-
-  # type-check:
-  #   needs: [changes]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: pnpm/action-setup@v3
-  #       with:
-  #         version: 8
-
-  #     - name: Typescript Check
-  #       run: |
-  #         cd src/frontend
-  #         pnpm install
-  #         pnpm typescript
-  #       env:
-  #         NODE_OPTIONS: --max-old-space-size=4096
-
-  # lint:
-  #   needs: [changes]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: pnpm/action-setup@v3
-  #       with:
-  #         version: 8
-
-  #     - name: Prettier check
-  #       run: |
-  #         cd src/frontend
-  #         pnpm install
-  #         pnpm format --check
-
-  #     - name: Lint
-  #       run: |
-  #         cd src/frontend
-  #         pnpm lint
-
-  # build:
-  #   needs: [changes, lint, type-check]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: pnpm/action-setup@v3
-  #       with:
-  #         version: 8
-
-  #     - name: Build project
-  #       run: |
-  #         cd src/frontend
-  #         pnpm install
-  #         pnpm build
-  #       env:
-  #         NODE_OPTIONS: --max_old_space_size=4096
-
-  #     - name: Build Storybook
-  #       run: |
-  #         cd src/frontend
-  #         pnpm install
-  #         pnpm build-storybook
 
   required:
     needs: [changes]
