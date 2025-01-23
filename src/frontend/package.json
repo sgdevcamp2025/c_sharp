@@ -6,11 +6,10 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "storybook": "pnpm --filter @workspace/ui run storybook",
-    "build-storybook": "pnpm --filter @workspace/ui run build-storybook",
-    "danger": "danger ci --config tsconfig.danger.json",
-    "typescript": "tsc --noEmit"
+    "format": "turbo run format",
+    "storybook": "turbo run storybook --filter=@workspace/ui",
+    "build-storybook": "turbo run build-storybook --filter=@workspace/ui",
+    "typescript": "turbo run typescript"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

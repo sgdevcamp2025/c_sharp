@@ -5,13 +5,6 @@ node_modules
 .pnp
 .pnp.js
 
-# Local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
 # Testing
 coverage
 
@@ -27,7 +20,6 @@ out/
 build
 dist
 
-
 # Debug
 npm-debug.log*
 
@@ -37,3 +29,48 @@ npm-debug.log*
 
 *storybook.log
 *storybook-static
+
+
+# Build outputs (Next.js, Storybook, TypeScript)
+packages/**/dist/
+packages/ui/storybook-static/
+.next/
+.out/
+coverage/
+
+# Turbo build cache
+turbo/
+.vscode/
+turbo/turbo.db
+turbo/turbo.db-shm
+turbo/turbo.db-wal
+
+# Environment files (security-sensitive)
+.env
+.env.*   # For different environment configurations (e.g. .env.local, .env.production)
+.env.local
+
+
+# Editor and OS-generated files
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript build artifacts
+*.tsbuildinfo
+
+# Linting and formatting
+eslintcache
+.prettier-cache
+
+# Package manager lock files (choose the one you don't use)
+package-lock.json
+yarn.lock
+
+# Turbo cache outputs (if caching is enabled)
+.pnpm-store/
+turbo/cache/
