@@ -28,11 +28,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '20'
-
       - uses: pnpm/action-setup@v3
         with:
           version: 8
@@ -59,7 +54,7 @@ jobs:
       - name: CI
         run: |
           cd src/frontend
-          pnpm turbo typescript lint format build build-storybook --parallel
+          pnpm turbo typescript lint format build build-storybook --parallel --affected
 
   required:
     needs: [changes]
