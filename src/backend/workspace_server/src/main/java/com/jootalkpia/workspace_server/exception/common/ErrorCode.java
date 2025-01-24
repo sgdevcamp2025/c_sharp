@@ -14,9 +14,12 @@ public enum ErrorCode {
     MISSING_PARAMETER("W40003", "필수 파라미터가 누락되었습니다."),
     INVALID_PARAMETER("W40004", "잘못된 파라미터가 포함되었습니다."),
     DUPLICATE_CHANNEL_NAME("W40005", "동일한 채널명이 이미 해당 워크스페이스에 존재합니다."),
+    DUPLICATE_USER_IN_CHANNEL("W40006", "유저가 이미 해당 채널에 참여하고 있습니다"),
 
     // 404 Not Found
     WORKSPACE_NOT_FOUND("W40401", "등록되지 않은 워크스페이스입니다."),
+    CHANNEL_NOT_FOUND("W40402", "등록되지 않은 채널입니다."),
+    USER_NOT_FOUND("W40403", "등록되지 않은 유저입니다."),
 
 
     // 500 Internal Server Error

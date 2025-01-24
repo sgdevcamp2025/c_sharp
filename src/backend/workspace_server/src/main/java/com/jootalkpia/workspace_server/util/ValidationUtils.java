@@ -14,4 +14,10 @@ public class ValidationUtils {
             throw new CustomException(ErrorCode.INVALID_PARAMETER.getCode(), ErrorCode.INVALID_PARAMETER.getMsg());
         }
     }
+
+    public static void validateChannelId(Long channelId) {
+        if (channelId == null || channelId <= 0) {
+            throw new CustomException(ErrorCode.INVALID_PARAMETER.getCode(), ErrorCode.INVALID_PARAMETER.getMsg());
+        }
+    }
 }
