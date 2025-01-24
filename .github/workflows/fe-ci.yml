@@ -8,10 +8,9 @@ on:
       - main
     # paths:
     #   - 'src/frontend/**'
-
   push:
     branches:
-      - fe-ci/refac-pipeline
+      - fe-ci/refac-pipleline
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
