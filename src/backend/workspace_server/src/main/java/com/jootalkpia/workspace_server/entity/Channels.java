@@ -13,14 +13,17 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "channels")
 @Getter
-public class Channels {
+@NoArgsConstructor
+public class Channels extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "channel_id", nullable = false)
@@ -33,14 +36,12 @@ public class Channels {
     @OneToMany(mappedBy = "channels", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserChannel> userChannel = new ArrayList<>();
 
-    @Column(name = "name", length = 100, nullable = false)
+    @Column(name = "name", length = 100, nullable = false, unique = true)
     private String name;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Builder
+    public Channels(WorkSpace workSpace, String name) {
+        this.workSpace = workSpace;
+        this.name = name;
+    }
 }

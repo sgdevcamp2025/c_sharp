@@ -16,7 +16,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Table(name = "users")
 @Getter
 @Setter
-public class Users {
+public class Users extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,11 +38,4 @@ public class Users {
     @Column(name = "profile_image", length = 100)
     private String profileImage;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 }

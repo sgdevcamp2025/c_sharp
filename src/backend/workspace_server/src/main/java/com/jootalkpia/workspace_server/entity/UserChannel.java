@@ -20,7 +20,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "user_channel")
 @Getter
-public class UserChannel {
+public class UserChannel extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_channel_id", nullable = false)
@@ -40,11 +40,4 @@ public class UserChannel {
     @Column(name = "mute", nullable = false)
     private Boolean mute;
 
-    @CreationTimestamp
-    @Column(name = "createdAt", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updatedAt")
-    private LocalDateTime updatedAt;
 }
