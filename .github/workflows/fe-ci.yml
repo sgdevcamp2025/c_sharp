@@ -6,8 +6,12 @@ on:
     branches:
       - dev
       - main
-    paths:
-      - 'src/frontend/**'
+    # paths:
+    #   - 'src/frontend/**'
+
+  push:
+    branches:
+      - fe-ci/refac-pipeline
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -16,8 +20,12 @@ concurrency:
 jobs:
   changes:
     if: ${{ github.actor != 'l10nbot' }} # Avoid running for 'l10nbot'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
+
+    strategy:
+      matrix:
+        node-version: [20]
 
     steps:
       - name: Check out code
@@ -25,19 +33,15 @@ jobs:
         with:
           fetch-depth: 2
 
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 10
 
-      - name: Cache dependencies
-        uses: actions/cache@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
-          path: |
-            ~/.pnpm-store
-            node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm
