@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd src/frontend
-          pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
+          pnpm install --no-frozen-lockfile
           pnpm add turbo --save-dev -w
 
       - name: CI
