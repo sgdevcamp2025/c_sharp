@@ -41,7 +41,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-          cache-dependency-path:
+          cache-dependency-path: src/frontend/pnpm-lock.yaml
 
       - name: Cache dependencies
         uses: actions/cache@v4
