@@ -4,11 +4,14 @@ package com.jootalkpia.workspace_server.service;
 import com.jootalkpia.workspace_server.dto.ChannelListDTO;
 import com.jootalkpia.workspace_server.dto.SimpleChannel;
 import com.jootalkpia.workspace_server.entity.Channels;
+import com.jootalkpia.workspace_server.entity.UserChannel;
+import com.jootalkpia.workspace_server.entity.Users;
 import com.jootalkpia.workspace_server.entity.WorkSpace;
 import com.jootalkpia.workspace_server.exception.common.CustomException;
 import com.jootalkpia.workspace_server.exception.common.ErrorCode;
 import com.jootalkpia.workspace_server.repository.ChannelRepository;
 import com.jootalkpia.workspace_server.repository.UserChannelRepository;
+import com.jootalkpia.workspace_server.repository.UserRepository;
 import com.jootalkpia.workspace_server.repository.WorkSpaceRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,7 @@ public class WorkSpaceService {
     private final ChannelRepository channelRepository;
     private final UserChannelRepository userChannelRepository;
     private final WorkSpaceRepository workSpaceRepository;
+    private final UserRepository userRepository;
 
     public ChannelListDTO getChannels(Long userId, Long workspaceId) {
         // workspaceId로 모든 채널 조회
@@ -47,7 +51,7 @@ public class WorkSpaceService {
     private List<SimpleChannel> classifyChannels(Long userId, List<Channels> channelList, boolean isJoined) {
         List<SimpleChannel> classifiedChannels = new ArrayList<>();
         for (Channels channel : channelList) {
-            boolean joined = isJoinedChannel(userId, channel);
+            boolean joined = isUserInChannel(userId, channel.getChannelId());
             if (joined == isJoined) {
                 classifiedChannels.add(new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt()));
             }
@@ -55,8 +59,8 @@ public class WorkSpaceService {
         return classifiedChannels;
     }
 
-    private boolean isJoinedChannel(Long userId, Channels channels) {
-        return userChannelRepository.findByUsersUserIdAndChannelsChannelId(userId, channels.getChannelId()).isPresent();
+    private boolean isUserInChannel(Long userId, Long channelId) {
+        return userChannelRepository.findByUsersUserIdAndChannelsChannelId(userId, channelId).isPresent();
     }
 
     private ChannelListDTO createChannelListDTO(List<SimpleChannel> joinedChannels, List<SimpleChannel> unjoinedChannels) {
@@ -97,5 +101,47 @@ public class WorkSpaceService {
     private WorkSpace fetchWorkSpace(Long workspaceId) {
         return workSpaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new CustomException(ErrorCode.WORKSPACE_NOT_FOUND.getCode(), ErrorCode.WORKSPACE_NOT_FOUND.getMsg()));
+    }
+
+    public String addMember(Long workspaceId, Long userId, Long channelId) {
+        WorkSpace workSpace = fetchWorkSpace(workspaceId);
+
+        // 워크스페이스에 채널 있는지
+        IsChannelInWorkSpace(workspaceId, channelId);
+
+        // 채널에 유저 있는지
+        if (isUserInChannel(userId, channelId)) {
+            throw new CustomException(ErrorCode.DUPLICATE_USER_IN_CHANNEL.getCode(), ErrorCode.DUPLICATE_USER_IN_CHANNEL.getMsg());
+        }
+
+        Channels channel = fetchChannel(channelId);
+        Users user = fetchUser(userId);
+
+        UserChannel userChannel = UserChannel.builder()
+                .users(user)
+                .channels(channel)
+                .mute(false)
+                .build();
+        userChannelRepository.save(userChannel);
+
+        return "success";
+    }
+
+    private void IsChannelInWorkSpace(Long workspaceId, Long channelId) {
+        List<Channels> channelList = fetchAllChannels(workspaceId);
+        for (Channels channel : channelList) {
+            if (channel.getChannelId().equals(channelId)) { return ; }
+        }
+        throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND.getCode(), ErrorCode.CHANNEL_NOT_FOUND.getMsg());
+    }
+
+    private Users fetchUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND.getCode(), ErrorCode.USER_NOT_FOUND.getMsg()));
+    }
+
+    private Channels fetchChannel(Long channelId) {
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND.getCode(), ErrorCode.CHANNEL_NOT_FOUND.getMsg()));
     }
 }

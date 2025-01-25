@@ -4,7 +4,6 @@ package com.jootalkpia.workspace_server.controller;
 //import com.jootalkpia.aop.JootalkpiaAuthenticationContext;
 import com.jootalkpia.workspace_server.dto.ChannelListDTO;
 import com.jootalkpia.workspace_server.dto.SimpleChannel;
-import com.jootalkpia.workspace_server.entity.Channels;
 import com.jootalkpia.workspace_server.service.WorkSpaceService;
 import com.jootalkpia.workspace_server.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +42,20 @@ public class WorkSpaceController {
         log.info("Creating channels for workspace with id: {}", workspaceId);
 
         SimpleChannel channel = workSpaceService.createChannel(workspaceId, channelName);
+
+        // 유저를 생성된 채널에 가입시킴
+        workSpaceService.addMember(workspaceId, userId, channel.getChannelId());
+
         return ResponseEntity.ok().body(channel);
+    }
+
+    @PostMapping("/{workspaceId}/channels/{channelId}/members")
+    public ResponseEntity<?> addMember(@PathVariable Long workspaceId, @PathVariable Long channelId) {
+
+        ValidationUtils.validateWorkSpaceId(workspaceId);
+        ValidationUtils.validateChannelId(channelId);
+        log.info("Adding member for workspace with id: {} {}", workspaceId, channelId);
+
+        return ResponseEntity.ok(workSpaceService.addMember(workspaceId, userId, channelId));
     }
 }

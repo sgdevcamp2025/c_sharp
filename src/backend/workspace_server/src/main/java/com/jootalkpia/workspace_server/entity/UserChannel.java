@@ -13,13 +13,16 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "user_channel")
 @Getter
+@RequiredArgsConstructor
 public class UserChannel extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +43,10 @@ public class UserChannel extends BaseEntity {
     @Column(name = "mute", nullable = false)
     private Boolean mute;
 
+    @Builder
+    public UserChannel(Users users, Channels channels, Boolean mute) {
+        this.users = users;
+        this.channels = channels;
+        this.mute = mute;
+    }
 }
