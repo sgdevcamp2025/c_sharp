@@ -51,7 +51,7 @@ public class WorkSpaceService {
     private List<SimpleChannel> classifyChannels(Long userId, List<Channels> channelList, boolean isJoined) {
         List<SimpleChannel> classifiedChannels = new ArrayList<>();
         for (Channels channel : channelList) {
-            boolean joined = isJoinedChannel(userId, channel.getChannelId());
+            boolean joined = isUserInChannel(userId, channel.getChannelId());
             if (joined == isJoined) {
                 classifiedChannels.add(new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt()));
             }
@@ -59,7 +59,7 @@ public class WorkSpaceService {
         return classifiedChannels;
     }
 
-    private boolean isJoinedChannel(Long userId, Long channelId) {
+    private boolean isUserInChannel(Long userId, Long channelId) {
         return userChannelRepository.findByUsersUserIdAndChannelsChannelId(userId, channelId).isPresent();
     }
 
@@ -107,12 +107,10 @@ public class WorkSpaceService {
         WorkSpace workSpace = fetchWorkSpace(workspaceId);
 
         // 워크스페이스에 채널 있는지
-        if (!IsChannelInWorkSpace(workspaceId, channelId)) {
-            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND.getCode(), ErrorCode.CHANNEL_NOT_FOUND.getMsg());
-        }
+        IsChannelInWorkSpace(workspaceId, channelId);
 
         // 채널에 유저 있는지
-        if (isJoinedChannel(userId, channelId)) {
+        if (isUserInChannel(userId, channelId)) {
             throw new CustomException(ErrorCode.DUPLICATE_USER_IN_CHANNEL.getCode(), ErrorCode.DUPLICATE_USER_IN_CHANNEL.getMsg());
         }
 
@@ -129,12 +127,12 @@ public class WorkSpaceService {
         return "success";
     }
 
-    private Boolean IsChannelInWorkSpace(Long workspaceId, Long channelId) {
+    private void IsChannelInWorkSpace(Long workspaceId, Long channelId) {
         List<Channels> channelList = fetchAllChannels(workspaceId);
         for (Channels channel : channelList) {
-            if (channel.getChannelId().equals(channelId)) { return true; }
+            if (channel.getChannelId().equals(channelId)) { return ; }
         }
-        return false;
+        throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND.getCode(), ErrorCode.CHANNEL_NOT_FOUND.getMsg());
     }
 
     private Users fetchUser(Long userId) {
