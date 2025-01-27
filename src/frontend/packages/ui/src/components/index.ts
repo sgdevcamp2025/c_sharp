@@ -8,3 +8,4 @@ export * from './Toast';
 export * from './Resizable';
 export * from './Avatar';
 export * from './Separate';
+export * from './Popover';
