@@ -10,3 +10,4 @@ export * from './Avatar';
 export * from './Separate';
 export * from './Popover';
 export * from './Label';
+export * from './Input';
