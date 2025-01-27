@@ -4,16 +4,15 @@ import Chatbox from '@/src/features/chat/chatbox';
 
 // 주식데이터를 가지고 올수있는 방법이 필요합니다.
 
-// export async function generateMetadata({ params }) {
-//   const { stockSlug } = params;
-//   const stockData = await getStockData(stockSlug);
+export async function generateMetadata({ params }) {
+  const { stockSlug } = params;
 
-//   return {
-//     title: `${stockData.name} - 주식 정보`,
-//     description: `${stockData.name}의 최신 주식 정보를 확인하세요.`,
-//     keywords: `주식, ${stockData.name}, 주식 정보`,
-//   };
-// }
+  return {
+    title: `${stockSlug} - 주식 정보`,
+    description: `${stockSlug}의 최신 주식 정보를 확인하세요.`,
+    keywords: `주식, ${stockSlug}, 주식 정보`,
+  };
+}
 
 export default function StockDetailsPage({ params }) {
   const { stockSlug } = params;
