@@ -12,3 +12,4 @@ export * from './Toggle';
 export * from './Popover';
 export * from './Label';
 export * from './Input';
+export * from './Collapsible';
