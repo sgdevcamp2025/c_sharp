@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     private final UserService userService;
 
+    @Override
     @PostMapping("api/v1/user/login")
     public ResponseEntity<LoginSuccessResponse> login(
             @RequestParam final String authorizationCode,
@@ -23,5 +24,4 @@ public class UserController {
     ) {
         return ResponseEntity.ok().body(userService.create(authorizationCode, loginRequest));
     }
-
 }
