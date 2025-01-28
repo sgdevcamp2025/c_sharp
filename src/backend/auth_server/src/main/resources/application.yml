@@ -21,3 +21,6 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET}
+
+kakao:
+  clientId: ${KAKAO_CLIENTID}
