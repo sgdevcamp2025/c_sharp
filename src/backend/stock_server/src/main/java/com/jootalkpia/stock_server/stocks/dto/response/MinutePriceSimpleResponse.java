@@ -30,7 +30,7 @@ public record MinutePriceSimpleResponse(
         );
     }
 
-    public MinutePrice toEntity() {
+    public MinutePrice toDocument() {
         return MinutePrice.of(
                 code,
                 htsKorIsnm,
