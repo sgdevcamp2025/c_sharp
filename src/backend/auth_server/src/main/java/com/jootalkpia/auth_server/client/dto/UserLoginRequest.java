@@ -11,7 +11,7 @@ public record UserLoginRequest(
         SocialType socialType,
 
         @NotBlank(message = "redirectUri가 입력되지 않았습니다.")
-        @Schema(description = "리다이텍트 uri 값", example = "https://pick-ple.com/kakao/redirection or http://localhost:5173/kakao/redirection")
+        @Schema(description = "리다이텍트 uri 값", example = "http://localhost:5173/kakao/redirection")
         String redirectUri
 ) {
 }
