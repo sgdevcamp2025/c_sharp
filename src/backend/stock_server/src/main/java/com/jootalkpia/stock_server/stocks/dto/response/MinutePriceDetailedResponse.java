@@ -1,10 +1,13 @@
 package com.jootalkpia.stock_server.stocks.dto.response;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-public record MinutePriceResponse(
+import java.util.List;
+
+public record MinutePriceDetailedResponse(
         Output1 output1,
-        ArrayList<Output2> output2,
+        List<Output2> output2,
         String rtCd,
         String msgCd,
         String msg1
