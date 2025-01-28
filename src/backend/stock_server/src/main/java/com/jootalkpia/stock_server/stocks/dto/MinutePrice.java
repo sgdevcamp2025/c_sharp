@@ -16,6 +16,7 @@ public class MinutePrice {
     @Id
     private ObjectId minutePriceId;
 
+    @Indexed(background = true)
     private String code;
 
     @Field("stock_name")
