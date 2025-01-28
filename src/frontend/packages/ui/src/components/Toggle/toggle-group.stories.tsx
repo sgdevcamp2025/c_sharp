@@ -24,6 +24,7 @@ export const Default: Story = {
       <ToggleGroup
         variant="outline"
         type="multiple"
+        size="lg"
       >
         <ToggleGroupItem
           value="mic"

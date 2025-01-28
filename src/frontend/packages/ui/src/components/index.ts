@@ -9,4 +9,3 @@ export * from './Resizable';
 export * from './Avatar';
 export * from './Separate';
 export * from './Toggle';
-export * from './ToggleGroup';
