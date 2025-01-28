@@ -259,6 +259,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # env file
+dev.env
 *.env
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,intellij,visualstudiocode,java,linux
