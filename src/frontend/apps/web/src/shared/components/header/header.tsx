@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage, Popover, PopoverContent, PopoverTrigger } from '@workspace/ui/components';
+import ProfileContainer from './profile-container';
 
 //로고 이미지 경로 변경 필요
 const Header = () => {
@@ -21,7 +22,9 @@ const Header = () => {
         <PopoverContent
           align="end"
           className="w-72 "
-        ></PopoverContent>
+        >
+          <ProfileContainer />
+        </PopoverContent>
       </Popover>
     </header>
   );
