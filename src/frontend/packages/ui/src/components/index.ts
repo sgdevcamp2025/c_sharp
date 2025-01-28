@@ -9,3 +9,6 @@ export * from './Resizable';
 export * from './Avatar';
 export * from './Separate';
 export * from './Toggle';
+export * from './Popover';
+export * from './Label';
+export * from './Input';
