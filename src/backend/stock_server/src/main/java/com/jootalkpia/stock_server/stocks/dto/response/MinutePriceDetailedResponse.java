@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import java.util.List;
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record MinutePriceDetailedResponse(
         Output1 output1,
         List<Output2> output2,
@@ -12,6 +13,7 @@ public record MinutePriceDetailedResponse(
         String msgCd,
         String msg1
 ) {
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public record Output1(
             String prdyVrss,
             String prdyVrssSign,
@@ -23,6 +25,7 @@ public record MinutePriceDetailedResponse(
             String stckPrpr
     ) {}
 
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public record Output2(
             String stckBsopDate,
             String stckCntgHour,
