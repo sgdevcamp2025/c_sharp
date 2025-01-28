@@ -3,7 +3,9 @@ package com.jootalkpia.stock_server.stocks.service;
 import com.jootalkpia.stock_server.stocks.advice.StockCaller;
 import com.jootalkpia.stock_server.stocks.domain.Schedule;
 import com.jootalkpia.stock_server.stocks.domain.StockCode;
+import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
 import com.jootalkpia.stock_server.stocks.dto.request.TokenRequestBody;
+import com.jootalkpia.stock_server.stocks.dto.response.CandlePriceHistoryResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceDetailedResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceSimpleResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.TokenResponse;
@@ -15,6 +17,8 @@ import com.jootalkpia.stock_server.support.property.TokenProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
@@ -85,5 +89,10 @@ public class StockService {
         );
 
         return MinutePriceSimpleResponse.from(response, code);
+    }
+
+    public CandlePriceHistoryResponse getCandlePriceHistoryByCode(Pageable pageable, String code) {
+        Page<MinutePrice> minutePricePage = minutePriceRepository.findAllByCode(pageable, code);
+        return CandlePriceHistoryResponse.of(minutePricePage, code);
     }
 }
