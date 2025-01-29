@@ -7,9 +7,9 @@ spring:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   data:
      mongodb:
-       port: 27017
-       host: localhost
-       database: c_shape
+       port: ${DB_PORT}
+       host: ${DB_HOST}
+       database: ${DB_NAME}
   jackson:
     property-naming-strategy: LOWER_CAMEL_CASE
 
