@@ -1,1 +1,1 @@
-export { default as ChatContainer } from './chat-container';
+export { default as ChatContainer } from './ui/chat-container';
