@@ -4,7 +4,7 @@ import { fontFamily } from 'tailwindcss/defaultTheme';
 
 const config = {
   darkMode: ['class'],
-  content: ['app/**/*.{ts,tsx}', 'components/**/*.{ts,tsx}', '../../packages/ui/src/components/**/*.{ts,tsx}'],
+  content: ['app/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}', '../../packages/ui/src/components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       fontFamily: {
@@ -13,6 +13,12 @@ const config = {
       },
       colors: {
         kakao: '#FEE500',
+        live: '#fff4e1',
+        thread: '#1264a3',
+        chatboxHover: '#F1F5F9',
+        black: {
+          100: 'rgba(0, 0, 0, 0.5)',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
