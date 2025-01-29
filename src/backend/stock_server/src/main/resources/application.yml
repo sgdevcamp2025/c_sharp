@@ -2,10 +2,21 @@ spring:
   config:
     import:
       - optional:file:env/dev-db.env[.properties]
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  data:
+     mongodb:
+       port: ${DB_PORT}
+       host: ${DB_HOST}
+       database: ${DB_NAME}
+  jackson:
+    property-naming-strategy: LOWER_CAMEL_CASE
 
 logging:
   level:
     com.jootalkpia.stock_server: debug
+    org.springframework.data.mongodb: debug
     org.springframework.web.servlet : debug
 
 feign:
