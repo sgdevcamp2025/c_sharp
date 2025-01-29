@@ -16,3 +16,4 @@ export * from './Collapsible';
 export * from './Tooltip';
 export * from './Skeleton';
 export * from './Sheet';
+export * from './Sidebar';
