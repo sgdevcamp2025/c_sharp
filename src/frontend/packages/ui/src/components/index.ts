@@ -15,3 +15,4 @@ export * from './Input';
 export * from './Collapsible';
 export * from './Tooltip';
 export * from './Skeleton';
+export * from './Sheet';
