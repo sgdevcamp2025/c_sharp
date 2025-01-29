@@ -18,7 +18,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'tex
   return (
     <textarea
       className={cn(
-        'flex min-h-[128px] h-auto w-full rounded-md bg-transparent px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+        'flex min-h-[128px] h-auto w-full rounded-md bg-white px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
         className,
       )}
       maxLength={2000}
