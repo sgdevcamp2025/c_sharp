@@ -17,6 +17,10 @@ const meta: Meta<typeof Avatar> = {
       control: 'select',
       options: ['default', 'square'],
     },
+    size: {
+      control: 'select',
+      options: ['default', 'sm'],
+    },
   },
 };
 export default meta;

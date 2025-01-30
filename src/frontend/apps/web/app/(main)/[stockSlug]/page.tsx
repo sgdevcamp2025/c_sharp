@@ -18,12 +18,12 @@ export default function StockDetailsPage({ params }) {
   // console.log(1, params);
 
   return (
-    <div className="flex flex-1 flex-row bg-gray-400 py-6 px-[30px]">
-      <div className="flex items-center justify-center pr-2 bg-gray-600 w-[45%] h-full">
+    <div className="flex bg-gray-700 py-6 px-[30px] h-full">
+      <div className="pr-2 w-[45vw]">
         <StockDetailLayout />
       </div>
 
-      <div className="flex items-center justify-center pl-2 bg-gray-500 w-[55%] h-full">
+      <div className="pl-2 w-[55vw]">
         <ChatContainer />
       </div>
     </div>
