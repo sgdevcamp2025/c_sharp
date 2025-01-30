@@ -26,20 +26,17 @@ public class SecurityConfig {
             "/api/v1/user/login",
             "/api/v1/user/token-refresh",
             "/api/v1/actuator/health",
-            "/api/v1/v3/api-docs/**",
-            "/api/v1/swagger-ui/**",
-            "/api/v1/swagger-resources/**"
+            "/v3/**",
+            "/swagger-ui/**"
     };
-
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> {
-                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-                })
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception ->
                 {
                     exception.authenticationEntryPoint(customJwtAuthenticationEntryPoint);
