@@ -1,1 +1,1 @@
-export { default as StockLayout } from './stock-layout';
+export { default as StockDetailLayout } from './ui/stock-detail-layout';
