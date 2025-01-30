@@ -43,6 +43,10 @@ const StocksList = () => {
       stockSlug: 'hanwha-aerospace',
     },
   ];
-  return <DataTable data={Stockdata} />;
+  return (
+    <div className="w-3/4 shadow-s">
+      <DataTable data={Stockdata} />
+    </div>
+  );
 };
 export default StocksList;
