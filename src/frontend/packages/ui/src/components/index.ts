@@ -12,3 +12,8 @@ export * from './Toggle';
 export * from './Popover';
 export * from './Label';
 export * from './Input';
+export * from './Collapsible';
+export * from './Tooltip';
+export * from './Skeleton';
+export * from './Sheet';
+export * from './Sidebar';
