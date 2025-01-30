@@ -1,4 +1,6 @@
 import { StocksList } from '@/src/features/stock';
+import { Button } from '@workspace/ui/components';
+import Link from 'next/link';
 
 export const metadata = {
   title: '주식 리스트 - 실시간 주식 정보',
@@ -9,6 +11,9 @@ export const metadata = {
 export default function Page() {
   return (
     <div className="flex flex-col items-center justify-center min-h-svh">
+      <Button size="sm">
+        <Link href="/tesla">상세페이지로 이동</Link>
+      </Button>
       <StocksList />
     </div>
   );
