@@ -11,7 +11,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <header className="h-[68px] bg-gray-800 flex items-center justify-center text-white">Header</header>
+        <header className="h-[68px] bg-gray-800 flex items-center justify-center">Header</header>
         <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">{children}</div>
       </body>
     </html>
