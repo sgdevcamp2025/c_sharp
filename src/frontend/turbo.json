@@ -5,19 +5,19 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**"]
+      "outputs": [".next/**"]
     },
     "build-storybook": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["packages/ui/storybook-static/**"],
+      "outputs": ["storybook-static/**"],
       "cache": true,
       "persistent": false
     },
     "storybook": {
       "dependsOn": ["^storybook"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["packages/ui/storybook-static/**"],
+      "outputs": ["storybook-static/**"],
       "cache": true,
       "persistent": false
     },
@@ -25,13 +25,6 @@
       "dependsOn": ["^lint"],
       "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx}"],
       "cache": false,
-      "persistent": false
-    },
-    "check-types": {
-      "dependsOn": ["^check-types"],
-      "inputs": ["$TURBO_DEFAULT$", "tsconfig.json", "packages/**/tsconfig.json"],
-      "outputs": ["packages/**/dist/**"],
-      "cache": true,
       "persistent": false
     },
     "dev": {
@@ -47,7 +40,6 @@
     "typescript": {
       "dependsOn": ["^typescript"],
       "inputs": ["$TURBO_DEFAULT$", "tsconfig.json", "packages/**/tsconfig.json"],
-      "outputs": ["packages/**/dist/**"],
       "cache": true,
       "persistent": false
     }
