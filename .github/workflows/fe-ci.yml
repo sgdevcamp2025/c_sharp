@@ -6,9 +6,10 @@ on:
     branches:
       - dev
       - main
+    paths-ignore:
+      - 'src/frontend/packages/ui/**'
     paths:
       - 'src/frontend/**'
-      - '!src/frontend/packages/ui/**'
   push:
     branches:
       - fe-feat/ci-storybook
