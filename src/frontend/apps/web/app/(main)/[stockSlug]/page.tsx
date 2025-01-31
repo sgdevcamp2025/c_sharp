@@ -1,5 +1,5 @@
 import { ChatContainer } from '@/src/features/chat';
-import { StockLayout } from '@/src/features/stock';
+import { StockDetailLayout } from '@/src/features/stock';
 
 // 주식데이터를 가지고 올수있는 방법이 필요합니다.
 
@@ -20,7 +20,7 @@ export default function StockDetailsPage({ params }) {
   return (
     <div className="flex bg-gray-700 py-6 px-[30px] h-full">
       <div className="pr-2 w-[45vw]">
-        <StockLayout />
+        <StockDetailLayout />
       </div>
 
       <div className="pl-2 w-[55vw]">
