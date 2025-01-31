@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum SocialType {
+public enum Platform {
     KAKAO("KAKAO"),
     ;
     private final String type;

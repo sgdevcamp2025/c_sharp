@@ -13,7 +13,7 @@ public enum ErrorCode {
     MISSING_REQUIRED_HEADER("A40002", HttpStatus.BAD_REQUEST, "필수 헤더가 누락되었습니다."),
     MISSING_REQUIRED_PARAMETER("A40003", HttpStatus.BAD_REQUEST, "필수 파라미터가 누락되었습니다."),
     AUTHENTICATION_CODE_EXPIRED("A40004", HttpStatus.BAD_REQUEST, "인가 코드가 만료되었습니다."),
-    SOCIAL_TYPE_BAD_REQUEST("A40005", HttpStatus.BAD_REQUEST, "로그인 요청이 유효하지 않습니다."),
+    PLATFORM_BAD_REQUEST("A40005", HttpStatus.BAD_REQUEST, "로그인 요청이 유효하지 않습니다."),
 
     // 401 Unauthorized
     ACCESS_TOKEN_EXPIRED("A40100", HttpStatus.UNAUTHORIZED, "액세스 토큰이 만료되었습니다."),
