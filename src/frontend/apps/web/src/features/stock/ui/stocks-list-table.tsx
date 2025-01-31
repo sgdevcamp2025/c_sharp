@@ -4,6 +4,7 @@ import { SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactT
 import { useState } from 'react';
 import { Stock, columns } from '../model';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@workspace/ui/components';
+import { useRouter } from 'next/navigation';
 
 const Stockdata: Stock[] = [
   {
@@ -50,6 +51,7 @@ const Stockdata: Stock[] = [
 
 const StocksListTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const router = useRouter();
 
   const table = useReactTable({
     data: Stockdata,
@@ -78,7 +80,10 @@ const StocksListTable = () => {
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
+                className="cursor-pointer"
+                onClick={() => {
+                  router.push(`/${row.original.slug ?? ''}`);
+                }}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
