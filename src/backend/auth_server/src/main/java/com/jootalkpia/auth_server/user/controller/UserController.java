@@ -1,10 +1,13 @@
 package com.jootalkpia.auth_server.user.controller;
 
 import com.jootalkpia.auth_server.client.dto.UserLoginRequest;
+import com.jootalkpia.auth_server.response.ApiResponseDto;
+import com.jootalkpia.auth_server.user.dto.AccessTokenGetSuccess;
 import com.jootalkpia.auth_server.user.dto.LoginSuccessResponse;
 import com.jootalkpia.auth_server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,5 +26,13 @@ public class UserController implements UserControllerDocs {
             @RequestBody final UserLoginRequest loginRequest
     ) {
         return ResponseEntity.ok().body(userService.create(authorizationCode, loginRequest));
+    }
+
+    @Override
+    @GetMapping("api/v1/user/token-refresh")
+    public ResponseEntity<AccessTokenGetSuccess> refreshToken(
+            @RequestParam final String token
+    ) {
+        return ResponseEntity.ok().body(userService.refreshToken(token));
     }
 }

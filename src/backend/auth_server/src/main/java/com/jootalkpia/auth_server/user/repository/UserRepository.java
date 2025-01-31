@@ -15,11 +15,10 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     Optional<User> findUserBySocialTypeAndSocialId(@Param("socialId") Long socialId,
                                                    @Param("socialType") SocialType socialType);
 
-    Optional<User> findUserById(Long id);
+    Optional<User> findById(Long id);
 
-    default User findUserByIdOrThrow(Long id) {
-        return findUserById(id)
+    default User findByIdOrThrow(Long id) {
+        return findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 }
-

@@ -1,5 +1,7 @@
 package com.jootalkpia.auth_server.user.service;
 
+import static com.jootalkpia.auth_server.jwt.JwtValidationType.EXPIRED_JWT_TOKEN;
+
 import com.jootalkpia.auth_server.client.dto.UserInfoResponse;
 import com.jootalkpia.auth_server.client.dto.UserLoginRequest;
 import com.jootalkpia.auth_server.client.kakao.KakaoSocialService;
@@ -10,6 +12,7 @@ import com.jootalkpia.auth_server.response.ErrorCode;
 import com.jootalkpia.auth_server.security.UserAuthentication;
 import com.jootalkpia.auth_server.user.domain.SocialType;
 import com.jootalkpia.auth_server.user.domain.User;
+import com.jootalkpia.auth_server.user.dto.AccessTokenGetSuccess;
 import com.jootalkpia.auth_server.user.dto.LoginSuccessResponse;
 import com.jootalkpia.auth_server.user.dto.TokenDto;
 import com.jootalkpia.auth_server.user.repository.UserRepository;
@@ -84,6 +87,30 @@ public class UserService {
         );
     }
 
+    public AccessTokenGetSuccess refreshToken(
+            final String refreshToken
+    ) {
+        if (jwtTokenProvider.validateToken(refreshToken) == EXPIRED_JWT_TOKEN) {
+            // 리프레시 토큰이 만료된 경우
+            throw new CustomException(ErrorCode.REFRESH_TOKEN_EXPIRED);
+        }
+
+        Long userId = jwtTokenProvider.getUserFromJwt(refreshToken);
+        if (!userId.equals(tokenService.findIdByRefreshToken(refreshToken))) {
+            throw new CustomException(ErrorCode.TOKEN_INCORRECT_ERROR);
+        }
+
+        // 사용자 정보 가져오기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        UserAuthentication userAuthentication = new UserAuthentication(userId.toString(), null);
+
+        return AccessTokenGetSuccess.of(
+                jwtTokenProvider.issueAccessToken(userAuthentication)
+        );
+    }
+
     private TokenDto getTokenDto(
             final User user
     ) {
@@ -105,3 +132,4 @@ public class UserService {
         return userRepository.findUserBySocialTypeAndSocialId(socialId, socialType).isPresent();
     }
 }
+
