@@ -8,7 +8,7 @@
       "outputs": [".next/**"]
     },
     "build-storybook": {
-      "dependsOn": ["^build", "build"],
+      "dependsOn": ["^build-storybook"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["storybook-static/**"],
       "cache": true,

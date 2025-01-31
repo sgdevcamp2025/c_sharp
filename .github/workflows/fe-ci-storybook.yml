@@ -6,8 +6,8 @@ on:
     branches:
       - dev
       - main
-    paths:
-      - 'src/frontend/packages/ui/**'
+    # paths:
+    #   - 'src/frontend/packages/ui/**'
   push:
     branches:
       - fe-feat/ci-storybook
