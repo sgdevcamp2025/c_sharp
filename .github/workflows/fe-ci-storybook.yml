@@ -62,7 +62,7 @@ jobs:
       - name: CI
         run: |
           cd src/frontend
-          pnpm turbo build-storybook --parallel
+          pnpm turbo typescript lint format build-storybook --parallel
 
   required:
     needs: [changes]
