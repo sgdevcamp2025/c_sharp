@@ -10,7 +10,8 @@ export const columns: ColumnDef<Stock>[] = [
     cell: ({ row }) => <div className="text-left">{row.getValue('name')}</div>,
   },
   {
-    accessorKey: 'currPrice',
+    id: 'currPrice',
+    accessorFn: (row) => parseFloat(row.currPrice),
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -30,7 +31,7 @@ export const columns: ColumnDef<Stock>[] = [
     },
   },
   {
-    accessorKey: 'fluctuation',
+    id: 'fluctuation',
     accessorFn: (row) => parseFloat(row.fluctuation),
     header: ({ column }) => (
       <Button
@@ -44,7 +45,8 @@ export const columns: ColumnDef<Stock>[] = [
     cell: ({ row }) => <div>{row.getValue('fluctuation')}%</div>,
   },
   {
-    accessorKey: 'volume',
+    id: 'volume',
+    accessorFn: (row) => parseFloat(row.volume),
     header: ({ column }) => (
       <Button
         variant="ghost"
