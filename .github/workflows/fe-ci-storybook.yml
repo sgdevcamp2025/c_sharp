@@ -8,6 +8,7 @@ on:
       - main
     paths:
       - 'src/frontend/packages/ui/**'
+      - '../workflows/fe-ci-storybook.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

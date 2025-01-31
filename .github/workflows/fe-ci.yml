@@ -9,6 +9,7 @@ on:
     paths:
       - 'src/frontend/**'
       - '!src/frontend/packages/ui/**'
+      - '../workflows/fe-ci.yml'
   # push:
   #   branches:
   #     - fe-feat/ci-storybook
