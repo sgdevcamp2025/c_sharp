@@ -1,5 +1,6 @@
-import { fetchInstance } from '@/src/shared/services/apis';
 import type { FetchOptions, JsonValue } from '@/src/shared/services/models';
+
+import { fetchInstance } from './fetch-instance.api';
 
 /**
  * GET 요청을 보내는 함수입니다.
@@ -20,11 +21,12 @@ import type { FetchOptions, JsonValue } from '@/src/shared/services/models';
  * // 기본 GET 요청
  * const data = await getRequest<UserData>('/api/users/me');
  *
- * // 쿼리 파라미터와 캐시 옵션을 포함한 GET 요청
+ * // 쿼리 파라미터와 캐시 옵션과 토큰이 없을때 GET 요청
  * const users = await getRequest<User[]>('/api/users', {
  *   params: { page: '1', size: '10' },
  *   cache: 'force-cache',
- *   tags: ['users']
+ *   tags: ['users'],
+ *   withToken: false,
  * });
  * ```
  */
@@ -55,13 +57,6 @@ export async function getRequest<TResponse>(
  * const newUser = await postRequest<User, CreateUserDto>(
  *   '/api/users',
  *   { name: 'John', email: 'john@example.com' }
- * );
- *
- * // 토큰 없이 로그인 요청
- * const loginResponse = await postRequest<LoginResponse, LoginDto>(
- *   '/api/auth/login',
- *   { email: 'user@example.com', password: '****' },
- *   { withToken: false }
  * );
  * ```
  */

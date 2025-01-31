@@ -1,2 +1,7 @@
-export * from './instance';
-export * from './method';
+export { fetchInstance } from './fetch-instance.api';
+export {
+  getRequest,
+  postRequest,
+  patchRequest,
+  deleteRequest,
+} from './fetch-method.api';

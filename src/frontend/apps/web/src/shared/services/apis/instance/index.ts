@@ -1,1 +1,0 @@
-export * from './fetchInstance.api';
