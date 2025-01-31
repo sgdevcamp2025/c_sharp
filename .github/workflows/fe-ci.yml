@@ -9,11 +9,11 @@ on:
     paths:
       - 'src/frontend/**'
       - '!src/frontend/packages/ui/**'
-  push:
-    branches:
-      - fe-feat/ci-storybook
-    paths:
-      - '!src/frontend/packages/ui/**'
+  # push:
+  #   branches:
+  #     - fe-feat/ci-storybook
+  #   paths:
+  #     - '!src/frontend/packages/ui/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -44,7 +44,7 @@ jobs:
           version: 8
 
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             ~/.pnpm-store
