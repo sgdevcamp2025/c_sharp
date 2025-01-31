@@ -6,13 +6,14 @@ on:
     branches:
       - dev
       - main
-    paths-ignore:
-      - 'src/frontend/packages/ui/**'
     paths:
       - 'src/frontend/**'
+      - '!src/frontend/packages/ui/**'
   push:
     branches:
       - fe-feat/ci-storybook
+    paths:
+      - '!src/frontend/packages/ui/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
