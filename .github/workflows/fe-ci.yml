@@ -46,7 +46,8 @@ jobs:
         with:
           path: |
             ~/.pnpm-store
-            node_modules
+            **/node_modules
+            src/frontend/node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
