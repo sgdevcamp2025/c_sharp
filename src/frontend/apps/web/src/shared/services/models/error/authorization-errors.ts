@@ -1,3 +1,5 @@
+export type AuthErrorCode = keyof typeof AUTH_ERROR_MESSAGES;
+
 export const AUTH_ERROR_MESSAGES: Record<string, string> = {
   A40000: '요청한 값이 유효하지 않습니다.',
   A40001: '잘못된 요청입니다.',
@@ -18,4 +20,4 @@ export const AUTH_ERROR_MESSAGES: Record<string, string> = {
   A40500: '지원하지 않는 메소드입니다.',
 
   A50000: '서버 내부 오류입니다.',
-};
+} as const;

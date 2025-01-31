@@ -1,3 +1,5 @@
+export type WorkspaceErrorCode = keyof typeof WORKSPACE_ERROR_MESSAGES;
+
 export const WORKSPACE_ERROR_MESSAGES: Record<string, string> = {
   W00001: '알 수 없는 에러가 발생했습니다.',
   W40001: '잘못된 요청입니다.',
@@ -17,4 +19,4 @@ export const WORKSPACE_ERROR_MESSAGES: Record<string, string> = {
   W50004: '파일 다운로드 중 오류가 발생했습니다.',
   W50005: '파일 처리 중 오류가 발생했습니다.',
   W50006: '예상치 못한 오류가 발생했습니다.',
-};
+} as const;
