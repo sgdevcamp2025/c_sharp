@@ -2,6 +2,8 @@ import type { FetchOptions, JsonValue } from '@/src/shared/services/models';
 
 import { fetchInstance } from './fetch-instance.api';
 
+type RequestOptions<TBody = never> = Omit<FetchOptions<TBody>, 'body'>;
+
 /**
  * GET 요청을 보내는 함수입니다.
  * @template TResponse - 응답 데이터의 타입
@@ -29,10 +31,15 @@ import { fetchInstance } from './fetch-instance.api';
  *   withToken: false,
  * });
  * ```
+ *
+ * * GET 요청을 보내는 함수입니다.
+ * @throws {ApiError} API 요청이 실패했을 때 발생합니다 (예: 400, 401, 404 등)
+ * @throws {NetworkError} 네트워크 연결에 문제가 있을 때 발생합니다
  */
+
 export async function getRequest<TResponse>(
   url: string,
-  options?: Omit<FetchOptions, 'body'>,
+  options?: RequestOptions,
 ): Promise<TResponse> {
   return fetchInstance<TResponse>(url, 'GET', options);
 }
@@ -59,11 +66,16 @@ export async function getRequest<TResponse>(
  *   { name: 'John', email: 'john@example.com' }
  * );
  * ```
+ *
+ * * POST 요청을 보내는 함수입니다.
+ * @throws {ApiError} API 요청이 실패했을 때 발생합니다 (예: 400, 401, 404 등)
+ * @throws {NetworkError} 네트워크 연결에 문제가 있을 때 발생합니다
  */
+
 export async function postRequest<TResponse, TBody = JsonValue>(
   url: string,
   body: TBody,
-  options?: Omit<FetchOptions<TBody>, 'body'>,
+  options?: RequestOptions<TBody>,
 ): Promise<TResponse> {
   return fetchInstance<TResponse, TBody>(url, 'POST', { ...options, body });
 }
@@ -91,11 +103,16 @@ export async function postRequest<TResponse, TBody = JsonValue>(
  *   { tags: ['user-profile'] }
  * );
  * ```
+ *
+ * * PATCH 요청을 보내는 함수입니다.
+ * @throws {ApiError} API 요청이 실패했을 때 발생합니다 (예: 400, 401, 404 등)
+ * @throws {NetworkError} 네트워크 연결에 문제가 있을 때 발생합니다
+ *
  */
 export async function patchRequest<TResponse, TBody = JsonValue>(
   url: string,
   body: TBody,
-  options?: Omit<FetchOptions<TBody>, 'body'>,
+  options?: RequestOptions<TBody>,
 ): Promise<TResponse> {
   return fetchInstance<TResponse, TBody>(url, 'PATCH', { ...options, body });
 }
@@ -126,11 +143,15 @@ export async function patchRequest<TResponse, TBody = JsonValue>(
  *   { tags: ['posts'] }
  * );
  * ```
+ *
+ * * DELETE 요청을 보내는 함수입니다.
+ * @throws {ApiError} API 요청이 실패했을 때 발생합니다 (예: 400, 401, 404 등)
+ * @throws {NetworkError} 네트워크 연결에 문제가 있을 때 발생합니다
  */
 export async function deleteRequest<TResponse, TBody = JsonValue>(
   url: string,
   body?: TBody,
-  options?: Omit<FetchOptions<TBody>, 'body'>,
+  options?: RequestOptions<TBody>,
 ): Promise<TResponse> {
   return fetchInstance<TResponse, TBody>(url, 'DELETE', { ...options, body });
 }
