@@ -7,4 +7,4 @@ export type {
   FetchOptions,
   ApiErrorResponse,
   ApiResponse,
-} from './fetch-types.d.ts';
+} from './fetch-types.js';

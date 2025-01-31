@@ -1,5 +1,5 @@
 import { fetchInstance } from '@/src/shared/services/apis';
-import type { FetchOptions, JsonValue } from '@/src/shared/services/model';
+import type { FetchOptions, JsonValue } from '@/src/shared/services/models';
 
 /**
  * GET 요청을 보냅니다.

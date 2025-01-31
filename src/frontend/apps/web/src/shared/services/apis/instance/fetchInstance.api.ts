@@ -1,11 +1,11 @@
-import { ERROR_MESSAGES } from '@/src/shared/services/model';
+import { ERROR_MESSAGES } from '@/src/shared/services/models';
 import type {
   HttpMethod,
   FetchOptions,
   JsonValue,
   ApiErrorResponse,
   ApiResponse,
-} from '@/src/shared/services/model';
+} from '@/src/shared/services/models';
 
 export async function fetchInstance<TResponse, TBody = JsonValue>(
   url: string,
