@@ -2,17 +2,17 @@
 
 import { SortingState, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { useState } from 'react';
-import { columns } from '../model';
+import { Stock, columns } from '../model';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@workspace/ui/components';
 
-const Stockdata = [
+const Stockdata: Stock[] = [
   {
     id: '1',
     name: '삼성전자',
     currPrice: '53700',
     fluctuation: '+0.00',
     volume: '1000',
-    stockSlug: 'samsung-electronics',
+    slug: 'samsung-electronics',
   },
   {
     id: '2',
@@ -20,7 +20,7 @@ const Stockdata = [
     currPrice: '221000',
     fluctuation: '+0.68',
     volume: '1000',
-    stockSlug: 'sk-hynix',
+    slug: 'sk-hynix',
   },
   {
     id: '3',
@@ -28,7 +28,7 @@ const Stockdata = [
     currPrice: '35750',
     fluctuation: '+0.00',
     volume: '1000',
-    stockSlug: 'kakao',
+    slug: 'kakao',
   },
   {
     id: '4',
@@ -36,7 +36,7 @@ const Stockdata = [
     currPrice: '204000',
     fluctuation: '-0.24',
     volume: '1000',
-    stockSlug: 'naver',
+    slug: 'naver',
   },
   {
     id: '5',
@@ -44,7 +44,7 @@ const Stockdata = [
     currPrice: '411500',
     fluctuation: '+7.30',
     volume: '1000',
-    stockSlug: 'hanwha-aerospace',
+    slug: 'hanwha-aerospace',
   },
 ];
 

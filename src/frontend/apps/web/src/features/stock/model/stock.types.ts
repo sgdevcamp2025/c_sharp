@@ -4,4 +4,5 @@ export type Stock = {
   currPrice: string;
   fluctuation: string;
   volume: string;
+  slug: string;
 };
