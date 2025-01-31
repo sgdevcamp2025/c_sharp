@@ -1,4 +1,4 @@
-name: FRONTEND-CI
+name: FRONTEND-CI-STORYBOOK
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - dev
       - main
     paths:
-      - 'src/frontend/**'
+      - 'src/frontend/packages/ui/**'
   push:
     branches:
       - fe-feat/ci-storybook
@@ -62,7 +62,7 @@ jobs:
       - name: CI
         run: |
           cd src/frontend
-          pnpm turbo typescript lint format build --parallel
+          pnpm turbo build-storybook --parallel
 
   required:
     needs: [changes]
