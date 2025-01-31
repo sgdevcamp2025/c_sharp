@@ -1,1 +1,1 @@
-export { fetchInstance } from './fetchInstance.api';
+export * from './fetchInstance.api';
