@@ -24,28 +24,33 @@ public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long userId;
 
     private Long socialId;
 
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private SocialType socialType;
+    private Platform platform;
 
     private String nickname;
+
+    private String profileImage;
+
 
     public static User of(
             final Long socialId,
             final String email,
-            final SocialType socialType,
-            final String socialNickname
+            final Platform platform,
+            final String socialNickname,
+            final String profileImage
     ) {
         return User.builder()
                 .socialId(socialId)
                 .email(email)
-                .socialType(socialType)
+                .platform(platform)
                 .nickname(socialNickname)
+                .profileImage(profileImage)
                 .build();
     }
 }
