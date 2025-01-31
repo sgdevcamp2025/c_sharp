@@ -24,9 +24,6 @@ jobs:
     if: ${{ github.actor != 'l10nbot' }} # Avoid running for 'l10nbot'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    strategy:
-      matrix:
-        node-version: [20.x]
 
     steps:
       - name: Check out code
@@ -34,10 +31,10 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
 
       - uses: pnpm/action-setup@v3
         with:
