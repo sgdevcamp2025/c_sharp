@@ -11,7 +11,7 @@ export type FetchOptions<TBody = JsonValue> = Omit<RequestInit, 'body'> & {
   cache?: RequestCache;
   tags?: string[];
   revalidate?: number;
-  withToken?: boolean;
+  includeAuthToken?: boolean;
 };
 
 export type ApiResponse<T> = {

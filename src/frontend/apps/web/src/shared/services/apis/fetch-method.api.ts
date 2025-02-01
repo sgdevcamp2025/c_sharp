@@ -12,7 +12,7 @@ type RequestOptions<TBody = never> = Omit<FetchOptions<TBody>, 'body'>;
  * @property {RequestCache} [cache] - Next.js의 캐시 전략 ('force-cache' | 'no-store' | 'no-cache')
  * @property {string[]} [tags] - 캐시 무효화를 위한 태그 배열
  * @property {number} [revalidate] - 캐시 재검증 주기(초)
- * @property {boolean} [withToken] - 인증 토큰 사용 여부
+ * @property {boolean} [includeAuthToken] - 인증 토큰 사용 여부
  *
  * @param {string} url - API 엔드포인트 URL
  * @param {Omit<FetchOptions, 'body'>} [options] - GET 요청 옵션
@@ -28,7 +28,7 @@ type RequestOptions<TBody = never> = Omit<FetchOptions<TBody>, 'body'>;
  *   params: { page: '1', size: '10' },
  *   cache: 'force-cache',
  *   tags: ['users'],
- *   withToken: false,
+ *   includeAuthToken: false,
  * });
  * ```
  *
@@ -51,7 +51,7 @@ export async function getRequest<TResponse>(
  * @typedef {object} PostRequestOptions
  * @property {Record<string, string>} [params] - URL 쿼리 파라미터
  * @property {string[]} [tags] - 캐시 무효화를 위한 태그 배열
- * @property {boolean} [withToken] - 인증 토큰 사용 여부
+ * @property {boolean} [includeAuthToken] - 인증 토큰 사용 여부
  *
  * @param {string} url - API 엔드포인트 URL
  * @param {TBody} body - 전송할 데이터
@@ -87,7 +87,7 @@ export async function postRequest<TResponse, TBody = JsonValue>(
  * @typedef {object} PatchRequestOptions
  * @property {Record<string, string>} [params] - URL 쿼리 파라미터
  * @property {string[]} [tags] - 캐시 무효화를 위한 태그 배열
- * @property {boolean} [withToken] - 인증 토큰 사용 여부
+ * @property {boolean} [includeAuthToken] - 인증 토큰 사용 여부
  *
  * @param {string} url - API 엔드포인트 URL
  * @param {TBody} body - 업데이트할 데이터
@@ -124,7 +124,7 @@ export async function patchRequest<TResponse, TBody = JsonValue>(
  * @typedef {object} DeleteRequestOptions
  * @property {Record<string, string>} [params] - URL 쿼리 파라미터
  * @property {string[]} [tags] - 캐시 무효화를 위한 태그 배열
- * @property {boolean} [withToken] - 인증 토큰 사용 여부
+ * @property {boolean} [includeAuthToken] - 인증 토큰 사용 여부
  *
  * @param {string} url - API 엔드포인트 URL
  * @param {TBody} [body] - 전송할 데이터 (선택사항)

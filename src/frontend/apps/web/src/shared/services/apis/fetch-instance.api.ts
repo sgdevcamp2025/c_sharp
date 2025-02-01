@@ -26,7 +26,7 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
      * @property {RequestCache} [cache] - Next.js 캐시 전략
      * @property {string[]} [tags] - 캐시 무효화 태그
      * @property {number} [revalidate] - 캐시 재검증 시간(초)
-     * @property {boolean} [withToken=true] - 토큰을 헤더에 추가할지 여부
+     * @property {boolean} [includeAuthToken=true] - 토큰을 헤더에 추가할지 여부
      */
     const {
       body,
@@ -34,7 +34,7 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
       cache,
       tags,
       revalidate,
-      withToken = true,
+      includeAuthToken = true,
       ...restOptions
     } = options;
 
@@ -50,8 +50,8 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
 
-    // withToken이 true일 때만 토큰을 헤더에 추가
-    if (withToken) {
+    // includeAuthToken이 true일 때만 토큰을 헤더에 추가
+    if (includeAuthToken) {
       const token =
         typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       if (token) {
