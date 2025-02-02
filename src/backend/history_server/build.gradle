@@ -18,9 +18,19 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
+	//spring boot
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	//mongo db
+	implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+
+	//test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
