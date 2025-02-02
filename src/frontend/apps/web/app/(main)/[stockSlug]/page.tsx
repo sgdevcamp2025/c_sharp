@@ -1,5 +1,7 @@
 import { ChatContainer } from '@/src/features/chat';
 import { StockDetailLayout } from '@/src/features/stock';
+import { ChevronLeft } from 'lucide-react';
+import Link from 'next/link';
 
 // 주식데이터를 가지고 올수있는 방법이 필요합니다.
 
@@ -19,7 +21,13 @@ export default function StockDetailsPage({ params }) {
 
   return (
     <div className="flex bg-gray-700 py-6 px-[30px] h-full">
-      <div className="pr-2 w-[45vw]">
+      <div className="pr-2 w-[45vw] flex flex-col">
+        <Link
+          href={'/'}
+          className="w-fit"
+        >
+          <ChevronLeft size={28} />
+        </Link>
         <StockDetailLayout />
       </div>
 
