@@ -3,7 +3,7 @@ import StockLogo from './stock-logo';
 
 const StockInfoContainer = () => {
   return (
-    <div className="h-full flex flex-row justify-start items-center">
+    <div className="h-full flex flex-row justify-start items-center gap-3">
       <StockLogo />
       <StockInfo />
     </div>
