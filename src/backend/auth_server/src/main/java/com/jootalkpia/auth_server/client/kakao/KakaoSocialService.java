@@ -7,7 +7,7 @@ import com.jootalkpia.auth_server.client.kakao.response.KakaoUserResponse;
 import com.jootalkpia.auth_server.client.service.SocialService;
 import com.jootalkpia.auth_server.exception.CustomException;
 import com.jootalkpia.auth_server.response.ErrorCode;
-import com.jootalkpia.auth_server.user.domain.SocialType;
+import com.jootalkpia.auth_server.user.domain.Platform;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class KakaoSocialService implements SocialService {
             throw new CustomException(ErrorCode.AUTHENTICATION_CODE_EXPIRED);
         }
         // Access Token으로 유저 정보 불러오기
-        return getLoginDto(loginRequest.socialType(), getUserInfo(accessToken));
+        return getLoginDto(loginRequest.platform(), getUserInfo(accessToken));
     }
 
     private String getOAuth2Authentication(
@@ -64,12 +64,12 @@ public class KakaoSocialService implements SocialService {
     }
 
     private UserInfoResponse getLoginDto(
-            final SocialType socialType,
+            final Platform platform,
             final KakaoUserResponse userResponse
     ) {
         return UserInfoResponse.of(
                 userResponse.id(),
-                socialType,
+                platform,
                 userResponse.kakaoAccount().email(),
                 userResponse.kakaoAccount().profile().nickname()
         );

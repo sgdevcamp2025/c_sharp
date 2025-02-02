@@ -2,6 +2,7 @@ package com.jootalkpia.auth_server.user.controller;
 
 
 import com.jootalkpia.auth_server.client.dto.UserLoginRequest;
+import com.jootalkpia.auth_server.user.dto.AccessTokenGetSuccess;
 import com.jootalkpia.auth_server.user.dto.LoginSuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,5 +29,18 @@ public interface UserControllerDocs {
     ResponseEntity<LoginSuccessResponse> login(
             @RequestParam final String authorizationCode,
             @RequestBody final UserLoginRequest loginRequest
+    );
+
+    @Operation(summary = "액세스 토큰 재발급")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "20001", description = "액세스 토큰 재발급 성공"),
+                    @ApiResponse(responseCode = "40102", description = "리프레시 토큰이 유효하지 않습니다."),
+                    @ApiResponse(responseCode = "40104", description = "해당 유저의 리프레시 토큰이 존재하지 않습니다."),
+                    @ApiResponse(responseCode = "50000", description = "서버 내부 오류입니다.")
+            }
+    )
+    ResponseEntity<AccessTokenGetSuccess> refreshToken(
+            @RequestParam final String refreshToken
     );
 }
