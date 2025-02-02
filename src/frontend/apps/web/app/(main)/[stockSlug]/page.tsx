@@ -20,7 +20,7 @@ export default function StockDetailsPage({ params }) {
   // console.log(1, params);
 
   return (
-    <div className="flex bg-gray-700 py-6 px-[30px] h-full">
+    <div className="flex py-6 px-[30px] h-full">
       <div className="pr-2 w-[45vw] flex flex-col">
         <Link
           href={'/'}
