@@ -11,9 +11,6 @@ export const metadata = {
 export default function Page() {
   return (
     <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button size="sm">
-        <Link href="/tesla">상세페이지로 이동</Link>
-      </Button>
       <StocksList />
     </div>
   );
