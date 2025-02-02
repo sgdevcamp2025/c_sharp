@@ -2,7 +2,6 @@ export * from './Button';
 export * from './Badge';
 export * from './Textarea';
 export * from './Table';
-export * from './DataTable';
 export * from './ChatTextarea';
 export * from './Toast';
 export * from './Resizable';
