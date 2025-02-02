@@ -11,7 +11,6 @@ const ChatTextArea = () => {
       <Textarea placeholder="Type your message..." />
       <div className="w-full px-2 pt-2">
         <ChatToggleGroup
-          label=""
           name="image"
           onSend={handleSendClick}
         />
