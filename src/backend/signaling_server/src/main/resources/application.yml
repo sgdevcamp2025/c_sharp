@@ -1,0 +1,6 @@
+server:
+  port: 8080
+
+kurento:
+  ws:
+    url: "ws://192.168.0.14:8888/kurento"
