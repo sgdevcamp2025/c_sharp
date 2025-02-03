@@ -16,6 +16,7 @@ import com.jootalkpia.auth_server.user.dto.response.AccessTokenGetSuccess;
 import com.jootalkpia.auth_server.user.dto.response.LoginSuccessResponse;
 import com.jootalkpia.auth_server.user.dto.response.TokenDto;
 import com.jootalkpia.auth_server.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -108,6 +109,20 @@ public class UserService {
         return AccessTokenGetSuccess.of(
                 jwtTokenProvider.issueAccessToken(userAuthentication)
         );
+    }
+
+    @Transactional
+    public void updateNickname(
+            String nickname,
+            Long userId
+    ) {
+        User user = userRepository.findByUserIdOrThrow(userId);
+
+        if (userRepository.existsByNickname(nickname)) {
+            throw new CustomException(ErrorCode.DUPLICATION_NICKNAME);
+        }
+
+        user.updateNickname(nickname);
     }
 
     private TokenDto getTokenDto(
