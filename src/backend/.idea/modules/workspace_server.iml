@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="workspace_server" external.linked.project.path="$MODULE_DIR$/../../workspace_server" external.root.project.path="$MODULE_DIR$/../../workspace_server" external.system.id="GRADLE" external.system.module.group="com.jootalkpia" external.system.module.version="0.0.1-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_17" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../workspace_server">
+      <excludeFolder url="file://$MODULE_DIR$/../../workspace_server/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../workspace_server/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
