@@ -11,6 +11,11 @@ export const MAX_VIDEO_SIZE = 200 * 1024 * 1024;
  * @returns 제한 범위를 벗어나면 false, 괜찮으면 true
  */
 export const validateFileSize = (file: File) => {
+  if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+    alert('Only image and video files are supported');
+    return false;
+  }
+
   if (file.type.startsWith('image/') && file.size > MAX_IMAGE_SIZE) {
     alert('Image size should not exceed 20MB');
     return false;
@@ -19,6 +24,7 @@ export const validateFileSize = (file: File) => {
     alert('Video size should not exceed 200MB');
     return false;
   }
+
   return true;
 };
 
