@@ -77,7 +77,7 @@ public class UserService {
         // 사용자 정보 가져오기
         userRepository.findByUserIdOrThrow(id);
 
-        UserAuthentication userAuthentication = new UserAuthentication(id.toString(), null);
+        UserAuthentication userAuthentication = new UserAuthentication(id.toString(), null, null);
 
         String refreshToken = jwtTokenProvider.issueRefreshToken(userAuthentication);
         tokenService.saveRefreshToken(id, refreshToken);
@@ -103,7 +103,7 @@ public class UserService {
         // 사용자 정보 가져오기
         userRepository.findByUserIdOrThrow(userId);
 
-        UserAuthentication userAuthentication = new UserAuthentication(userId.toString(), null);
+        UserAuthentication userAuthentication = new UserAuthentication(userId.toString(),null, null);
 
         return AccessTokenGetSuccess.of(
                 jwtTokenProvider.issueAccessToken(userAuthentication)
