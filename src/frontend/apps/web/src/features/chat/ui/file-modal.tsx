@@ -1,7 +1,7 @@
 import { Button } from '@workspace/ui/components';
 import { Modal } from '@workspace/ui/components/Modal/modal';
 import { FileData } from '../model';
-import { formatFileSize } from '../model';
+import { formatFileSize } from '../lib';
 import Image from 'next/image';
 
 type FileModalProps = {
