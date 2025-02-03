@@ -3,7 +3,7 @@ import StockInfoContainer from './stock-info-container';
 
 const StockDetailLayout = () => {
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full h-full flex flex-col min-w-0">
       <div className="h-[120px]">
         <StockInfoContainer />
       </div>
