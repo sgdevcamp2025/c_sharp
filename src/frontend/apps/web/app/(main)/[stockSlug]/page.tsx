@@ -20,8 +20,8 @@ export default function StockDetailsPage({ params }) {
   // console.log(1, params);
 
   return (
-    <div className="flex py-6 px-[30px] h-full">
-      <div className="pr-2 w-[45vw] flex flex-col">
+    <div className="flex py-6 px-[30px] h-full min-w-0 min-h-0">
+      <div className="pr-2 basis-[45vw] flex flex-col min-w-0">
         <Link
           href={'/'}
           className="w-fit"
@@ -31,7 +31,7 @@ export default function StockDetailsPage({ params }) {
         <StockDetailLayout />
       </div>
 
-      <div className="pl-2 w-[55vw]">
+      <div className="pl-2 basis-[55%] flex-shrink-0 min-w-0">
         <ChatContainer />
       </div>
     </div>

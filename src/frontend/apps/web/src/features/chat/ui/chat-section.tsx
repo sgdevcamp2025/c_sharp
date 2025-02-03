@@ -1,16 +1,13 @@
-import { ChatTextarea } from '@workspace/ui/components';
 import ChatContent from './chat-content';
+import ChatTextarea from './chat-textarea';
 
 const ChatSection = () => {
   return (
-    <div className="flex flex-1 flex-col h-full">
-      <div className="flex flex-1 flex-col h-full overflow-y-auto">
+    <div className="flex flex-1 flex-col w-full h-full">
+      <div className="flex flex-1 flex-col w-full h-full overflow-y-auto">
         <ChatContent />
       </div>
-      <ChatTextarea
-        onSend=""
-        onAdd=""
-      />
+      <ChatTextarea />
     </div>
   );
 };
