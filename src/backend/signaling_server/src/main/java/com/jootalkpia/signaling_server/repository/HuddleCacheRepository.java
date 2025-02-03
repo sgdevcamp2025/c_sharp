@@ -11,8 +11,8 @@ public class HuddleCacheRepository {
     private final Map<Long, String> channelToHuddleMap = new ConcurrentHashMap<>();
 
     public void saveHuddle(Huddle huddle) {
-        huddlesById.put(huddle.getHuddleId(), huddle);
-        channelToHuddleMap.put(huddle.getChannelId(), huddle.getHuddleId());
+        huddlesById.put(huddle.huddleId(), huddle);
+        channelToHuddleMap.put(huddle.channelId(), huddle.huddleId());
     }
 
     public Huddle getHuddleById(String huddleId) {
@@ -27,7 +27,7 @@ public class HuddleCacheRepository {
     public void deleteHuddle(String huddleId) {
         Huddle huddle = huddlesById.remove(huddleId);
         if (huddle != null) {
-            channelToHuddleMap.remove(huddle.getChannelId());
+            channelToHuddleMap.remove(huddle.channelId());
         }
     }
 }

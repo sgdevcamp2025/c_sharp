@@ -1,20 +1,24 @@
 package com.jootalkpia.signaling_server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Huddle {
-    private String huddleId;
-    private Long channelId;
-    private Long createdByUserId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private Set<Long> participants = new HashSet<>();
+public record Huddle(
+        String huddleId,
+        Long channelId,
+        Long createdByUserId,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
+        Set<Long> participants
+) {
+    public Huddle {
+        if (participants == null) {
+            participants = Collections.emptySet();
+        }
+    }
+
+    public Huddle updateParticipants(Set<Long> newParticipants) {
+        return new Huddle(this.huddleId, this.channelId, this.createdByUserId, this.createdAt, LocalDateTime.now(), newParticipants);
+    }
 }
