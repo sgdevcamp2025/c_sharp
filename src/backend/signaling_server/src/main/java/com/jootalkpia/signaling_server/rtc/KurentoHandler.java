@@ -131,7 +131,16 @@ public class KurentoHandler extends TextWebSocketHandler {
             }
 
             WebRtcEndpoint webRtcEndpoint = kUserSession.getWebRtcEndpoint();
-            webRtcEndpoint.addIceCandidateFoundListener(event -> sendIceCandidate(session, event.getCandidate()));
+
+            // ICE Candidate 이벤트 리스너 추가 (null 값 검사)
+            webRtcEndpoint.addIceCandidateFoundListener(event -> {
+                IceCandidate candidate = event.getCandidate();
+                if (candidate.getSdpMid() == null || candidate.getSdpMLineIndex() < 0) {
+                    log.warn("Invalid ICE Candidate received from Kurento: {}", candidate);
+                    return;  // 잘못된 데이터는 전송하지 않음
+                }
+                sendIceCandidate(session, candidate);
+            });
 
             String sdpAnswer = webRtcEndpoint.processOffer(sdpOffer);
             webRtcEndpoint.gatherCandidates();
@@ -157,12 +166,35 @@ public class KurentoHandler extends TextWebSocketHandler {
     }
 
     // ICE Candidate 전송 공통 메서드
+    private final Object webSocketLock = new Object(); // 동기화용 Lock 객체
+
     private void sendIceCandidate(WebSocketSession session, IceCandidate candidate) {
-        try {
-            session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "iceCandidate", "candidate", candidate))));
-            log.info("Sent ICE candidate: {}", candidate);
-        } catch (IOException e) {
-            log.error("Failed to send ICE candidate", e);
+        synchronized (webSocketLock) { // 동기화 블록 사용
+            try {
+                // 웹소켓이 닫혀 있으면 전송 안 하도록 처리
+                if (!session.isOpen()) {
+                    log.warn("WebSocket session is closed. Cannot send ICE candidate.");
+                    return;
+                }
+
+                // ICE Candidate JSON 변환
+                Map<String, Object> candidateJson = Map.of(
+                        "id", "iceCandidate",
+                        "candidate", Map.of(
+                                "candidate", candidate.getCandidate(),
+                                "sdpMid", candidate.getSdpMid(),
+                                "sdpMLineIndex", candidate.getSdpMLineIndex()
+                        )
+                );
+
+                session.sendMessage(new TextMessage(gson.toJson(candidateJson))); // 동기화된 WebSocket 메시지 전송
+                log.info("Sent ICE candidate: {}", candidateJson);
+
+            } catch (IllegalStateException e) {
+                log.error("Cannot send ICE candidate. WebSocket is in an invalid state: {}", e.getMessage());
+            } catch (IOException e) {
+                log.error("Failed to send ICE candidate", e);
+            }
         }
     }
 }
