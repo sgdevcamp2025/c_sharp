@@ -1,5 +1,17 @@
+import StockChartContainer from './stock-chart-container';
+import StockInfoContainer from './stock-info-container';
+
 const StockDetailLayout = () => {
-  return <div className="bg-gray-200 w-full h-full">123</div>;
+  return (
+    <div className="w-full h-full flex flex-col min-w-0">
+      <div className="h-[120px]">
+        <StockInfoContainer />
+      </div>
+      <div className="h-full rounded-md overflow-hidden">
+        <StockChartContainer />
+      </div>
+    </div>
+  );
 };
 
 export default StockDetailLayout;
