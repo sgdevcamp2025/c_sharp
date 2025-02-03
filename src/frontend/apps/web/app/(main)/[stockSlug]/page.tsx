@@ -21,7 +21,7 @@ export default function StockDetailsPage({ params }) {
 
   return (
     <div className="flex py-6 px-[30px] h-full min-w-0 min-h-0">
-      <div className="pr-2 basis-[45vw] flex flex-col min-w-0">
+      <div className="pr-2 basis-[45%] flex flex-col min-w-0">
         <Link
           href={'/'}
           className="w-fit"
