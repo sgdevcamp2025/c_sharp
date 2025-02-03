@@ -48,7 +48,7 @@ const SidebarContainer = () => {
   };
   return (
     <Sidebar>
-      <SidebarHeader>#WSName</SidebarHeader>
+      <SidebarHeader className="font-bold text-xl pt-4">#WSName</SidebarHeader>
       <SidebarContent className="gap-0">
         {data.navMain.map((item) => (
           <Collapsible
@@ -63,7 +63,7 @@ const SidebarContainer = () => {
                 className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               >
                 <CollapsibleTrigger>
-                  {item.title}{' '}
+                  {item.title}
                   <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
