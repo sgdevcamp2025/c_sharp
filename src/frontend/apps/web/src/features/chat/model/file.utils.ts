@@ -72,3 +72,17 @@ export const generateVideoThumbnail = (file: File): Promise<string> => {
     };
   });
 };
+
+/**
+ * 파일 크기를 사람이 읽기 쉬운 형태로 포맷팅하는 함수
+ *
+ * @param bytes - 파일 크기 (바이트 단위)
+ * @returns 포맷팅된 파일 크기 문자열 (예: '1.23 MB')
+ */
+export const formatFileSize = (bytes: number) => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
