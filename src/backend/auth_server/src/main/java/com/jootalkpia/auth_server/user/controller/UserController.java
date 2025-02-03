@@ -38,7 +38,8 @@ public class UserController implements UserControllerDocs {
     ) {
         return ResponseEntity.ok().body(userService.refreshToken(token));
     }
-    
+
+    @Override
     @PatchMapping("api/v1/user/profile")
     public ResponseEntity<String> updateNickname (
             @RequestBody final UpdateNicknameRequest request,
@@ -46,6 +47,6 @@ public class UserController implements UserControllerDocs {
     ) {
         Long userId = Long.valueOf(principal.getName());//JootalkpiaAuthenticationContext.getUserInfo().userId();
         userService.updateNickname(request.nickname(), userId);
-        return ResponseEntity.ok("ok");
+        return ResponseEntity.ok("닉네임 변경 성공");
     }
 }
