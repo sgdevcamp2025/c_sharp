@@ -1,4 +1,4 @@
-package com.jootalkpia.auth_server.user.dto;
+package com.jootalkpia.auth_server.user.dto.response;
 
 public record AccessTokenGetSuccess(
 

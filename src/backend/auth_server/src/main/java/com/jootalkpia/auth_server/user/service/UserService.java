@@ -12,9 +12,9 @@ import com.jootalkpia.auth_server.response.ErrorCode;
 import com.jootalkpia.auth_server.security.UserAuthentication;
 import com.jootalkpia.auth_server.user.domain.Platform;
 import com.jootalkpia.auth_server.user.domain.User;
-import com.jootalkpia.auth_server.user.dto.AccessTokenGetSuccess;
-import com.jootalkpia.auth_server.user.dto.LoginSuccessResponse;
-import com.jootalkpia.auth_server.user.dto.TokenDto;
+import com.jootalkpia.auth_server.user.dto.response.AccessTokenGetSuccess;
+import com.jootalkpia.auth_server.user.dto.response.LoginSuccessResponse;
+import com.jootalkpia.auth_server.user.dto.response.TokenDto;
 import com.jootalkpia.auth_server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -131,4 +131,3 @@ public class UserService {
         return userRepository.findUserByPlatformAndSocialId(socialId, platform).isPresent();
     }
 }
-
