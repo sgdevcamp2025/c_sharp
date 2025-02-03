@@ -29,7 +29,10 @@ const ChatToggleGroup = ({ name, onSend }: ChatToggleGroupsProps) => {
 
       <FilePreviewList
         selectedFiles={selectedFiles}
-        onRemoveFile={handleRemoveFile}
+        onRemoveFile={useCallback(
+          (id) => handleRemoveFile(id),
+          [handleRemoveFile],
+        )}
       />
       <div className="flex flex-row justify-between">
         <div className="flex flex-row gap-4 items-center">
