@@ -42,6 +42,7 @@ export const handleFileChangeEvent = async (
     try {
       const fileData: FileData = {
         id: Math.random().toString(36).substring(7),
+        name: file.name,
         file,
         preview: URL.createObjectURL(file),
         type: file.type.startsWith('image/') ? 'image' : 'video',
