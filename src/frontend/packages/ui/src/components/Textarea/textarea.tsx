@@ -6,7 +6,7 @@ import { cn } from '@workspace/ui/lib/utils';
 
 const Textarea = React.forwardRef<
   HTMLTextAreaElement,
-  React.ComponentProps<'textarea'>
+  React.ComponentPropsWithRef<'textarea'>
 >(({ className, ...props }, ref) => {
   const autoResizeTextarea = () => {
     const textarea = document.querySelector('textarea');
