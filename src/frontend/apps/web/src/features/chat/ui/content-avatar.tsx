@@ -9,7 +9,7 @@ const ContentAvatar = ({ type }: ContentAvatarProps) => {
   return (
     <>
       {type === 'live' ? (
-        <div className="bg-primary flex justify-center items-center flex h-10 w-10 shrink-0 overflow-hidden rounded-md">
+        <div className="bg-primary flex justify-center items-center h-10 w-10 shrink-0 overflow-hidden rounded-md">
           <Headset
             size={24}
             color="#fff"
