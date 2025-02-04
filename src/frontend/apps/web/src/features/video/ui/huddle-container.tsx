@@ -8,7 +8,7 @@ const HuddleContainer = () => {
       <h3 className="flex flex-row text-white gap-2">
         <Headphones /> slack-전체에서의 허들 1명
       </h3>
-      <div className="bg-gray-500 min-h-0 h-[90%]">
+      <div className="min-h-0 h-[90%]">
         <HuddleContent />
       </div>
       <div className="bg-red-100 min-h-0 h-[10%]">
