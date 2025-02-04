@@ -17,10 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class FileController {
     private final FileService fileService;
+    private final Long userId = 1L;//JootalkpiaAuthenticationContext.getUserInfo().userId();
 
     @PostMapping("/workspace/{workspaceId}/channel/{channelId}")
-    public ResponseEntity<UploadFileResponseDto> uploadPungs(@ModelAttribute UploadFileRequestDto uploadFileRequest) {
-
+    public ResponseEntity<UploadFileResponseDto> uploadFiles(@ModelAttribute UploadFileRequestDto uploadFileRequest) {
+        fileService.uploadFiles(userId, uploadFileRequest);
 
 
 

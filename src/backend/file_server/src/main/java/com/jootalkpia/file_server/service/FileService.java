@@ -1,66 +1,88 @@
 package com.jootalkpia.file_server.service;
 
+import com.jootalkpia.file_server.dto.UploadFileRequestDto;
+import com.jootalkpia.file_server.dto.UploadFileResponseDto;
+import com.jootalkpia.file_server.entity.File;
+import com.jootalkpia.file_server.repository.FileRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FileService {
 
+    private final FileRepository fileRepository;
+    private final S3Service s3Service;
+
     @Transactional
-    public MessageResponseDto uploadPung(Long userId, UploadPungRequestDto uploadPungRequestDto) {
-        Long placeId = uploadPungRequestDto.getPlaceId();
-        MultipartFile imageWithText = uploadPungRequestDto.getImageWithText();
-        MultipartFile pureImage = uploadPungRequestDto.getPureImage();
-        String text = uploadPungRequestDto.getText();
+    public UploadFileResponseDto uploadFiles(Long userId, UploadFileRequestDto uploadFileRequestDto) {
+        MultipartFile[] files = uploadFileRequestDto.getFiles();
+        MultipartFile[] thumbnails = uploadFileRequestDto.getThumbnails();
+
+        List<String> fileTypes = new ArrayList<>();
+        List<Long> fileIds = new ArrayList<>();
 
         try {
-            Long imageId = null;
-            // 1. Image 엔티티 생성 후 저장하여 imageId 얻기
-            if (imageWithText != null & !imageWithText.isEmpty() && pureImage != null && !pureImage.isEmpty())
-            {
-                Image image = new Image();
-                imageRepository.save(image);
-                imageId = image.getImageId();
+            if (files != null && files.length > 0) {
+                for (int i = 0; i < files.length; i++) {
+                    Long fileId = null;
+                    File fileEntity = new File();
+                    fileRepository.save(fileEntity);
+                    fileId = fileEntity.getFile_id();
 
-                // 2. S3에 이미지 업로드
-                Map<String, String> imageKeys = s3Service.uploadFile(imageWithText, pureImage, imageId, false);
-                log.info("S3 업로드 완료: {}", imageKeys);
+                    MultipartFile file = files[i];
 
-                // 3. Image 엔티티에 S3 키값 업데이트 후 저장
-                image.setImageTextKey(imageKeys.get("imageTextKey"));
-                image.setPureImageKey(imageKeys.get("pureImageKey"));
-                imageRepository.save(image);
-                log.info("Image 저장 완료, imageId: {}", image.getImageId());
+                    // 파일 타입 결정
+                    String fileType = FileTypeDetector.detectFileTypeFromMultipartFile(file);
+
+                    // S3에 업로드
+                    String s3Url = s3Service.uploadFile(file, fileType, fileId);
+
+                    // DB에 파일 저장
+                    fileEntity.setUrl(s3Url);
+                    fileEntity.setFile_type(fileType);
+                    fileEntity.setMime_type(file.getContentType());
+                    fileEntity.setFile_size(file.getSize());
+                    fileRepository.save(fileEntity);
+
+                    fileIds.add(fileEntity.getFile_id());
+                    fileTypes.add(fileEntity.getFile_type());
+
+                    // 영상 파일일 경우 썸네일 처리
+                    if ("VIDEO".equalsIgnoreCase(fileType) && thumbnails != null && i < thumbnails.length && thumbnails[i] != null) {
+                        fileId = null;
+                        fileEntity = new File();
+                        fileRepository.save(fileEntity);
+                        fileId = fileEntity.getFile_id();
+
+                        MultipartFile thumbnail = thumbnails[i];
+                        String thumbnailUrl = s3Service.uploadFile(thumbnail, "THUMBNAIL", fileId);
+
+                        File thumbnailEntity = new File();
+                        thumbnailEntity.setUrl(thumbnailUrl);
+                        thumbnailEntity.setFile_type("THUMBNAIL");
+                        thumbnailEntity.setMime_type(thumbnail.getContentType());
+                        thumbnailEntity.setFile_size(thumbnail.getSize());
+                        fileRepository.save(thumbnailEntity);
+
+                        fileIds.add(thumbnailEntity.getFile_id());
+                        fileTypes.add("THUMBNAIL");
+                    }
+                }
             }
 
-            // 4. Pung 엔티티 생성 후 저장
-            Pung pung = new Pung();
-            pung.setUserId(userId);
-            pung.setPlaceId(placeId);
-            pung.setImageId(imageId);
-            pung.setIsReview(false);
-            pung.setText(text);
-            pungRepository.save(pung);
-            log.info("Pung 저장 완료, pungId: {}", pung.getPungId());
-
-            // 5. AI에 이미지 전달 (실패해도 프론트엔드에 영향 없음)
-            try {
-                aiService.genTags(placeId, text, "https://pinpung-s3.s3.ap-northeast-2.amazonaws.com/original-images/"+imageId, userId);
-                log.info("AI 태그 생성 요청 완료");
-            } catch (Exception aiException) {
-                log.error("AI 태그 생성 중 오류 발생: {}", aiException.getMessage(), aiException);
-            }
-
-            return new MessageResponseDto("Pung upload success");
+            return new UploadFileResponseDto(fileTypes, fileIds);
 
         } catch (Exception e) {
-            log.error("이미지 업로드 및 Pung 저장 중 오류 발생: {}", e.getMessage(), e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, "Pung 업로드 중 오류가 발생했습니다.");
+            log.error("파일 업로드 중 오류 발생: {}", e.getMessage(), e);
+            throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.");
         }
     }
 }
