@@ -24,21 +24,39 @@ const meta: Meta<typeof Toggle> = {
 export default meta;
 type Story = StoryObj<typeof Toggle>;
 
+const MicButton = ({
+  variant = 'outline',
+  size = 'default',
+}: {
+  variant?: 'default' | 'outline';
+  size?: 'default' | 'lg';
+}) => {
+  const [isPressed, setIsPressed] = useState(false);
+  return (
+    <Toggle
+      pressed={isPressed}
+      onPressedChange={setIsPressed}
+      variant={variant}
+      size={size}
+      className="bg-gray-100 border-black-100"
+    >
+      {isPressed ? <Mic /> : <MicOff />}
+    </Toggle>
+  );
+};
+
 export const Default: Story = {
   args: {
     variant: 'outline',
     size: 'default',
   },
-  render: (args) => {
-    const [isPressed, setIsPressed] = useState(false);
-    return (
-      <Toggle
-        {...args}
-        pressed={isPressed}
-        onPressedChange={setIsPressed}
-      >
-        {isPressed ? <Mic /> : <MicOff />}
-      </Toggle>
-    );
+  render: (args) => <MicButton {...args} />,
+};
+
+export const LargeButton: Story = {
+  args: {
+    variant: 'default',
+    size: 'lg',
   },
+  render: (args) => <MicButton {...args} />,
 };
