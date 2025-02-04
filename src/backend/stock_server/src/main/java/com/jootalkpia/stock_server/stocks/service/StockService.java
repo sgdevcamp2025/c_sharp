@@ -1,5 +1,6 @@
 package com.jootalkpia.stock_server.stocks.service;
 
+import com.google.gson.Gson;
 import com.jootalkpia.stock_server.stocks.advice.StockCaller;
 import com.jootalkpia.stock_server.stocks.domain.Schedule;
 import com.jootalkpia.stock_server.stocks.domain.StockCode;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,8 @@ public class StockService {
     private final TokenProperties tokenProperties;
     private final TaskSchedulerConfiguration taskSchedulerConfiguration;
     private final MinutePriceRepository minutePriceRepository;
+    private final Gson gson = new Gson();
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @PostConstruct
     public void initScheduledTasks() {
@@ -66,8 +70,18 @@ public class StockService {
 
     private void createMinutePriceTask(StockCode stockCode, ScheduledTaskRegistrar taskRegistrar) {
         for (Schedule schedule : Schedule.values()) {
-            taskRegistrar.addCronTask(new CronTask(() ->
-                    minutePriceRepository.save(getStockPrice(stockCode.getCode()).toDocument()), schedule.getTime()));
+            taskRegistrar.addCronTask(new CronTask(() -> {
+                MinutePriceSimpleResponse minutePriceSimpleResponse = getStockPrice(stockCode.getCode());
+                String jsonMinutePrice = gson.toJson(minutePriceSimpleResponse);
+                minutePriceRepository.save(minutePriceSimpleResponse.toDocument());
+                kafkaTemplate.send("jootalkpia.stock.local.minute", jsonMinutePrice).whenComplete((result, ex) -> {
+                    if (ex == null) {
+                        log.info(result.toString());
+                    } else {
+                        log.error(ex.getMessage(), ex); //추후 예외처리
+                    }
+                });
+            }, schedule.getTime()));
         }
     }
 

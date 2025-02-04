@@ -5,11 +5,21 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVER}
+    producer:
+      properties:
+        delivery.timeout.ms: 60000
+        retry.backoff.ms: 100
+        request.timeout.ms: 3000
+      acks: all # 멱등성 프로듀서를 위해 all로 설정, 0 또는 1이면 enable.idempotence=true 불가
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
   data:
-     mongodb:
-       port: ${DB_PORT}
-       host: ${DB_HOST}
-       database: ${DB_NAME}
+    mongodb:
+      port: ${DB_PORT}
+      host: ${DB_HOST}
+      database: ${DB_NAME}
   jackson:
     property-naming-strategy: LOWER_CAMEL_CASE
 
@@ -17,7 +27,7 @@ logging:
   level:
     com.jootalkpia.stock_server: debug
     org.springframework.data.mongodb: debug
-    org.springframework.web.servlet : debug
+    org.springframework.web.servlet: debug
 
 feign:
   base-url: https://openapivts.koreainvestment.com:29443
@@ -29,7 +39,7 @@ feign:
   minute-price:
     path: /uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice
     tr-id: FHKST03010200
-    custtype : P
-    etc-cls-code : ""
-    market-div-code : "J"
+    custtype: P
+    etc-cls-code: ""
+    market-div-code: "J"
     pw-data-incu-yn: "N"
