@@ -29,4 +29,25 @@ public class KafkaConsumer {
             log.error(ex.getMessage(), ex); // 추후에 GlobalException 처리
         }
     }
+
+    @KafkaListener(
+            topics = "jootalkpia.chat.local.message",
+            groupId = "chat-message-handle-consumer-group", //추후 그룹 ID에 동적인 컨테이너 ID 삽입
+            concurrency = "2"
+    )
+    public void processChatMessage(String kafkaMessage) {
+        log.info("message ===> " + kafkaMessage);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            ChatMessageToKafka chatMessageToKafka = mapper.readValue(kafkaMessage, ChatMessageToKafka.class);
+
+            //로컬 메모리와 유저 ID를 비교하는 로직, 있으면 웹소켓을 통한 데이터 전달 없으면 일단 버림
+
+            log.info("dto ===> " + chatMessageToKafka.toString());
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        }
+    }
 }
