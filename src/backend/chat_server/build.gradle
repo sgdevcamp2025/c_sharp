@@ -27,7 +27,6 @@ dependencies {
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -43,6 +42,13 @@ dependencies {
 
     //socket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    //Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+    //Gson
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
 }
 
 tasks.named('test') {
