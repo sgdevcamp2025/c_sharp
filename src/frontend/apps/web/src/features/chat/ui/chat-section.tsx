@@ -16,7 +16,9 @@ const ChatSection = () => {
         <div className="flex flex-1 flex-col w-full h-full overflow-y-auto">
           <ChatContent setIsThreadOpen={setIsThreadOpen} />
         </div>
-        <ChatTextarea />
+        <div className="p-4">
+          <ChatTextarea />
+        </div>
       </div>
 
       {/* Thread Panel Overlay */}
