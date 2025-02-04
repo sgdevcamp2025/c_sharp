@@ -62,16 +62,6 @@ export const useFileManagements = () => {
     }
   };
 
-  useEffect(() => {
-    const currentFiles = selectedFiles;
-
-    return () => {
-      currentFiles.forEach((file) => {
-        URL.revokeObjectURL(file.preview);
-      });
-    };
-  }, [selectedFiles]);
-
   /**
    * 파일 제거 메서드
    * @param id - 제거할 파일의 ID
