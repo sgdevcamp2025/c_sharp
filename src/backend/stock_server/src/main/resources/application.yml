@@ -9,7 +9,6 @@ spring:
     bootstrap-servers: ${KAFKA_SERVER}
     producer:
       properties:
-        partitioner.class: org.apache.kafka.clients.producer.RoundRobinPartitioner
         delivery.timeout.ms: 60000
         retry.backoff.ms: 100
         request.timeout.ms: 3000
