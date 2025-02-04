@@ -1,6 +1,6 @@
 import { Headphones } from 'lucide-react';
 import HuddleContent from './huddle-content';
-import HuddleControls from './huddle-controls';
+import ControlsContainer from './controls-container';
 
 const HuddleContainer = () => {
   return (
@@ -11,8 +11,8 @@ const HuddleContainer = () => {
       <div className="min-h-0 h-[90%]">
         <HuddleContent />
       </div>
-      <div className="bg-red-100 min-h-0 h-[10%]">
-        <HuddleControls />
+      <div className="min-h-0 h-[10%]">
+        <ControlsContainer />
       </div>
     </div>
   );
