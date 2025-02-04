@@ -6,8 +6,8 @@ const ControlsContainer = () => {
     <div className="relative w-full h-full min-w-0 min-h-0 flex flex-row justify-center items-center">
       <HuddleControls />
       <Toggle
-        size="default"
-        variant="outline"
+        variant="default"
+        size="lg"
         className="absolute right-0"
       >
         <MessageSquareText />
