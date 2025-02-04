@@ -1,12 +1,13 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useCallback } from 'react';
 
 import { Button } from '@workspace/ui/components';
-import { handleFileChangeEvent, removeFile } from '@/src/features/chat/model';
 
-import { FilePreviewList } from './file-preivew-list';
+import { FilePreviewList } from './file-preview-list';
 import { FileUploadTrigger } from './file-upload-trigger';
-import type { FileData } from '../model';
+import { Loader } from 'lucide-react';
+
+import { useFileManagements } from '../model';
 
 type ChatToggleGroupsProps = {
   name: string;
@@ -14,27 +15,41 @@ type ChatToggleGroupsProps = {
 };
 
 const ChatToggleGroup = ({ name, onSend }: ChatToggleGroupsProps) => {
-  const [selectedFiles, setSelectedFiles] = useState<FileData[]>([]);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    handleFileChangeEvent(event, setSelectedFiles);
-  };
-
-  const handleRemoveFile = (id: string) => {
-    removeFile(id, setSelectedFiles);
-  };
+  const {
+    selectedFiles,
+    handleFileChange,
+    handleRemoveFile,
+    isLoading,
+    error,
+  } = useFileManagements();
 
   return (
     <div className="flex flex-col justify-between gap-2">
+      {error && <div className="text-red-500">{error.message}</div>}
+
       <FilePreviewList
         selectedFiles={selectedFiles}
-        onRemoveFile={handleRemoveFile}
+        onRemoveFile={useCallback(
+          (id) => handleRemoveFile(id),
+          [handleRemoveFile],
+        )}
       />
       <div className="flex flex-row justify-between">
-        <FileUploadTrigger
-          name={name}
-          onFileChange={handleFileChange}
-        />
+        <div className="flex flex-row gap-4 items-center">
+          <FileUploadTrigger
+            name={name}
+            onFileChange={useCallback(
+              (event) => handleFileChange(event),
+              [handleFileChange],
+            )}
+          />
+          {isLoading && (
+            <Loader
+              size="20"
+              color="#000"
+            />
+          )}
+        </div>
         {onSend && (
           <Button
             onClick={onSend}
