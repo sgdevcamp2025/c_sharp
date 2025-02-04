@@ -28,7 +28,19 @@ ext {
 }
 
 dependencies {
+	//gateway
+	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 
+	//mono
+	implementation 'io.projectreactor:reactor-core'
+
+	//lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	//test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 dependencyManagement {
