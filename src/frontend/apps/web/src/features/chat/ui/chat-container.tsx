@@ -1,16 +1,17 @@
+import { SidebarInset, SidebarProvider } from '@workspace/ui/components';
 import ChatHeader from './chat-header';
 import ChatSection from './chat-section';
+import { SidebarContainer } from '@/src/shared/components/sidebar';
 
 const ChatContainer = () => {
   return (
-    <div className="flex w-full h-full bg-white">
-      <aside className="w-44 h-full bg-gray-400 flex-shrink-0">sidebar</aside>
-
-      <div className="flex flex-col min-w-0 min-h-0 w-full h-full">
+    <SidebarProvider className="flex w-full h-full min-w-0 min-h-0 border  rounded-md overflow-hidden">
+      <SidebarContainer />
+      <SidebarInset className="flex flex-col min-w-0 min-h-0 w-full h-full">
         <ChatHeader />
         <ChatSection />
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 
