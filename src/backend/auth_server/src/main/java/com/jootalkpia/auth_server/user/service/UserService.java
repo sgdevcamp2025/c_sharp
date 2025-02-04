@@ -12,10 +12,11 @@ import com.jootalkpia.auth_server.response.ErrorCode;
 import com.jootalkpia.auth_server.security.UserAuthentication;
 import com.jootalkpia.auth_server.user.domain.Platform;
 import com.jootalkpia.auth_server.user.domain.User;
-import com.jootalkpia.auth_server.user.dto.AccessTokenGetSuccess;
-import com.jootalkpia.auth_server.user.dto.LoginSuccessResponse;
-import com.jootalkpia.auth_server.user.dto.TokenDto;
+import com.jootalkpia.auth_server.user.dto.response.AccessTokenGetSuccess;
+import com.jootalkpia.auth_server.user.dto.response.LoginSuccessResponse;
+import com.jootalkpia.auth_server.user.dto.response.TokenDto;
 import com.jootalkpia.auth_server.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -77,7 +78,7 @@ public class UserService {
         // 사용자 정보 가져오기
         userRepository.findByUserIdOrThrow(id);
 
-        UserAuthentication userAuthentication = new UserAuthentication(id.toString(), null);
+        UserAuthentication userAuthentication = new UserAuthentication(id.toString(), null, null);
 
         String refreshToken = jwtTokenProvider.issueRefreshToken(userAuthentication);
         tokenService.saveRefreshToken(id, refreshToken);
@@ -103,11 +104,25 @@ public class UserService {
         // 사용자 정보 가져오기
         userRepository.findByUserIdOrThrow(userId);
 
-        UserAuthentication userAuthentication = new UserAuthentication(userId.toString(), null);
+        UserAuthentication userAuthentication = new UserAuthentication(userId.toString(),null, null);
 
         return AccessTokenGetSuccess.of(
                 jwtTokenProvider.issueAccessToken(userAuthentication)
         );
+    }
+
+    @Transactional
+    public void updateNickname(
+            String nickname,
+            Long userId
+    ) {
+        User user = userRepository.findByUserIdOrThrow(userId);
+
+        if (userRepository.existsByNickname(nickname)) {
+            throw new CustomException(ErrorCode.DUPLICATION_NICKNAME);
+        }
+
+        user.updateNickname(nickname);
     }
 
     private TokenDto getTokenDto(
@@ -131,4 +146,3 @@ public class UserService {
         return userRepository.findUserByPlatformAndSocialId(socialId, platform).isPresent();
     }
 }
-

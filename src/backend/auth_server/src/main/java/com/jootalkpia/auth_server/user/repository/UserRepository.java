@@ -21,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
         return findByUserId(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
+
+    boolean existsByNickname(String nickname);
 }
