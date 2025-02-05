@@ -1,16 +1,18 @@
 package com.jootalkpia.file_server.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @Service
 @Slf4j
@@ -70,5 +72,39 @@ public class S3Service {
                 log.warn("임시 파일 삭제 실패: {}", e.getMessage(), e);
             }
         }
+    }
+
+//    public byte[] downloadFile(String folder, Long fileId) {
+//        String key = folder + "/" + fileId;
+//
+//        try (ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(
+//                GetObjectRequest.builder()
+//                        .bucket(bucketName)
+//                        .key(key)
+//                        .build())) {
+//
+//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//            byte[] buffer = new byte[1024];
+//            int length;
+//            while ((length = s3Object.read(buffer)) != -1) {
+//                outputStream.write(buffer, 0, length);
+//            }
+//            return outputStream.toByteArray();
+//
+//        } catch (IOException e) {
+//            log.error("S3 파일 다운로드 중 오류 발생: {}", e.getMessage(), e);
+//            throw new RuntimeException("S3 파일 다운로드 중 오류가 발생했습니다.");
+//        }
+//    }
+
+    public ResponseInputStream<GetObjectResponse> downloadFile(String folder, Long fileId) {
+        String key = folder + "/" + fileId;
+
+        // S3에서 파일 다운로드 (스트림 반환)
+        return s3Client.getObject(
+                GetObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key)
+                        .build());
     }
 }
