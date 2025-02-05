@@ -10,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,11 +77,11 @@ public class FileController {
                 .body(new InputStreamResource(s3InputStream));
     }
 
-    @PatchMapping("/{userId}/profile-image")
+    @PostMapping("/{userId}/profile-image")
     public ResponseEntity<String> changeProfile(
             @PathVariable Long userId,
             @RequestParam("newImage") MultipartFile newImage) {
-
+        log.info("newImage: {}", newImage);
         String response = fileService.changeProfile(userId, newImage);
         return ResponseEntity.ok(response);
     }
