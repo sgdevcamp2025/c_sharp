@@ -21,7 +21,7 @@ const meta: Meta<typeof ToggleGroup> = {
 export default meta;
 type Story = StoryObj<typeof ToggleGroup>;
 
-const ToolBar = ({
+const ToggleGroupTemplate = ({
   type = 'multiple',
   variant = 'outline',
   size = 'lg',
@@ -62,5 +62,5 @@ const ToolBar = ({
   );
 };
 export const Default: Story = {
-  render: () => <ToolBar />,
+  render: () => <ToggleGroupTemplate />,
 };

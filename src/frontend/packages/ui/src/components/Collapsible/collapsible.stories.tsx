@@ -19,7 +19,7 @@ const meta: Meta<typeof Collapsible> = {
 export default meta;
 type Story = StoryObj<typeof Collapsible>;
 
-const CollapsibleList = () => {
+const CollapsibleListTemplate = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -49,5 +49,5 @@ const CollapsibleList = () => {
   );
 };
 export const Default: Story = {
-  render: () => <CollapsibleList />,
+  render: () => <CollapsibleListTemplate />,
 };

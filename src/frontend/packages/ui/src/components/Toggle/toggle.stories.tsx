@@ -24,7 +24,7 @@ const meta: Meta<typeof Toggle> = {
 export default meta;
 type Story = StoryObj<typeof Toggle>;
 
-const MicButton = ({
+const ToggleButtonTemplate = ({
   variant = 'outline',
   size = 'default',
 }: {
@@ -50,7 +50,7 @@ export const Default: Story = {
     variant: 'outline',
     size: 'default',
   },
-  render: (args) => <MicButton {...args} />,
+  render: (args) => <ToggleButtonTemplate {...args} />,
 };
 
 export const LargeButton: Story = {
@@ -58,5 +58,5 @@ export const LargeButton: Story = {
     variant: 'default',
     size: 'lg',
   },
-  render: (args) => <MicButton {...args} />,
+  render: (args) => <ToggleButtonTemplate {...args} />,
 };
