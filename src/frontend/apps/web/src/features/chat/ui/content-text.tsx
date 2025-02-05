@@ -3,7 +3,11 @@ import { Badge } from '@workspace/ui/components';
 import type { ChatContentWithAvatarsProps } from './chat-content';
 import AvatarList from './avatarlist';
 
-const ContentText = ({ type, avatarUrls }: ChatContentWithAvatarsProps) => {
+const ContentText = ({
+  type,
+  avatarUrls,
+  setIsThreadOpen,
+}: ChatContentWithAvatarsProps) => {
   return (
     <div className="flex flex-col ">
       <div className="flex flex-col gap-2">
@@ -21,7 +25,12 @@ const ContentText = ({ type, avatarUrls }: ChatContentWithAvatarsProps) => {
         </div>
         <div className="text-base">안녕하세요</div>
       </div>
-      <AvatarList avatarUrls={avatarUrls} />
+      <div onClick={() => setIsThreadOpen(true)}>
+        <AvatarList
+          avatarUrls={avatarUrls}
+          setIsThreadOpen={setIsThreadOpen}
+        />
+      </div>
     </div>
   );
 };
