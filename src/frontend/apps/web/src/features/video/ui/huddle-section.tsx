@@ -1,6 +1,6 @@
-import HuddleParticipant from './huddle-participant';
+import HuddleParticipant from './huddle-participant-card';
 
-const HuddleContent = () => {
+const HuddleSection = () => {
   return (
     <div className="w-full h-full min-h-0 overflow-hidden p-3 bg-muted rounded-lg flex flex-row flex-wrap justify-center items-center gap-5 overflow-y-auto">
       <HuddleParticipant />
@@ -10,4 +10,4 @@ const HuddleContent = () => {
     </div>
   );
 };
-export default HuddleContent;
+export default HuddleSection;

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-const HuddleControls = () => {
+const HuddleControlsGroup = () => {
   const [isMicOn, setIsMicOn] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
@@ -57,4 +57,4 @@ const HuddleControls = () => {
     </div>
   );
 };
-export default HuddleControls;
+export default HuddleControlsGroup;

@@ -1,10 +1,11 @@
 import { Button, Toggle } from '@workspace/ui/components';
-import HuddleControls from './huddle-controls';
+import HuddleControlsGroup from './huddle-controls-group';
 import { MessageSquareText } from 'lucide-react';
-const ControlsContainer = () => {
+
+const HuddleFooter = () => {
   return (
     <div className="relative w-full h-full min-w-0 min-h-0 flex flex-row justify-center items-center">
-      <HuddleControls />
+      <HuddleControlsGroup />
       <Toggle
         variant="default"
         size="lg"
@@ -15,4 +16,4 @@ const ControlsContainer = () => {
     </div>
   );
 };
-export default ControlsContainer;
+export default HuddleFooter;

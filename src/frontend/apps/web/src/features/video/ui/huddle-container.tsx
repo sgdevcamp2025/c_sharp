@@ -1,6 +1,6 @@
 import { Headphones } from 'lucide-react';
-import HuddleContent from './huddle-content';
-import ControlsContainer from './controls-container';
+import HuddleContent from './huddle-section';
+import ControlsContainer from './huddle-footer';
 
 const HuddleContainer = () => {
   return (
