@@ -1,14 +1,11 @@
-type HuddleControlsGroup = {
-  mic: boolean;
-  video: boolean;
-  screen: boolean;
-};
-type HuddleControlAction = {
-  type: 'mic' | 'video' | 'screen';
+import { type HuddleControl } from './huddle-control.type';
+
+export type HuddleControlAction = {
+  type: HuddleControl;
 };
 
 export const huddleControlReducer = (
-  state: HuddleControlsGroup,
+  state: Record<HuddleControl, boolean>,
   action: HuddleControlAction,
 ) => {
   switch (action.type) {
