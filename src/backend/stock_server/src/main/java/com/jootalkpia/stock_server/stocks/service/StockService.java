@@ -74,7 +74,7 @@ public class StockService {
                 MinutePriceSimpleResponse minutePriceSimpleResponse = getStockPrice(stockCode.getCode());
                 String jsonMinutePrice = gson.toJson(minutePriceSimpleResponse);
                 minutePriceRepository.save(minutePriceSimpleResponse.toDocument());
-                kafkaTemplate.send("jootalkpia.stock.local.minute", jsonMinutePrice).whenComplete((result, ex) -> {
+                kafkaTemplate.send("jootalkpia.stock.prd.minute", jsonMinutePrice).whenComplete((result, ex) -> {
                     if (ex == null) {
                         log.info(result.toString());
                     } else {
