@@ -58,7 +58,7 @@ const AvatarList = ({
         )}
       </div>
       <div
-        className={`ml-2 text-sm transition-all duration-300 ease-in-out ${isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'}`}
+        className={`ml-2 text-sm transition-all duration-300 ease-in-out ${isHovered ? 'opacity-100' : 'opacity-0'}`}
       >
         스레드 보기
       </div>
