@@ -8,6 +8,13 @@ on:
       - main
     paths:
       - 'src/frontend/**'
+      - '!src/frontend/packages/ui/**'
+      - '../workflows/fe-ci.yml'
+  # push:
+  #   branches:
+  #     - fe-feat/ci-storybook
+  #   paths:
+  #     - '!src/frontend/packages/ui/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -25,16 +32,22 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - uses: pnpm/action-setup@v3
         with:
           version: 8
 
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             ~/.pnpm-store
-            node_modules
+            **/node_modules
+            src/frontend/node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
@@ -51,7 +64,7 @@ jobs:
       - name: CI
         run: |
           cd src/frontend
-          pnpm turbo typescript lint format build build-storybook --parallel
+          pnpm turbo typescript lint format build --parallel
 
   required:
     needs: [changes]

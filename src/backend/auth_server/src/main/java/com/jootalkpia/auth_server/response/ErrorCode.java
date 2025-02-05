@@ -12,6 +12,9 @@ public enum ErrorCode {
     BAD_REQUEST("A40001", HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     MISSING_REQUIRED_HEADER("A40002", HttpStatus.BAD_REQUEST, "필수 헤더가 누락되었습니다."),
     MISSING_REQUIRED_PARAMETER("A40003", HttpStatus.BAD_REQUEST, "필수 파라미터가 누락되었습니다."),
+    AUTHENTICATION_CODE_EXPIRED("A40004", HttpStatus.BAD_REQUEST, "인가 코드가 만료되었습니다."),
+    PLATFORM_BAD_REQUEST("A40005", HttpStatus.BAD_REQUEST, "로그인 요청이 유효하지 않습니다."),
+    DUPLICATION_NICKNAME("A40006", HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
 
     // 401 Unauthorized
     ACCESS_TOKEN_EXPIRED("A40100", HttpStatus.UNAUTHORIZED, "액세스 토큰이 만료되었습니다."),
@@ -25,6 +28,7 @@ public enum ErrorCode {
 
     // 404 Not Found
     NOT_FOUND_END_POINT("A40400", HttpStatus.NOT_FOUND, "존재하지 않는 API입니다."),
+    USER_NOT_FOUND("A40401", HttpStatus.NOT_FOUND, "해당 유저는 존재하지 않습니다."),
 
     // 405 Method Not Allowed Error
     METHOD_NOT_ALLOWED("A40500", HttpStatus.METHOD_NOT_ALLOWED, "지원하지 않는 메소드입니다."),

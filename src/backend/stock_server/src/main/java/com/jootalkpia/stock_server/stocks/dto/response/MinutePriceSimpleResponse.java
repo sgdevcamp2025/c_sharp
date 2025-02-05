@@ -1,5 +1,7 @@
 package com.jootalkpia.stock_server.stocks.dto.response;
 
+import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
+
 public record MinutePriceSimpleResponse(
         String code,
         String htsKorIsnm,
@@ -13,7 +15,7 @@ public record MinutePriceSimpleResponse(
         String acmlTrPbmn
 ) {
 
-    public static MinutePriceSimpleResponse from(MinutePriceResponse minutePriceDto, String code) {
+    public static MinutePriceSimpleResponse from(MinutePriceDetailedResponse minutePriceDto, String code) {
         return new MinutePriceSimpleResponse(
                 code,
                 minutePriceDto.output1().htsKorIsnm(),
@@ -25,6 +27,21 @@ public record MinutePriceSimpleResponse(
                 minutePriceDto.output2().get(1).stckLwpr(),
                 minutePriceDto.output2().get(1).cntgVol(),
                 minutePriceDto.output2().get(1).acmlTrPbmn()
+        );
+    }
+
+    public MinutePrice toDocument() {
+        return MinutePrice.of(
+                code,
+                htsKorIsnm,
+                stckBsopDate,
+                stckCntgHour,
+                stckPrpr,
+                stckOprc,
+                stckHgpr,
+                stckLwpr,
+                cntgVol,
+                acmlTrPbmn
         );
     }
 }
