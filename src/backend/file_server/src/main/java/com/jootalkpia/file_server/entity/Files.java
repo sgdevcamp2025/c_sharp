@@ -11,16 +11,16 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class File {
+public class Files {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long file_id;
+    private Long fileId;
 
     private String url;
-    private String url_thumbnail;
-    private String file_type;
-    private Long file_size;
-    private String mime_type;
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
+    private String urlThumbnail;
+    private String fileType;
+    private Long fileSize;
+    private String mimeType;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

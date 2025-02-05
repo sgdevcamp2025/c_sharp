@@ -1,6 +1,7 @@
 server:
   port: 8080
-
+  tomcat:
+    max-swallow-size: -1
 spring:
   application:
     name: file_server
@@ -19,9 +20,16 @@ spring:
     level:
       org.hibernate.SQL: DEBUG
       org.hibernate.type.descriptor.sql: TRACE
-
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1000MB  # 개별 파일 최대 크기
+      max-request-size: 1000MB  # 전체 요청 최대 크기
   cloud:
     aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
       s3:
         bucket: ${S3_BUCKET_NAME}
       region:

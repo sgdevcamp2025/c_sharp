@@ -2,7 +2,7 @@ package com.jootalkpia.file_server.service;
 
 import com.jootalkpia.file_server.dto.UploadFileRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileResponseDto;
-import com.jootalkpia.file_server.entity.File;
+import com.jootalkpia.file_server.entity.Files;
 import com.jootalkpia.file_server.repository.FileRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +33,9 @@ public class FileService {
             if (files != null && files.length > 0) {
                 for (int i = 0; i < files.length; i++) {
                     Long fileId = null;
-                    File fileEntity = new File();
-                    fileRepository.save(fileEntity);
-                    fileId = fileEntity.getFile_id();
+                    Files filesEntity = new Files();
+                    fileRepository.save(filesEntity);
+                    fileId = filesEntity.getFileId();
 
                     MultipartFile file = files[i];
 
@@ -46,34 +46,31 @@ public class FileService {
                     String s3Url = s3Service.uploadFile(file, fileType, fileId);
 
                     // DB에 파일 저장
-                    fileEntity.setUrl(s3Url);
-                    fileEntity.setFile_type(fileType);
-                    fileEntity.setMime_type(file.getContentType());
-                    fileEntity.setFile_size(file.getSize());
-                    fileRepository.save(fileEntity);
+                    filesEntity.setUrl(s3Url);
+                    filesEntity.setFileType(fileType);
+                    filesEntity.setMimeType(file.getContentType());
+                    filesEntity.setFileSize(file.getSize());
+                    fileRepository.save(filesEntity);
 
-                    fileIds.add(fileEntity.getFile_id());
-                    fileTypes.add(fileEntity.getFile_type());
+                    fileIds.add(filesEntity.getFileId());
+                    fileTypes.add(filesEntity.getFileType());
 
                     // 영상 파일일 경우 썸네일 처리
                     if ("VIDEO".equalsIgnoreCase(fileType) && thumbnails != null && i < thumbnails.length && thumbnails[i] != null) {
                         fileId = null;
-                        fileEntity = new File();
-                        fileRepository.save(fileEntity);
-                        fileId = fileEntity.getFile_id();
+                        filesEntity = new Files();
+                        fileRepository.save(filesEntity);
+                        fileId = filesEntity.getFileId();
 
                         MultipartFile thumbnail = thumbnails[i];
                         String thumbnailUrl = s3Service.uploadFile(thumbnail, "THUMBNAIL", fileId);
 
-                        File thumbnailEntity = new File();
-                        thumbnailEntity.setUrl(thumbnailUrl);
-                        thumbnailEntity.setFile_type("THUMBNAIL");
-                        thumbnailEntity.setMime_type(thumbnail.getContentType());
-                        thumbnailEntity.setFile_size(thumbnail.getSize());
-                        fileRepository.save(thumbnailEntity);
+                        filesEntity.setUrlThumbnail(thumbnailUrl);
 
-                        fileIds.add(thumbnailEntity.getFile_id());
-                        fileTypes.add("THUMBNAIL");
+                        fileRepository.save(filesEntity);
+
+//                        fileIds.add(filesEntity.getFileId());
+//                        fileTypes.add("THUMBNAIL");
                     }
                 }
             }

@@ -23,6 +23,7 @@ public class S3Service {
     private String bucketName;
 
     public String uploadFile(MultipartFile file, String fileType, Long fileId) {
+        Path tempFile = null;
         try {
             // 폴더 경로 설정
             String folder;
@@ -39,9 +40,9 @@ public class S3Service {
             // S3에 저장될 파일 키 생성
             String key = folder + fileId;
 
-            // 파일을 임시 디스크에 저장
-            Path tempFile = Files.createTempFile("temp-", key);
-            file.transferTo(tempFile);
+            // 임시 파일 생성
+            tempFile = Files.createTempFile("temp-", ".tmp");
+            file.transferTo(tempFile.toFile()); // MultipartFile -> 임시 파일 저장
 
             // S3에 업로드
             s3Client.putObject(
@@ -52,15 +53,22 @@ public class S3Service {
                             .build(),
                     tempFile);
 
-            // 임시 파일 삭제
-            Files.deleteIfExists(tempFile);
-
             log.info("파일 업로드 완료 - S3 Key: {}", key);
             return "https://" + bucketName + ".s3.amazonaws.com/" + key;
 
         } catch (IOException e) {
             log.error("파일 업로드 중 오류 발생: {}", e.getMessage(), e);
             throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.");
+        } finally {
+            // 임시 파일 삭제
+            try {
+                if (tempFile != null && Files.exists(tempFile)) {
+                    Files.delete(tempFile);
+                    log.info("임시 파일 삭제 완료: {}", tempFile);
+                }
+            } catch (IOException e) {
+                log.warn("임시 파일 삭제 실패: {}", e.getMessage(), e);
+            }
         }
     }
 }
