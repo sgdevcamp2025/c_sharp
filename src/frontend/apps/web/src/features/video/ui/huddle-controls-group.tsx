@@ -8,12 +8,18 @@ import {
   Video,
   VideoOff,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
+import { huddleControlReducer } from '../model/huddle-controls-reducer';
 
 const HuddleControlsGroup = () => {
-  const [isMicOn, setIsMicOn] = useState(false);
-  const [isVideoOn, setIsVideoOn] = useState(false);
-  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [controlGroupState, controlGroupDispatch] = useReducer(
+    huddleControlReducer,
+    {
+      mic: false,
+      video: false,
+      screen: false,
+    },
+  );
   const iconStyle = 'w-16 h-16';
 
   return (
@@ -26,9 +32,9 @@ const HuddleControlsGroup = () => {
       >
         <ToggleGroupItem
           value="mic"
-          onClick={() => setIsMicOn((prev) => !prev)}
+          onClick={() => controlGroupDispatch({ type: 'mic' })}
         >
-          {isMicOn ? (
+          {controlGroupState.mic ? (
             <Mic className={iconStyle} />
           ) : (
             <MicOff className={iconStyle} />
@@ -36,15 +42,15 @@ const HuddleControlsGroup = () => {
         </ToggleGroupItem>
         <ToggleGroupItem
           value="video"
-          onClick={() => setIsVideoOn((prev) => !prev)}
+          onClick={() => controlGroupDispatch({ type: 'video' })}
         >
-          {isVideoOn ? <Video /> : <VideoOff />}
+          {controlGroupState.video ? <Video /> : <VideoOff />}
         </ToggleGroupItem>
         <ToggleGroupItem
-          value="sharing"
-          onClick={() => setIsScreenSharing((prev) => !prev)}
+          value="screen"
+          onClick={() => controlGroupDispatch({ type: 'screen' })}
         >
-          {isScreenSharing ? <ScreenShare /> : <ScreenShareOff />}
+          {controlGroupState.screen ? <ScreenShare /> : <ScreenShareOff />}
         </ToggleGroupItem>
         <Button
           variant="destructive"
