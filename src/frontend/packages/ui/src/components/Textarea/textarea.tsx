@@ -7,10 +7,9 @@ import { cn } from '@workspace/ui/lib/utils';
 const Textarea = React.forwardRef<
   HTMLTextAreaElement,
   React.ComponentPropsWithRef<'textarea'>
->(({ className, ...props }, ref) => {
+>(({ className, onKeyDown, ...props }, ref) => {
   const autoResizeTextarea = () => {
     const textarea = document.querySelector('textarea');
-
     if (textarea) {
       textarea.style.height = 'auto';
       const height = textarea.scrollHeight;
@@ -18,14 +17,24 @@ const Textarea = React.forwardRef<
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      if (!e.shiftKey) {
+        e.preventDefault();
+      }
+    }
+    onKeyDown?.(e);
+    autoResizeTextarea();
+  };
+
   return (
     <textarea
       className={cn(
-        'flex min-h-[64px] max-h-[128px] resize-none h-auto w-full rounded-md bg-white px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+        'flex min-h-[64px] max-h-[388px] resize-none h-auto w-full rounded-md bg-white px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
         className,
       )}
       maxLength={2000}
-      onKeyDown={autoResizeTextarea}
+      onKeyDown={handleKeyDown}
       onKeyUp={autoResizeTextarea}
       ref={ref}
       {...props}
