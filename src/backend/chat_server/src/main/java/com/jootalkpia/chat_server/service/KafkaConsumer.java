@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class KafkaConsumer {
     @KafkaListener(
-            topics = "jootalkpia.stock.local.minute",
-            groupId = "minute-price-save-consumer-group"
+            topics = "${topic.minute}",
+            groupId = "${group.minute}"
     )
     public void processMinutePrice(String kafkaMessage) {
         log.info("message ===> " + kafkaMessage);
@@ -31,8 +31,8 @@ public class KafkaConsumer {
     }
 
     @KafkaListener(
-            topics = "jootalkpia.chat.local.message",
-            groupId = "chat-message-handle-consumer-group", //추후 그룹 ID에 동적인 컨테이너 ID 삽입
+            topics = "${topic.chat}",
+            groupId = "${group.chat}", //추후 그룹 ID에 동적인 컨테이너 ID 삽입
             concurrency = "2"
     )
     public void processChatMessage(String kafkaMessage) {
