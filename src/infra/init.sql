@@ -1,3 +1,4 @@
+
 -- Users 테이블 생성
 CREATE TABLE IF NOT EXISTS users (
                                      user_id SERIAL PRIMARY KEY,
@@ -73,3 +74,4 @@ BEGIN
             ('한화에어로스페이스 워크스페이스', '한화에어로스페이스');
     END IF;
 END $$;
+
