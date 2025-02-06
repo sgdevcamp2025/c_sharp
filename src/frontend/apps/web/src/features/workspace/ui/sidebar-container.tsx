@@ -14,7 +14,7 @@ import {
 } from '@workspace/ui/components';
 import { ChevronRight } from 'lucide-react';
 
-const SidebarContainer = () => {
+const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
   const data = {
     navMain: [
       {
@@ -48,8 +48,17 @@ const SidebarContainer = () => {
   };
   return (
     <Sidebar>
-      <SidebarHeader className="font-bold text-xl pt-4">#WSName</SidebarHeader>
-      <SidebarContent className="gap-0">
+      <SidebarHeader className="px-4 py-3.5 min-w-0 max-w-full border-b border-white/10">
+        <div className="flex flex-col gap-1">
+          <div className="text-[11px] text-white/40 font-medium tracking-wide uppercase">
+            Workspace
+          </div>
+          <div className="truncate text-white/95 font-bold text-[18px] tracking-tight">
+            {stockSlug}
+          </div>
+        </div>
+      </SidebarHeader>
+      <SidebarContent className="gap-1 pt-2">
         {data.navMain.map((item) => (
           <Collapsible
             key={item.title}
@@ -60,11 +69,11 @@ const SidebarContainer = () => {
             <SidebarGroup>
               <SidebarGroupLabel
                 asChild
-                className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                className="group/label text-sm text-white/90 hover:bg-white/10 hover:text-white transition-colors px-4 py-2"
               >
                 <CollapsibleTrigger>
                   {item.title}
-                  <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                  <ChevronRight className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90 opacity-70 group-hover/label:opacity-100" />
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
               <CollapsibleContent>
@@ -75,6 +84,7 @@ const SidebarContainer = () => {
                         <SidebarMenuButton
                           asChild
                           isActive={item.isActive}
+                          className="px-8 py-1.5 text-sm text-white/80 hover:text-white transition-colors"
                         >
                           <a href={item.url}>{item.title}</a>
                         </SidebarMenuButton>
