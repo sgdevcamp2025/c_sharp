@@ -18,6 +18,8 @@ permissions:
   contents: read
   deployments: write
   pull-requests: write
+  statuses: write
+  checks: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
