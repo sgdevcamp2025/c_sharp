@@ -1,6 +1,13 @@
 [build]
   command = "cd src/frontend && pnpm turbo build"
-  publish = "src/frontend/apps/web/.next"
+  publish = "src/frontend/apps/web/.next/standalone"
   
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NEXT_TELEMETRY_DISABLED = "1"
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"

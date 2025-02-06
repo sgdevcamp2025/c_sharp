@@ -3,9 +3,8 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".next/standalone/**"],
+      "dependsOn": ["^build"]
     },
     "build-storybook": {
       "dependsOn": ["^build-storybook"],
@@ -39,7 +38,11 @@
     },
     "typescript": {
       "dependsOn": ["^typescript"],
-      "inputs": ["$TURBO_DEFAULT$", "tsconfig.json", "packages/**/tsconfig.json"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "tsconfig.json",
+        "packages/**/tsconfig.json"
+      ],
       "cache": true,
       "persistent": false
     }
