@@ -1,13 +1,12 @@
 [build]
-  command = "cd src/frontend && pnpm turbo build"
-  publish = "src/frontend/apps/web/.next/standalone"
-  
+  base = "."  
+  command = "pnpm turbo build"
+  publish = "apps/web/.next/standalone"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF . ../backend/"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "22"
-
-[functions]
-  node_bundler = "esbuild"
