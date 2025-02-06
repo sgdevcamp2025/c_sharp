@@ -77,16 +77,20 @@ jobs:
           pnpm turbo build
 
       - name: Deploy to Netlify
+        id: netlify-deploy
         uses: nwtgck/actions-netlify@v2.0
         with:
           publish-dir: 'src/frontend/apps/web/.next/standalone'
           production-branch: develop
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: 'Deploy from GitHub Actions'
-          enable-pull-request-comment: false
+          enable-pull-request-comment: true # PR 코멘트 활성화
           enable-commit-comment: true
+          enable-commit-status: true # 커밋 상태 표시 추가
           overwrites-pull-request-comment: true
+          fails-without-credentials: true # 인증 실패시 배포 실패 처리
           netlify-config-path: 'src/frontend/netlify.toml'
+          alias: deploy-preview-${{ github.event.number }}
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
