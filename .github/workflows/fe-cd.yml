@@ -78,7 +78,7 @@ jobs:
           cd src/frontend
           pnpm turbo build
 
-      - name: Deploy to Netlify
+      - name: Deploy to Netlifys
         uses: nwtgck/actions-netlify@v2.0
         with:
           publish-dir: 'src/frontend/apps/web/.next'
