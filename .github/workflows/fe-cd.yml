@@ -1,4 +1,4 @@
-name: FRONTEND-CI
+name: FRONTEND-CD
 
 on:
   pull_request:
@@ -74,7 +74,7 @@ jobs:
       - name: Build
         run: |
           cd src/frontend
-          pnpm run turbo build
+          pnpm turbo build
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
