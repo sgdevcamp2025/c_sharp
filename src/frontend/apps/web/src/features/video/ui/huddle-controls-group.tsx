@@ -8,8 +8,15 @@ import {
   Video,
   VideoOff,
 } from 'lucide-react';
-import { useReducer, useState } from 'react';
-import { huddleControlReducer } from '../model/huddle-controls-reducer';
+import { useReducer } from 'react';
+import HuddleControlItem from './huddle-control-item';
+import { huddleControlReducer } from '../model';
+
+const controlIconList = {
+  mic: { on: <Mic />, off: <MicOff /> },
+  video: { on: <Video />, off: <VideoOff /> },
+  screen: { on: <ScreenShare />, off: <ScreenShareOff /> },
+} as const;
 
 const HuddleControlsGroup = () => {
   const [controlGroupState, controlGroupDispatch] = useReducer(
@@ -20,7 +27,6 @@ const HuddleControlsGroup = () => {
       screen: false,
     },
   );
-  const iconStyle = 'w-16 h-16';
 
   return (
     <div className="flex justify-center items-center">
@@ -30,28 +36,16 @@ const HuddleControlsGroup = () => {
         size="lg"
         className="gap-3"
       >
-        <ToggleGroupItem
-          value="mic"
-          onClick={() => controlGroupDispatch({ type: 'mic' })}
-        >
-          {controlGroupState.mic ? (
-            <Mic className={iconStyle} />
-          ) : (
-            <MicOff className={iconStyle} />
-          )}
-        </ToggleGroupItem>
-        <ToggleGroupItem
-          value="video"
-          onClick={() => controlGroupDispatch({ type: 'video' })}
-        >
-          {controlGroupState.video ? <Video /> : <VideoOff />}
-        </ToggleGroupItem>
-        <ToggleGroupItem
-          value="screen"
-          onClick={() => controlGroupDispatch({ type: 'screen' })}
-        >
-          {controlGroupState.screen ? <ScreenShare /> : <ScreenShareOff />}
-        </ToggleGroupItem>
+        {Object.entries(controlIconList).map(([key, component]) => (
+          <HuddleControlItem
+            key={key}
+            value={key as keyof typeof controlIconList}
+            dispatch={controlGroupDispatch}
+          >
+            {component[controlGroupState[key] ? 'on' : 'off']}
+          </HuddleControlItem>
+        ))}
+
         <Button
           variant="destructive"
           size="lg"
