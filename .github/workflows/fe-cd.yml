@@ -13,7 +13,6 @@ on:
   push:
     branches:
       - fe-ci/cd-deploy
-      - dev
 
 permissions:
   contents: read
