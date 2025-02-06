@@ -98,7 +98,7 @@ const StocksListTable = () => {
     },
   });
   return (
-    <div className="w-3/4 h-1/2 shadow-s flex flex-col gap-3">
+    <div className="w-3/4 h-2/3 shadow-s flex flex-col gap-3">
       <div className="flex flex-row justify-between">
         <Input
           placeholder="주식 종목명을 검색하세요."
