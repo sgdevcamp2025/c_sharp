@@ -6,16 +6,13 @@ on:
     branches:
       - dev
       - main
-    paths:
-      - 'src/frontend/**'
-      - '!src/frontend/packages/ui/**'
-      - '../workflows/fe-ci.yml'
+    # paths:
+    #   - 'src/frontend/**'
+    #   - '!src/frontend/packages/ui/**'
+    #   - '../workflows/fe-ci.yml'
   push:
     branches:
       - fe-ci/cd-deploy
-    paths:
-      - 'src/frontend/**'
-      - '../workflows/fe-ci.yml'
 
 permissions:
   contents: read
