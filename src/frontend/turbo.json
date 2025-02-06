@@ -3,7 +3,7 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "outputs": [".next/**", "!.next/cache/**", ".next/standalone/**"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"],
       "dependsOn": ["^build"]
     },
     "build-storybook": {
