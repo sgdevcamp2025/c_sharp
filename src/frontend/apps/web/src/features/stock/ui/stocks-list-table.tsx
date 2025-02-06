@@ -13,6 +13,11 @@ import {
 import { useState } from 'react';
 import { Stock, columns } from '../model';
 import {
+  Button,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
   Input,
   Table,
   TableBody,
@@ -22,6 +27,7 @@ import {
   TableRow,
 } from '@workspace/ui/components';
 import { useRouter } from 'next/navigation';
+import { ChevronDown } from 'lucide-react';
 
 const Stockdata: Stock[] = [
   {
@@ -93,7 +99,7 @@ const StocksListTable = () => {
   });
   return (
     <div className="w-3/4 h-1/2 shadow-s flex flex-col gap-3">
-      <div className="flex flex-row">
+      <div className="flex flex-row justify-between">
         <Input
           placeholder="주식 종목명을 검색하세요."
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
@@ -102,6 +108,34 @@ const StocksListTable = () => {
           }
           className="max-w-sm"
         />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="default">
+              Columns <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                if (column.id === 'name') return;
+
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <Table className="table-fixed">
         <TableHeader>
