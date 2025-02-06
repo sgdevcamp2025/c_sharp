@@ -103,7 +103,7 @@ const StocksListTable = () => {
           className="max-w-sm"
         />
       </div>
-      <Table>
+      <Table className="table-fixed">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
