@@ -1,0 +1,107 @@
+name: FRONTEND-CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - dev
+      - main
+    paths:
+      - 'src/frontend/**'
+      - '!src/frontend/packages/ui/**'
+      - '../workflows/fe-ci.yml'
+  push:
+    branches:
+      - fe-feat/cd-deploy
+    paths:
+      - '!src/frontend/packages/ui/**'
+      - 'src/frontend/**'
+      - '!src/frontend/packages/ui/**'
+      - '../workflows/fe-ci.yml'
+
+permissions:
+  contents: read
+  deployments: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    if: ${{ github.actor != 'l10nbot' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            **/node_modules
+            src/frontend/node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Cache turbo build
+        uses: actions/cache@v4
+        with:
+          path: |
+            src/frontend/.turbo
+            src/frontend/apps/web/.next
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Install dependencies
+        run: |
+          cd src/frontend
+          pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
+          pnpm add turbo --save-dev -w
+
+      - name: Build
+        run: |
+          cd src/frontend
+          pnpm run turbo build
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: 'src/frontend/apps/web/.next'
+          production-branch: develop
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: 'Deploy from GitHub Actions'
+          enable-pull-request-comment: false
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+          netlify-config-path: './netlify.toml'
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 1
+
+  required:
+    needs: [changes]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: fail if conditional jobs failed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'skipped') || contains(needs.*.result, 'cancelled')
+        run: exit 1
