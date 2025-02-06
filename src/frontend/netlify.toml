@@ -1,5 +1,5 @@
 [build]
-  command = "cd src/frontend && pnpm run turbo build"
+  command = "cd src/frontend && pnpm turbo build"
   publish = "src/frontend/apps/web/.next"
   
 [[plugins]]
