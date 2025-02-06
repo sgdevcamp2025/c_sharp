@@ -12,11 +12,9 @@ on:
       - '../workflows/fe-ci.yml'
   push:
     branches:
-      - fe-feat/cd-deploy
+      - fe-ci/cd-deploy
     paths:
-      - '!src/frontend/packages/ui/**'
       - 'src/frontend/**'
-      - '!src/frontend/packages/ui/**'
       - '../workflows/fe-ci.yml'
 
 permissions:
