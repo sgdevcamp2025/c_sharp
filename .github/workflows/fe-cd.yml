@@ -73,11 +73,12 @@ jobs:
         run: |
           cd src/frontend
           pnpm turbo build
+          ls -la apps/web/.next/standalone
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
-          publish-dir: 'src/frontend/apps/web/.next' # out → .next 변경 (SSR 지원)
+          publish-dir: 'src/frontend/apps/web/.next/standalone' # out → .next 변경 (SSR 지원)
           production-branch: '["main", "dev"]'
           github-token: ${{ secrets.PAT_GITHUB_TOKEN }}
           deploy-message: 'Deploy from GitHub Actions'

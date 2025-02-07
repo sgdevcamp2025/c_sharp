@@ -1,8 +1,8 @@
 [build]
   base = "src/frontend"
   command = "pnpm turbo build"
-  publish = "apps/web/.next" 
-  functions = "apps/web/.netlify/functions"
+  publish = "apps/web/.next/standalone" 
+  functions = "apps/web/.next/standalone"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
@@ -13,8 +13,9 @@
 
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/.netlify/functions/next" 
   status = 200
+
 
 [[headers]]
   for = "/*"
