@@ -1,1 +1,60 @@
-spring.application.name=gateway_server
+server:
+  port : ${GATEWAY_PORT}
+
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - GlobalFilter
+
+      # 라우팅 설정
+      routes:
+        - id: auth # 정책명
+          uri: http://localhost:${AUTH_PORT} # 8081 포트로 라우팅
+          predicates:
+            - Path= #/store/**  URI path가 '/store'로 시작되면 해당 장정으로 라우팅
+
+        - id: stock
+          uri: http://localhost:${STOCK_PORT}
+          predicates:
+            - Path=
+
+        - id: file
+          uri: http://localhost:${FILE_PORT}
+          predicates:
+            - Path=
+
+        - id: chat1
+          uri: http://localhost:${CHAT1_PORT}
+          predicates:
+            - Path=
+
+        - id: chat2
+          uri: http://localhost:${CHAT2_PORT}
+          predicates:
+            - Path=
+
+        - id: history
+          uri: http://localhost:${HISTORY_PORT}
+          predicates:
+            - Path=
+
+        - id: workspace
+          uri: http://localhost:${WORKSPACE_PORT}
+          predicates:
+            - Path=
+
+        - id: push
+          uri: http://localhost:${PUSH_PORT}
+          predicates:
+            - Path=
+
+        - id: state
+          uri: http://localhost:${STATE_PORT}
+          predicates:
+            - Path=
+
+        - id: signaling
+          uri: http://localhost:${SIGNALING_PORT}
+          predicates:
+            - Path=
