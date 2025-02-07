@@ -108,6 +108,13 @@ public class StockService {
         return MinutePriceSimpleResponse.from(response, code);
     }
 
+    private List<MinutePrice> findMinutePriceChart(String code, String cursorId, int size) {
+        if (cursorId == null || cursorId.isEmpty()) {
+            return findFirstPage(code, size);
+        }
+        return findNextPage(code, cursorId, size);
+    }
+
     private List<MinutePrice> findFirstPage(String code, int size) {
         return minutePriceRepository.findByCodeOrderByMinutePriceIdAsc(
                 code,
@@ -122,6 +129,4 @@ public class StockService {
                 PageRequest.of(CURSOR_PAGE_NUMBER, size + 1)
         );
     }
-
-   
 }
