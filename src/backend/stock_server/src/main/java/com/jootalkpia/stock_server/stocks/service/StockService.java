@@ -129,4 +129,11 @@ public class StockService {
                 PageRequest.of(CURSOR_PAGE_NUMBER, size + 1)
         );
     }
+
+    private List<MinutePrice> sliceBySize(List<MinutePrice> minutePriceChart, int size) {
+        if (minutePriceChart.size() <= size) {
+            return minutePriceChart;
+        }
+        return minutePriceChart.subList(0, size);
+    }
 }
