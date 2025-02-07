@@ -74,29 +74,6 @@ public class S3Service {
         }
     }
 
-//    public byte[] downloadFile(String folder, Long fileId) {
-//        String key = folder + "/" + fileId;
-//
-//        try (ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(
-//                GetObjectRequest.builder()
-//                        .bucket(bucketName)
-//                        .key(key)
-//                        .build())) {
-//
-//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//            byte[] buffer = new byte[1024];
-//            int length;
-//            while ((length = s3Object.read(buffer)) != -1) {
-//                outputStream.write(buffer, 0, length);
-//            }
-//            return outputStream.toByteArray();
-//
-//        } catch (IOException e) {
-//            log.error("S3 파일 다운로드 중 오류 발생: {}", e.getMessage(), e);
-//            throw new RuntimeException("S3 파일 다운로드 중 오류가 발생했습니다.");
-//        }
-//    }
-
     public ResponseInputStream<GetObjectResponse> downloadFile(String folder, Long fileId) {
         String key = folder + "/" + fileId;
 
