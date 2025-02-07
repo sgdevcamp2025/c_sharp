@@ -25,12 +25,12 @@ spring:
             - Path=
 
         - id: chat1
-          uri: http://localhost:${CHAT1_PORT}
+          uri: http://localhost:${CHAT_PORT1}
           predicates:
             - Path=
 
         - id: chat2
-          uri: http://localhost:${CHAT2_PORT}
+          uri: http://localhost:${CHAT_PORT2}
           predicates:
             - Path=
 
