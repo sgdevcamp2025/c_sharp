@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": false,
   "scripts": {
-    "build": "turbo build",
+    "build": "turbo build && pnpm --filter=web next export",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo run format",
