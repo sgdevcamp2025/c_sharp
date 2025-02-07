@@ -17,9 +17,7 @@ spring:
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
   data:
     mongodb:
-      port: ${DB_PORT}
-      host: ${DB_HOST}
-      database: ${DB_NAME}
+      uri: ${MONGO_URI}
   jackson:
     property-naming-strategy: LOWER_CAMEL_CASE
 
@@ -43,3 +41,6 @@ feign:
     etc-cls-code: ""
     market-div-code: "J"
     pw-data-incu-yn: "N"
+
+server:
+  port: ${STOCK_PORT}
