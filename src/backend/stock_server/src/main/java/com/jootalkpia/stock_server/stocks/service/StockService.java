@@ -140,4 +140,10 @@ public class StockService {
         }
         return minutePriceChart.subList(0, size);
     }
+
+    private String getLastObjectId(List<MinutePrice> slicedMinutePriceChart) {
+        validationChartSize(slicedMinutePriceChart);
+
+        return String.valueOf(slicedMinutePriceChart.get(slicedMinutePriceChart.size() - 1).getMinutePriceId());
+    }
 }
