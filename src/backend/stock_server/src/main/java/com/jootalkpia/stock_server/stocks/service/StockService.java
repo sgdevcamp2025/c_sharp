@@ -130,7 +130,9 @@ public class StockService {
     }
 
     private List<MinutePrice> findNextPage(String code, String cursorId, int size) {
+        validateObjectId(cursorId);
         ObjectId objectId = new ObjectId(cursorId);
+
         return minutePriceRepository.findByCodeAndMinutePriceIdGreaterThanOrderByMinutePriceIdAsc(
                 code,
                 objectId,
@@ -159,5 +161,19 @@ public class StockService {
         if (slicedMinutePriceChart.isEmpty()) {
             throw new NoSuchElementException("조회된 분봉 데이터가 없습니다.");
         }
+    }
+
+    private void validateObjectId(String cursorId) {
+        if (!isValidObjectId(cursorId)) {
+            throw new IllegalArgumentException("ObjectId는 24자리의 16진수 문자열이어야 합니다: " + cursorId);
+        }
+    }
+
+    private boolean isValidObjectId(String cursorId) {
+        if (cursorId.length() != 24) {
+            return false;
+        }
+
+        return cursorId.matches("[0-9a-fA-F]{24}");
     }
 }
