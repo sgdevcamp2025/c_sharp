@@ -6,6 +6,7 @@ import com.jootalkpia.stock_server.stocks.domain.Schedule;
 import com.jootalkpia.stock_server.stocks.domain.StockCode;
 import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
 import com.jootalkpia.stock_server.stocks.dto.request.TokenRequestBody;
+import com.jootalkpia.stock_server.stocks.dto.response.CandlePriceHistoryResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceDetailedResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceSimpleResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.TokenResponse;
@@ -17,6 +18,7 @@ import com.jootalkpia.stock_server.support.property.TokenProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.config.CronTask;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -110,4 +113,15 @@ public class StockService {
                 code,
                 PageRequest.of(CURSOR_PAGE_NUMBER, size + 1));
     }
+
+    private List<MinutePrice> findNextPage(String code, String cursorId, int size) {
+        ObjectId objectId = new ObjectId(cursorId);
+        return minutePriceRepository.findByCodeAndMinutePriceIdGreaterThanOrderByMinutePriceIdAsc(
+                code,
+                objectId,
+                PageRequest.of(CURSOR_PAGE_NUMBER, size + 1)
+        );
+    }
+
+   
 }
