@@ -5,7 +5,7 @@ on:
     branches:
       - dev
     paths:
-      - 'src/backend/**' 
+      - 'src/backend/**'
   pull_request:
     branches:
       - dev
@@ -73,3 +73,18 @@ jobs:
             -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest .
 
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest
+
+  cd:
+    needs: build-and-deploy
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          script: |
+            cd ~
+            ./deploy.sh
