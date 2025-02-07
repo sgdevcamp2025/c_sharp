@@ -6,7 +6,6 @@ import com.jootalkpia.stock_server.stocks.domain.Schedule;
 import com.jootalkpia.stock_server.stocks.domain.StockCode;
 import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
 import com.jootalkpia.stock_server.stocks.dto.request.TokenRequestBody;
-import com.jootalkpia.stock_server.stocks.dto.response.CandlePriceHistoryResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceDetailedResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceSimpleResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.TokenResponse;
@@ -18,8 +17,7 @@ import com.jootalkpia.stock_server.support.property.TokenProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -27,12 +25,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class StockService {
     private static final String TOKEN_SEPARATOR = " ";
+    private static final int CURSOR_PAGE_NUMBER = 0;
 
     private String token;
 
@@ -105,8 +105,9 @@ public class StockService {
         return MinutePriceSimpleResponse.from(response, code);
     }
 
-    public CandlePriceHistoryResponse getCandlePriceHistoryByCode(Pageable pageable, String code) {
-        Page<MinutePrice> minutePricePage = minutePriceRepository.findAllByCode(pageable, code);
-        return CandlePriceHistoryResponse.of(minutePricePage, code);
+    private List<MinutePrice> findFirstPage(String code, int size) {
+        return minutePriceRepository.findByCodeOrderByMinutePriceIdAsc(
+                code,
+                PageRequest.of(CURSOR_PAGE_NUMBER, size + 1));
     }
 }
