@@ -15,6 +15,7 @@ jobs:
       matrix:
         service:
           - stock_server
+          - auth_server
           - workspace_server
           - chat_server
           - file_server
