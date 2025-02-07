@@ -76,8 +76,7 @@ jobs:
 
   cd:
     needs: build-and-deploy
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to server
         uses: appleboy/ssh-action@master
