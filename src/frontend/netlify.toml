@@ -2,7 +2,7 @@
   base = "src/frontend"
   command = "pnpm turbo build"
   publish = "apps/web/.next/standalone" 
-  functions = "apps/web/.next/standalone"
+  functions = "apps/web/.next/functions"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

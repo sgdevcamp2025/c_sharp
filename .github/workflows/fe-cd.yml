@@ -73,7 +73,10 @@ jobs:
         run: |
           cd src/frontend
           pnpm turbo build
-          ls -la apps/web/.next/standalone
+          echo "🔍 Checking .next directory..."
+          ls -la apps/web/.next  # .next 디렉토리 내 파일 확인
+          echo "🔍 Checking .next/standalone directory..."
+          ls -la apps/web/.next/standalone || echo "❌ standalone 폴더가 없음"
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
