@@ -89,7 +89,10 @@ jobs:
           fails-without-credentials: true
           netlify-config-path: 'src/frontend/netlify.toml'
           alias: deploy-preview-${{ github.event.number }}
-
+        env:
+          PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         timeout-minutes: 10
 
   required:
