@@ -30,6 +30,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.jootalkpia.stock_server.stocks.advice.StockValidationUtils.validateChartSize;
+import static com.jootalkpia.stock_server.stocks.advice.StockValidationUtils.validateObjectId;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -152,28 +155,8 @@ public class StockService {
     }
 
     private String getLastObjectId(List<MinutePrice> slicedMinutePriceChart) {
-        validationChartSize(slicedMinutePriceChart);
+        validateChartSize(slicedMinutePriceChart);
 
         return String.valueOf(slicedMinutePriceChart.get(slicedMinutePriceChart.size() - 1).getMinutePriceId());
-    }
-
-    private void validationChartSize(List<MinutePrice> slicedMinutePriceChart) {
-        if (slicedMinutePriceChart.isEmpty()) {
-            throw new NoSuchElementException("조회된 분봉 데이터가 없습니다.");
-        }
-    }
-
-    private void validateObjectId(String cursorId) {
-        if (!isValidObjectId(cursorId)) {
-            throw new IllegalArgumentException("ObjectId는 24자리의 16진수 문자열이어야 합니다: " + cursorId);
-        }
-    }
-
-    private boolean isValidObjectId(String cursorId) {
-        if (cursorId.length() != 24) {
-            return false;
-        }
-
-        return cursorId.matches("[0-9a-fA-F]{24}");
     }
 }
