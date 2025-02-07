@@ -1,23 +1,19 @@
 [build]
   base = "src/frontend"
-  command = "pnpm turbo build && pnpm --filter=web next export"
-  publish = "apps/web/out" 
+  command = "pnpm turbo build"
+  publish = "apps/web/.next" 
   functions = "apps/web/.netlify/functions"
-
-[build.environment]
-  NETLIFY_NEXT_PLUGIN_FORCE_RUN = "true"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
-  NODE_VERSION = "22"    # 22 대신 20 사용 (안정 버전)
+  NODE_VERSION = "20"
 
-# Next.js 앱을 위한 리다이렉트 규칙
 [[redirects]]
   from = "/*"
-  to = "/index.html" 
+  to = "/index.html"
   status = 200
 
 [[headers]]
