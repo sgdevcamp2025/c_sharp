@@ -78,6 +78,8 @@ jobs:
     needs: build-and-deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Secrets
+        run: echo "SERVER_IP=${{ secrets.SERVER_IP }}"
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
