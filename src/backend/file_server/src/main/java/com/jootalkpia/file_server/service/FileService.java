@@ -37,6 +37,7 @@ public class FileService {
         List<Long> fileIds = new ArrayList<>();
 
         for (int i = 0; i < files.length; i++) {
+            Long fileId = null;
             Files filesEntity = new Files();
             fileRepository.save(filesEntity);
             fileId = filesEntity.getFileId();
@@ -45,11 +46,13 @@ public class FileService {
 
             // 파일 타입 결정
             String fileType = FileTypeDetector.detectFileTypeFromMultipartFile(file);
+            log.info(fileType);
 
             String s3Url = uploadEachFile(fileType, fileId, file);
 
             filesEntity.setUrl(s3Url);
             filesEntity.setMimeType(file.getContentType());
+            filesEntity.setFileType(fileType);
             filesEntity.setFileSize(file.getSize());
 
             fileIds.add(filesEntity.getFileId());
@@ -57,7 +60,7 @@ public class FileService {
 
             if ("VIDEO".equalsIgnoreCase(fileType) && thumbnails != null && i < thumbnails.length && thumbnails[i] != null) {
                 MultipartFile thumbnail = thumbnails[i];
-                String thumbnailUrl = s3Service.uploadFile(thumbnail, "THUMBNAIL", fileId);
+                String thumbnailUrl = uploadEachFile(fileType, fileId, thumbnail);
                 filesEntity.setUrlThumbnail(thumbnailUrl);
             }
             fileRepository.save(filesEntity);
@@ -66,7 +69,8 @@ public class FileService {
     }
 
     private String uploadEachFile(String fileType, Long fileId, MultipartFile file) {
-        return s3Service.uploadFile(file, fileType, fileId);
+        String folder = defineFolderToUpload(fileType) + "/";
+        return s3Service.uploadFile(file, folder, fileId);
     }
 
     public ResponseInputStream<GetObjectResponse> downloadFile(Long fileId) {
@@ -81,7 +85,7 @@ public class FileService {
         return s3Service.downloadFile(folder, fileId);
     }
 
-    private String defineFolderToUpload(String fileType) {
+    public String defineFolderToUpload(String fileType) {
         if ("VIDEO".equalsIgnoreCase(fileType)) {
             return "videos";
         } else if ("IMAGE".equalsIgnoreCase(fileType)) {
