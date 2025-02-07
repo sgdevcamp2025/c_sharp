@@ -4,6 +4,9 @@
   publish = "apps/web/out" 
   functions = "apps/web/.netlify/functions"
 
+[build.environment]
+  NETLIFY_NEXT_PLUGIN_FORCE_RUN = "true"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
