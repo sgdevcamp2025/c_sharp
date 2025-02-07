@@ -45,6 +45,7 @@ public class FileController {
         ValidationUtils.validateFiles(uploadFileRequest.getFiles());
         ValidationUtils.validateFiles(uploadFileRequest.getThumbnails());
 
+        log.info("got uploadFileRequest: {}", uploadFileRequest.getFiles().length);
         UploadFileResponseDto response = fileService.uploadFiles(userId, uploadFileRequest);
         return ResponseEntity.ok(response);
     }
