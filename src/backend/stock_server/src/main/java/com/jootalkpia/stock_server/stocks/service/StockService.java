@@ -146,4 +146,10 @@ public class StockService {
 
         return String.valueOf(slicedMinutePriceChart.get(slicedMinutePriceChart.size() - 1).getMinutePriceId());
     }
+
+    private void validationChartSize(List<MinutePrice> slicedMinutePriceChart) {
+        if (slicedMinutePriceChart.isEmpty()) {
+            throw new NoSuchElementException("조회된 분봉 데이터가 없습니다.");
+        }
+    }
 }
