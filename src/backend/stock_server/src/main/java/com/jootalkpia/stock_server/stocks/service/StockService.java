@@ -136,4 +136,8 @@ public class StockService {
         }
         return minutePriceChart.subList(0, size);
     }
+
+    private boolean checkHasNext(List<MinutePrice> minutePriceChart, int size) {
+        return minutePriceChart.size() > size;
+    }
 }
