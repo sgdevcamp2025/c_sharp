@@ -130,14 +130,14 @@ public class StockService {
         );
     }
 
-    private List<MinutePrice> sliceBySize(List<MinutePrice> minutePriceChart, int size) {
-        if (minutePriceChart.size() <= size) {
+    private boolean checkHasNext(List<MinutePrice> minutePriceChart, int size) {
+        return minutePriceChart.size() > size;
+    }
+
+    private List<MinutePrice> sliceBySize(List<MinutePrice> minutePriceChart, int size, boolean hasNext) {
+        if (!hasNext) {
             return minutePriceChart;
         }
         return minutePriceChart.subList(0, size);
-    }
-
-    private boolean checkHasNext(List<MinutePrice> minutePriceChart, int size) {
-        return minutePriceChart.size() > size;
     }
 }
