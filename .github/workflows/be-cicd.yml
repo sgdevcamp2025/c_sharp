@@ -79,7 +79,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Debug Secrets
-        run: echo "SERVER_IP=${{ secrets.SERVER_IP }}"
+        run: |
+          echo "SERVER_IP=${{ secrets.SERVER_IP }}"
+          echo "SERVER_USER=${{ secrets.SERVER_USER }}"
+          echo "SERVER_KEY Length=$(echo -n "${{ secrets.SERVER_KEY }}" | wc -c)"
+
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
