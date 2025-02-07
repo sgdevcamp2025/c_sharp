@@ -108,6 +108,14 @@ public class StockService {
         return MinutePriceSimpleResponse.from(response, code);
     }
 
+    public CandlePriceHistoryResponse getCandlePriceHistoryByCode(String code, String cursorId, int size) {
+        List<MinutePrice> minutePriceChart = findMinutePriceChart(code, cursorId, size);
+        boolean hasNext = checkHasNext(minutePriceChart, size);
+        List<MinutePrice> slicedMinutePriceChart = sliceBySize(minutePriceChart, size, hasNext);
+
+        return CandlePriceHistoryResponse.of(slicedMinutePriceChart, code, hasNext, getLastObjectId(slicedMinutePriceChart));
+    }
+
     private List<MinutePrice> findMinutePriceChart(String code, String cursorId, int size) {
         if (cursorId == null || cursorId.isEmpty()) {
             return findFirstPage(code, size);
