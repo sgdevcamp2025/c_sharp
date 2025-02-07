@@ -13,6 +13,10 @@ java {
     }
 }
 
+bootJar {
+    archiveFileName = 'chat_server1.jar'
+}
+
 repositories {
     mavenCentral()
 }

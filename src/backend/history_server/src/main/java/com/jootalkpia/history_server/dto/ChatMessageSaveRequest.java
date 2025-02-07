@@ -3,29 +3,22 @@ package com.jootalkpia.history_server.dto;
 import com.jootalkpia.history_server.domain.ChatMessage;
 import com.jootalkpia.history_server.domain.MessageType;
 
-public record ChatMessageSaveRequest (
+public record ChatMessageSaveRequest(
 
-    Long channelId,          // 채널 ID
+        Long channelId,          // 채널 ID
 
-    Long userId,             // 유저 ID
+        Long userId,             // 유저 ID
 
-    String message,          // 메시지 내용
+        String message,          // 메시지 내용
 
-    MessageType messageType, // 메시지 타입 (TEXT, IMAGE 등)
+        MessageType messageType, // 메시지 타입 (TEXT, IMAGE 등)
 
-    Boolean isAttachment,    // 파일 첨부 여부
+        Boolean isAttachment,    // 파일 첨부 여부
 
-    Long threadId            // 원본 메시지 ID (최초 메시지일 경우 null)
+        Long threadId            // 원본 메시지 ID (최초 메시지일 경우 null)
 
-)  {
-    public ChatMessage toEntity() {
-        return ChatMessage.builder()
-                .channelId(channelId)
-                .userId(userId)
-                .message(message)
-                .messageType((messageType != null) ? messageType : MessageType.TEXT) // 기본값 설정
-                .isAttachment((isAttachment != null) ? isAttachment : false)       // 기본값 설정
-                .threadId(threadId)
-                .build();
+) {
+    public ChatMessage toDocument() {
+        return ChatMessage.of(channelId, userId, message, messageType, isAttachment, threadId);
     }
 }

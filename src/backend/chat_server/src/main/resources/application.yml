@@ -30,4 +30,4 @@ group:
   chat: chat-message-handle-consumer-group
 
 server:
-  port:  8081
+  port: ${CHAT_PORT1}
