@@ -4,6 +4,7 @@
   "private": false,
   "scripts": {
     "build": "turbo build",
+    "build:web": "turbo run build --filter=web...",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo run format",
@@ -12,6 +13,7 @@
     "typescript": "turbo run typescript"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.9.4",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "danger": "^12.3.3",

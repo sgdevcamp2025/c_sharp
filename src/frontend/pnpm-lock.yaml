@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@netlify/plugin-nextjs':
+        specifier: ^5.9.4
+        version: 5.9.4
       '@workspace/eslint-config':
         specifier: workspace:*
         version: link:packages/eslint-config
@@ -57,9 +60,6 @@ importers:
         specifier: ^5.0.3
         version: 5.0.3(@types/react@19.0.7)(react@18.3.1)
     devDependencies:
-      '@netlify/plugin-nextjs':
-        specifier: ^5.9.4
-        version: 5.9.4
       '@tanstack/react-query-devtools':
         specifier: ^5.64.2
         version: 5.64.2(@tanstack/react-query@5.64.2(react@18.3.1))(react@18.3.1)

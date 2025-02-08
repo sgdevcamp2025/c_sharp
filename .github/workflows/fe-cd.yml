@@ -58,7 +58,7 @@ jobs:
         with:
           path: |
             src/frontend/.turbo
-            src/frontend/apps/web/.next
+            src/frontend/apps/web/.next/cache
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-turbo-
@@ -73,15 +73,23 @@ jobs:
         run: |
           cd src/frontend
           pnpm turbo build
-          echo "🔍 Checking .next directory..."
-          ls -la apps/web/.next  # .next 디렉토리 내 파일 확인
-          echo "🔍 Checking .next/standalone directory..."
-          ls -la apps/web/.next/standalone || echo "❌ standalone 폴더가 없음"
+          echo "🔍 Checking build output..."
+          ls -la apps/web/.next
+
+      - name: Prepare for Netlify
+        run: |
+          cd src/frontend/apps/web
+          # standalone 디렉토리의 내용을 .next로 복사
+          cp -r .next/standalone/* .next/
+          # static 파일들도 복사
+          cp -r .next/static .next/standalone/apps/web/.next/
+          # public 디렉토리가 있다면 복사
+          [ -d "public" ] && cp -r public .next/standalone/apps/web/ || true
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
-          publish-dir: 'src/frontend/apps/web/.next/standalone' # out → .next 변경 (SSR 지원)
+          publish-dir: 'src/frontend/apps/web/.next' # standalone이 아닌 전체 .next 디렉토리를 배포
           production-branch: '["main", "dev"]'
           github-token: ${{ secrets.PAT_GITHUB_TOKEN }}
           deploy-message: 'Deploy from GitHub Actions'

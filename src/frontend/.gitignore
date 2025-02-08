@@ -20,6 +20,9 @@ out/
 build
 dist
 
+# Next.js telemetry
+.netlify
+
 # Debug
 npm-debug.log*
 

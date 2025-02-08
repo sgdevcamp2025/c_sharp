@@ -1,0 +1,15 @@
+[build]
+  command = "turbo run build"
+  publish = "apps/web/.next"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF . ./apps/web/"
+
+[build.environment]
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
+  NODE_VERSION = "20"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[functions]
+  included_files = ["apps/web/.next/standalone/**"]
