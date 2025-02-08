@@ -82,14 +82,14 @@ jobs:
           # standalone 디렉토리의 내용을 .next로 복사
           cp -r .next/standalone/* .next/
           # static 파일들도 복사
-          cp -r .next/static .next/standalone/apps/web/.next/
+          cp -r .next/static/* .next/standalone/apps/web/.next/
           # public 디렉토리가 있다면 복사
           [ -d "public" ] && cp -r public .next/standalone/apps/web/ || true
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
-          publish-dir: 'src/frontend/apps/web/.next' # standalone이 아닌 전체 .next 디렉토리를 배포
+          publish-dir: 'src/frontend/apps/web/.next' # 전체 .next 디렉토리를 배포
           production-branch: '["main", "dev"]'
           github-token: ${{ secrets.PAT_GITHUB_TOKEN }}
           deploy-message: 'Deploy from GitHub Actions'
