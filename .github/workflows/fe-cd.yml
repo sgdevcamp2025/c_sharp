@@ -90,7 +90,7 @@ jobs:
           enable-commit-status: true
           overwrites-pull-request-comment: true
           fails-without-credentials: true
-          netlify-config-path: 'src/frontend/netlify.toml'
+          netlify-config-path: 'src/frontend/apps/web/netlify.toml'
           alias: deploy-preview-${{ github.event.number }}
         env:
           PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
