@@ -37,19 +37,11 @@ public class ChatService {
         if (attachmentList != null && !attachmentList.isEmpty()) {
             for (Long fileId : attachmentList) {
                 Files file = fileRepository.findById(fileId)
-                        .orElseThrow(() -> new IllegalArgumentException("File not found for fileId: " + fileId));// to do : 예외 처리 추가
+                        .orElseThrow(() -> new IllegalArgumentException("File not found for fileId: " + fileId)); // todo : 예외 처리 추가
                 switch (file.getFileType()) {
-
-                    case "IMAGE" -> {
-                        response.add(new ImageResponse(file.getUrl()));
-                    }
-                    case "VIDEO" -> {
-                        response.add(new VideoResponse(file.getUrlThumbnail(),file.getUrl()));
-                    }
-                    default -> {
-                        // to do : 예외 처리 추가
-                        throw new IllegalArgumentException("Unsupported file type: " + file.getFileType());
-                    }
+                    case "IMAGE" -> response.add(new ImageResponse(file.getUrl()));
+                    case "VIDEO" -> response.add(new VideoResponse(file.getUrlThumbnail(),file.getUrl()));
+                    default -> throw new IllegalArgumentException("Unsupported file type: " + file.getFileType()); // todo : 예외 처리 추가
                 }
             }
         }

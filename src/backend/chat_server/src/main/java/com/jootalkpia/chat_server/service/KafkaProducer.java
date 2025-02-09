@@ -27,7 +27,7 @@ public class KafkaProducer {
                     if (ex == null) {
                         log.info("Kafka message sent: {}", result.toString());
                     } else {
-                        log.error("Error sending Kafka message: {}", ex.getMessage(), ex); // to do : 추후 예외처리
+                        log.error("Error sending Kafka message: {}", ex.getMessage(), ex); // todo : 추후 예외처리
                     }
                 });
     }
