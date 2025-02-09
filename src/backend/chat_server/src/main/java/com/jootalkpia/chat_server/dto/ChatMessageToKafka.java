@@ -1,9 +1,9 @@
 package com.jootalkpia.chat_server.dto;
 
+import java.util.List;
+
 public record ChatMessageToKafka(
         Long channelId,
-        Long userId,
-        String username,
-        String content
+        List chatMessage    //type 건들지말것
 ) {
 }
