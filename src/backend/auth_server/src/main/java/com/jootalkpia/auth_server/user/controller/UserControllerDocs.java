@@ -5,6 +5,7 @@ import com.jootalkpia.auth_server.client.dto.UserLoginRequest;
 import com.jootalkpia.auth_server.user.dto.request.UpdateNicknameRequest;
 import com.jootalkpia.auth_server.user.dto.response.AccessTokenGetSuccess;
 import com.jootalkpia.auth_server.user.dto.response.LoginSuccessResponse;
+import com.jootalkpia.auth_server.user.dto.response.UpdateNicknameResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -54,7 +55,7 @@ public interface UserControllerDocs {
                     @ApiResponse(responseCode = "400", description = "이미 존재하는 닉네임입니다."),
             }
     )
-    ResponseEntity<String> updateNickname (
+    ResponseEntity<UpdateNicknameResponse> updateNickname (
             @RequestBody final UpdateNicknameRequest request,
             Principal principal
     );
