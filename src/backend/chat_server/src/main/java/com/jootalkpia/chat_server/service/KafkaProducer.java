@@ -17,7 +17,7 @@ public class KafkaProducer {
 
     public void sendChatMessage(ChatMessageToKafka chatMessageToKafka, Long roomId) {
         String jsonChatMessage = gson.toJson(chatMessageToKafka);
-        kafkaTemplate.send("jootalkpia.chat.prd.message", String.valueOf(roomId), jsonChatMessage).whenComplete((result, ex) -> { //키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
+        kafkaTemplate.send("${topic.minute}", String.valueOf(roomId), jsonChatMessage).whenComplete((result, ex) -> { //키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
             if (ex == null) {
                 log.info(result.toString());
             } else {
