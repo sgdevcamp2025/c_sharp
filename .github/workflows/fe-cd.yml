@@ -63,6 +63,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
+      - name: Prepare Netlify functions
+        run: |
+          cd src/frontend/apps/web
+          mkdir -p .netlify/functions-internal
+
       - name: Install dependencies
         run: |
           cd src/frontend
