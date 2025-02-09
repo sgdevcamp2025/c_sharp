@@ -1,7 +1,7 @@
 package com.jootalkpia.stock_server.stocks.service;
 
 import com.google.gson.Gson;
-import com.jootalkpia.stock_server.stocks.advice.StockCaller;
+import com.jootalkpia.stock_server.stocks.advice.caller.StockCaller;
 import com.jootalkpia.stock_server.stocks.domain.Schedule;
 import com.jootalkpia.stock_server.stocks.domain.StockCode;
 import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
@@ -28,10 +28,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-import static com.jootalkpia.stock_server.stocks.advice.StockValidationUtils.validateChartSize;
-import static com.jootalkpia.stock_server.stocks.advice.StockValidationUtils.validateObjectId;
+import static com.jootalkpia.stock_server.stocks.advice.util.StockValidationUtils.validateChartSize;
+import static com.jootalkpia.stock_server.stocks.advice.util.StockValidationUtils.validateObjectId;
 
 @Slf4j
 @RequiredArgsConstructor

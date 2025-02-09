@@ -1,5 +1,7 @@
-package com.jootalkpia.stock_server.stocks.advice;
+package com.jootalkpia.stock_server.stocks.advice.util;
 
+import com.jootalkpia.stock_server.stocks.advice.exception.InvalidObjectIdFormatException;
+import com.jootalkpia.stock_server.stocks.advice.exception.NoSuchMinutePriceException;
 import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
 
 import java.util.List;
@@ -12,13 +14,13 @@ public class StockValidationUtils {
 
     public static void validateChartSize(List<MinutePrice> slicedMinutePriceChart) {
         if (slicedMinutePriceChart.isEmpty()) {
-            throw new NoSuchElementException("조회된 분봉 데이터가 없습니다.");
+            throw new NoSuchMinutePriceException();
         }
     }
 
     public static void validateObjectId(String cursorId) {
         if (!isValidObjectId(cursorId)) {
-            throw new IllegalArgumentException("ObjectId는 24자리의 16진수 문자열이어야 합니다: " + cursorId);
+            throw new InvalidObjectIdFormatException(cursorId);
         }
     }
 
