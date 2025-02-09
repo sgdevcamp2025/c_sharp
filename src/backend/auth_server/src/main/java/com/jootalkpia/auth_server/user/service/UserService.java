@@ -15,6 +15,7 @@ import com.jootalkpia.auth_server.user.domain.User;
 import com.jootalkpia.auth_server.user.dto.response.AccessTokenGetSuccess;
 import com.jootalkpia.auth_server.user.dto.response.LoginSuccessResponse;
 import com.jootalkpia.auth_server.user.dto.response.TokenDto;
+import com.jootalkpia.auth_server.user.dto.response.UserDto;
 import com.jootalkpia.auth_server.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +34,10 @@ public class UserService {
             final UserLoginRequest loginRequest
     ) {
         User user = getUser(getUserInfoResponse(authorizationCode, loginRequest));
-
+        UserDto userDto = UserDto.of(user.getUserId(), user.getNickname(),user.getProfileImage());
         TokenDto tokenDto = getTokenDto(user);
 
-        return LoginSuccessResponse.of(user.getNickname(), user.getUserId(), tokenDto);
+        return LoginSuccessResponse.of(userDto, tokenDto);
     }
 
     public UserInfoResponse getUserInfoResponse(
