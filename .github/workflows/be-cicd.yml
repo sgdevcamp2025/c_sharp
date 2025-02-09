@@ -84,6 +84,11 @@ jobs:
           echo "SERVER_USER=${{ secrets.SERVER_USER }}"
           echo "SERVER_KEY Length=$(echo -n "${{ secrets.SECRET_KEY }}" | wc -c)"
 
+      - name: Configure SSH Key
+        run: |
+          echo "${{ secrets.SECRET_KEY }}" | base64 -d > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
@@ -93,3 +98,5 @@ jobs:
           script: |
             cd ~
             ./deploy.sh
+
+
