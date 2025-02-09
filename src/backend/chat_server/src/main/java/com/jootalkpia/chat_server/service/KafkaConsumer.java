@@ -19,19 +19,18 @@ public class KafkaConsumer {
 
     private final ObjectMapper objectMapper;
     private final SimpMessagingTemplate messagingTemplate;
-    private final SimpMessageSendingOperations messagingTemplateBroker; // 내부 메시지 브로커 사용
 
     @KafkaListener(
             topics = "${topic.minute}",
             groupId = "${group.minute}"
     )
     public void processMinutePrice(String kafkaMessage) {
-        log.info("Received Kafka message ===> " + kafkaMessage);
+        log.info("Received Kafka minute message ===> {}", kafkaMessage);
         try {
             MinutePriceResponse stockUpdate = objectMapper.readValue(kafkaMessage, MinutePriceResponse.class);
             String stockDataJson = objectMapper.writeValueAsString(stockUpdate);
 
-            messagingTemplateBroker.convertAndSend("/subscribe/stock", stockDataJson);
+            messagingTemplate.convertAndSend("/subscribe/stock", stockDataJson);
 
             log.info("Broadcasted stock data via WebSocket: " + stockDataJson);
 
