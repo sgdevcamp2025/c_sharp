@@ -12,8 +12,8 @@ import com.jootalkpia.auth_server.response.ErrorCode;
 import com.jootalkpia.auth_server.security.UserAuthentication;
 import com.jootalkpia.auth_server.user.domain.Platform;
 import com.jootalkpia.auth_server.user.domain.User;
-import com.jootalkpia.auth_server.user.dto.response.AccessTokenGetSuccess;
-import com.jootalkpia.auth_server.user.dto.response.LoginSuccessResponse;
+import com.jootalkpia.auth_server.user.dto.response.GetAccessTokenResponse;
+import com.jootalkpia.auth_server.user.dto.response.LoginResponse;
 import com.jootalkpia.auth_server.user.dto.response.TokenDto;
 import com.jootalkpia.auth_server.user.dto.response.UpdateNicknameResponse;
 import com.jootalkpia.auth_server.user.dto.response.UserDto;
@@ -30,7 +30,7 @@ public class UserService {
     private final TokenService tokenService;
     private final KakaoSocialService kakaoSocialService;
 
-    public LoginSuccessResponse create(
+    public LoginResponse create(
             final String authorizationCode,
             final UserLoginRequest loginRequest
     ) {
@@ -38,7 +38,7 @@ public class UserService {
         UserDto userDto = UserDto.of(user.getUserId(), user.getNickname(),user.getProfileImage());
         TokenDto tokenDto = getTokenDto(user);
 
-        return LoginSuccessResponse.of(userDto, tokenDto);
+        return LoginResponse.of(userDto, tokenDto);
     }
 
     public UserInfoResponse getUserInfoResponse(
@@ -90,7 +90,7 @@ public class UserService {
         );
     }
 
-    public AccessTokenGetSuccess refreshToken(
+    public GetAccessTokenResponse refreshToken(
             final String refreshToken
     ) {
         if (jwtTokenProvider.validateToken(refreshToken) == EXPIRED_JWT_TOKEN) {
@@ -108,7 +108,7 @@ public class UserService {
 
         UserAuthentication userAuthentication = new UserAuthentication(userId.toString(),null, null);
 
-        return AccessTokenGetSuccess.of(
+        return GetAccessTokenResponse.of(
                 jwtTokenProvider.issueAccessToken(userAuthentication)
         );
     }

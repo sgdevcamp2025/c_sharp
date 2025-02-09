@@ -1,12 +1,12 @@
 package com.jootalkpia.auth_server.user.dto.response;
 
-public record AccessTokenGetSuccess(
+public record GetAccessTokenResponse(
 
         String accessToken
 ) {
-    public static AccessTokenGetSuccess of(
+    public static GetAccessTokenResponse of(
             final String accessToken
     ) {
-        return new AccessTokenGetSuccess(accessToken);
+        return new GetAccessTokenResponse(accessToken);
     }
 }

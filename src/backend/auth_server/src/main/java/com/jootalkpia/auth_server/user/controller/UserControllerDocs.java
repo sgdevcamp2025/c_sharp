@@ -3,8 +3,8 @@ package com.jootalkpia.auth_server.user.controller;
 
 import com.jootalkpia.auth_server.client.dto.UserLoginRequest;
 import com.jootalkpia.auth_server.user.dto.request.UpdateNicknameRequest;
-import com.jootalkpia.auth_server.user.dto.response.AccessTokenGetSuccess;
-import com.jootalkpia.auth_server.user.dto.response.LoginSuccessResponse;
+import com.jootalkpia.auth_server.user.dto.response.GetAccessTokenResponse;
+import com.jootalkpia.auth_server.user.dto.response.LoginResponse;
 import com.jootalkpia.auth_server.user.dto.response.UpdateNicknameResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,7 +30,7 @@ public interface UserControllerDocs {
                     @ApiResponse(responseCode = "A40104", description = "해당 유저의 리프레시 토큰이 존재하지 않습니다.")
             }
     )
-    ResponseEntity<LoginSuccessResponse> login(
+    ResponseEntity<LoginResponse> login(
             @RequestParam final String authorizationCode,
             @RequestBody final UserLoginRequest loginRequest
     );
@@ -44,7 +44,7 @@ public interface UserControllerDocs {
                     @ApiResponse(responseCode = "A50000", description = "서버 내부 오류입니다.")
             }
     )
-    ResponseEntity<AccessTokenGetSuccess> refreshToken(
+    ResponseEntity<GetAccessTokenResponse> refreshToken(
             @RequestParam final String refreshToken
     );
 

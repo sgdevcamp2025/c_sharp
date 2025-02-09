@@ -1,15 +1,15 @@
 package com.jootalkpia.auth_server.user.dto.response;
 
-public record LoginSuccessResponse(
+public record LoginResponse(
 
         UserDto user,
 
         TokenDto token
 ) {
-    public static LoginSuccessResponse of(
+    public static LoginResponse of(
             final UserDto user,
             final TokenDto token
     ) {
-        return new LoginSuccessResponse(user, token);
+        return new LoginResponse(user, token);
     }
 }
