@@ -15,6 +15,7 @@ import com.jootalkpia.auth_server.user.domain.User;
 import com.jootalkpia.auth_server.user.dto.response.AccessTokenGetSuccess;
 import com.jootalkpia.auth_server.user.dto.response.LoginSuccessResponse;
 import com.jootalkpia.auth_server.user.dto.response.TokenDto;
+import com.jootalkpia.auth_server.user.dto.response.UpdateNicknameResponse;
 import com.jootalkpia.auth_server.user.dto.response.UserDto;
 import com.jootalkpia.auth_server.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -113,7 +114,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateNickname(
+    public UpdateNicknameResponse updateNickname(
             String nickname,
             Long userId
     ) {
@@ -124,6 +125,8 @@ public class UserService {
         }
 
         user.updateNickname(nickname);
+
+        return UpdateNicknameResponse.of(user.getUserId(),user.getNickname(),user.getProfileImage());
     }
 
     private TokenDto getTokenDto(
