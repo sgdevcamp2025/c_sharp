@@ -1,5 +1,5 @@
 'use client';
-import { Button, ToggleGroup, ToggleGroupItem } from '@workspace/ui/components';
+import { Button, ToggleGroup } from '@workspace/ui/components';
 import {
   Mic,
   MicOff,
@@ -10,21 +10,21 @@ import {
 } from 'lucide-react';
 import { useReducer } from 'react';
 import HuddleControlItem from './huddle-control-item';
-import { huddleControlReducer } from '../model';
+import { HuddleControl, huddleControlReducer } from '../model';
 
-const controlIconList = {
-  mic: { on: <Mic />, off: <MicOff /> },
-  video: { on: <Video />, off: <VideoOff /> },
-  screen: { on: <ScreenShare />, off: <ScreenShareOff /> },
+export const controlIconList = {
+  [HuddleControl.Mic]: { on: <Mic />, off: <MicOff /> },
+  [HuddleControl.Video]: { on: <Video />, off: <VideoOff /> },
+  [HuddleControl.Screen]: { on: <ScreenShare />, off: <ScreenShareOff /> },
 } as const;
 
 const HuddleControlsGroup = () => {
   const [controlGroupState, controlGroupDispatch] = useReducer(
     huddleControlReducer,
     {
-      mic: false,
-      video: false,
-      screen: false,
+      [HuddleControl.Mic]: false,
+      [HuddleControl.Video]: false,
+      [HuddleControl.Screen]: false,
     },
   );
 
@@ -36,15 +36,18 @@ const HuddleControlsGroup = () => {
         size="lg"
         className="gap-3"
       >
-        {Object.entries(controlIconList).map(([key, component]) => (
-          <HuddleControlItem
-            key={key}
-            value={key as keyof typeof controlIconList}
-            dispatch={controlGroupDispatch}
-          >
-            {component[controlGroupState[key] ? 'on' : 'off']}
-          </HuddleControlItem>
-        ))}
+        {Object.entries(controlIconList).map(([key, component]) => {
+          const controlKey = key as HuddleControl;
+          return (
+            <HuddleControlItem
+              key={key}
+              value={controlKey}
+              dispatch={controlGroupDispatch}
+            >
+              {component[controlGroupState[controlKey] ? 'on' : 'off']}
+            </HuddleControlItem>
+          );
+        })}
 
         <Button
           variant="destructive"

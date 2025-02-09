@@ -1,1 +1,5 @@
-export type HuddleControl = 'mic' | 'video' | 'screen';
+export enum HuddleControl {
+  Mic = 'mic',
+  Video = 'video',
+  Screen = 'screen',
+}

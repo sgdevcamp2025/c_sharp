@@ -1,19 +1,16 @@
 import { type HuddleControl } from './huddle-control.type';
 
+export type HuddleControlsState = {
+  [HuddleControl.Mic]: boolean;
+  [HuddleControl.Video]: boolean;
+  [HuddleControl.Screen]: boolean;
+};
+
 export type HuddleControlAction = {
   type: HuddleControl;
 };
 
 export const huddleControlReducer = (
-  state: Record<HuddleControl, boolean>,
+  state: HuddleControlsState,
   action: HuddleControlAction,
-) => {
-  switch (action.type) {
-    case 'mic':
-      return { ...state, mic: !state.mic };
-    case 'video':
-      return { ...state, video: !state.video };
-    case 'screen':
-      return { ...state, screen: !state.screen };
-  }
-};
+) => ({ ...state, [action.type]: !state[action.type] });

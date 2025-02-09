@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components';
-import { CircleUserRound } from 'lucide-react';
 
 const HuddleParticipantAvatar = () => {
   return (
