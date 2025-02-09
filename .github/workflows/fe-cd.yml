@@ -79,7 +79,8 @@ jobs:
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
-          publish-dir: 'src/frontend/apps/web'
+          publish-dir: 'src/frontend/apps/web/.next'
+          functions-dir: 'src/frontend/apps/web/.netlify/functions-internal'
           production-branch: '["main", "dev"]'
           github-token: ${{ secrets.PAT_GITHUB_TOKEN }}
           deploy-message: 'Deploy from GitHub Actions'
