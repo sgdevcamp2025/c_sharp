@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.jootalkpia.chat_server.dto.ChatMessageToKafka;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,12 @@ public class KafkaProducer {
     private final Gson gson = new Gson();
     private final KafkaTemplate<String, String> kafkaTemplate;
 
+    @Value("${topic.chat}")
+    private String chatTopic;
+
     public void sendChatMessage(ChatMessageToKafka chatMessageToKafka, Long roomId) {
         String jsonChatMessage = gson.toJson(chatMessageToKafka);
-        kafkaTemplate.send("${topic.minute}", String.valueOf(roomId), jsonChatMessage).whenComplete((result, ex) -> { //키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
+        kafkaTemplate.send(chatTopic, String.valueOf(roomId), jsonChatMessage).whenComplete((result, ex) -> { //키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
             if (ex == null) {
                 log.info(result.toString());
             } else {
