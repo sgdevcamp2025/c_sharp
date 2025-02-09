@@ -19,14 +19,16 @@ public class KafkaProducer {
     @Value("${topic.chat}")
     private String chatTopic;
 
-    public void sendChatMessage(ChatMessageToKafka chatMessageToKafka, Long roomId) {
+    public void sendChatMessage(ChatMessageToKafka chatMessageToKafka, Long channelId) {
         String jsonChatMessage = gson.toJson(chatMessageToKafka);
-        kafkaTemplate.send(chatTopic, String.valueOf(roomId), jsonChatMessage).whenComplete((result, ex) -> { //키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
-            if (ex == null) {
-                log.info(result.toString());
-            } else {
-                log.error(ex.getMessage(), ex); //추후 예외처리
-            }
-        });
+
+        kafkaTemplate.send(chatTopic, String.valueOf(channelId), jsonChatMessage)
+                .whenComplete((result, ex) -> {//키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
+                    if (ex == null) {
+                        log.info("Kafka message sent: {}", result.toString());
+                    } else {
+                        log.error("Error sending Kafka message: {}", ex.getMessage(), ex); // to do : 추후 예외처리
+                    }
+                });
     }
 }
