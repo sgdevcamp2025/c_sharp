@@ -12,9 +12,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        //스프링 인메모리 메시지 브로커 사용
-        config.enableSimpleBroker("/subscribe");    //구독 prefix
-        config.setApplicationDestinationPrefixes("/publish");   //발행 prefix
+        config.setApplicationDestinationPrefixes("/publish"); // STOMP 메시지 발행 prefix
     }
 
     @Override
