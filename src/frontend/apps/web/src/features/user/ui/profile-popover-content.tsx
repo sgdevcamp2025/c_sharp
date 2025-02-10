@@ -1,6 +1,6 @@
-import { Button } from '@workspace/ui/components';
 import ProfilePicture from './profile-picture';
 import ProfileNickname from './profile-nickname';
+import { LogoutButton } from '../../auth';
 
 const ProfilePopoverContent = () => {
   return (
@@ -10,13 +10,7 @@ const ProfilePopoverContent = () => {
         <ProfilePicture />
         <ProfileNickname />
       </div>
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full text-xs"
-      >
-        LOGOUT
-      </Button>
+      <LogoutButton />
     </div>
   );
 };
