@@ -2,6 +2,8 @@ package com.jootalkpia.stock_server.stocks.dto.response;
 
 import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
 
+import static com.jootalkpia.stock_server.stocks.advice.util.StockValidationUtils.validateMinutePriceOutput;
+
 public record MinutePriceSimpleResponse(
         String code,
         String htsKorIsnm,
@@ -16,6 +18,8 @@ public record MinutePriceSimpleResponse(
 ) {
 
     public static MinutePriceSimpleResponse from(MinutePriceDetailedResponse minutePriceDto, String code) {
+        validateMinutePriceOutput(minutePriceDto);
+
         return new MinutePriceSimpleResponse(
                 code,
                 minutePriceDto.output1().htsKorIsnm(),

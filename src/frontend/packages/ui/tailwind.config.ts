@@ -20,6 +20,7 @@ const config = {
         live: '#fff4e1',
         thread: '#1264a3',
         chatboxHover: '#F1F5F9',
+        toggle: '#E59A43',
         black: {
           100: 'rgba(0, 0, 0, 0.5)',
         },

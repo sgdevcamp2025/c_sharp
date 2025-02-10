@@ -1,32 +1,42 @@
 package com.jootalkpia.chat_server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jootalkpia.chat_server.dto.ChatMessageResponse;
 import com.jootalkpia.chat_server.dto.ChatMessageToKafka;
 import com.jootalkpia.chat_server.dto.MinutePriceResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class KafkaConsumer {
+
+    private final ChatService chatService;
+    private final ObjectMapper objectMapper;
+    private final SimpMessagingTemplate messagingTemplate; // SimpMessagingTemplate 주입
+    private final SimpMessageSendingOperations messagingTemplateBroker; // 내부 메시지 브로커 사용
+
     @KafkaListener(
             topics = "${topic.minute}",
             groupId = "${group.minute}"
     )
     public void processMinutePrice(String kafkaMessage) {
-        log.info("message ===> " + kafkaMessage);
-
-        ObjectMapper mapper = new ObjectMapper();
-
+        log.info("Received Kafka message ===> " + kafkaMessage);
         try {
-            MinutePriceResponse minutePriceResponse = mapper.readValue(kafkaMessage, MinutePriceResponse.class);
+            MinutePriceResponse stockUpdate = objectMapper.readValue(kafkaMessage, MinutePriceResponse.class);
+            String stockDataJson = objectMapper.writeValueAsString(stockUpdate);
 
-            //웹소켓 전달하는 로직 or 전달하는 함수
+            messagingTemplateBroker.convertAndSend("/subscribe/stock", stockDataJson);
 
-            log.info("dto ===> " + minutePriceResponse.toString());
+            log.info("Broadcasted stock data via WebSocket: " + stockDataJson);
+
         } catch (Exception ex) {
-            log.error(ex.getMessage(), ex); // 추후에 GlobalException 처리
+            log.error("Error processing stock message: " + ex.getMessage(), ex);
         }
     }
 
@@ -36,7 +46,7 @@ public class KafkaConsumer {
             concurrency = "2"
     )
     public void processChatMessage(String kafkaMessage) {
-        log.info("message ===> " + kafkaMessage);
+        log.info("Received Kafka message ===> " + kafkaMessage);
 
         ObjectMapper mapper = new ObjectMapper();
 
