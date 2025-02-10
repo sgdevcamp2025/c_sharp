@@ -1,4 +1,5 @@
 import { LoginButton } from '@/src/features/auth';
+import AuthWrapper from '@/src/features/auth/ui/auth-wrapper';
 import ProfilePopover from '@/src/features/user/ui/profile-popover';
 import { Header } from '@/src/shared';
 import '@workspace/ui/globals.css';
@@ -19,7 +20,7 @@ export default function RootLayout({
           <Header authContent={user ? <ProfilePopover /> : <LoginButton />} />
         </header>
         <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">
-          {children}
+          <AuthWrapper> {children}</AuthWrapper>
         </div>
       </body>
     </html>
