@@ -68,9 +68,11 @@ jobs:
       - name: Build and push Docker image
         working-directory: src/backend/${{ matrix.service }}
         run: |
-          docker build --platform linux/amd64 \
-            --build-arg JAR_FILE=build/libs/${{ matrix.service }}-0.0.1-SNAPSHOT.jar \
-            -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest .
+          JAR_FILE=$(ls build/libs/*.jar | head -n 1)  # 최신 JAR 파일 찾기
+          echo "Using JAR file: $JAR_FILE"
+          
+          docker build --no-cache --platform linux/amd64 \
+          -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest .
 
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest
 
