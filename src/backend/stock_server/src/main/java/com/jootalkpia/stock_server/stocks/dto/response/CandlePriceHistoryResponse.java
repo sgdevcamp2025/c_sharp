@@ -2,7 +2,6 @@ package com.jootalkpia.stock_server.stocks.dto.response;
 
 import com.jootalkpia.stock_server.stocks.domain.StockCode;
 import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -10,17 +9,19 @@ public record CandlePriceHistoryResponse(
         String code,
         String stockName,
         List<Output> output,
-        long totalCount
+        boolean hasNext,
+        String lastObjectId
 ) {
 
-    public static CandlePriceHistoryResponse of(Page<MinutePrice> minutePricePage, String code) {
+    public static CandlePriceHistoryResponse of(List<MinutePrice> minutePriceChart, String code, boolean hasNext, String lastObjectId) {
         return new CandlePriceHistoryResponse(
                 code,
                 StockCode.getNameByCode(code),
-                minutePricePage.getContent().stream()
+                minutePriceChart.stream()
                         .map(Output::of)
                         .toList(),
-                minutePricePage.getTotalElements()
+                hasNext,
+                lastObjectId
         );
     }
 

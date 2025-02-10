@@ -1,4 +1,4 @@
-package com.jootalkpia.stock_server.stocks.advice;
+package com.jootalkpia.stock_server.stocks.advice.caller;
 
 import com.jootalkpia.stock_server.stocks.dto.request.TokenRequestBody;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceDetailedResponse;

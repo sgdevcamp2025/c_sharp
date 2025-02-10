@@ -1,7 +1,7 @@
 package com.jootalkpia.stock_server.stocks.service;
 
 import com.google.gson.Gson;
-import com.jootalkpia.stock_server.stocks.advice.StockCaller;
+import com.jootalkpia.stock_server.stocks.advice.caller.StockCaller;
 import com.jootalkpia.stock_server.stocks.domain.Schedule;
 import com.jootalkpia.stock_server.stocks.domain.StockCode;
 import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
@@ -18,8 +18,8 @@ import com.jootalkpia.stock_server.support.property.TokenProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.bson.types.ObjectId;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -27,12 +27,17 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import static com.jootalkpia.stock_server.stocks.advice.util.StockValidationUtils.validateChartSize;
+import static com.jootalkpia.stock_server.stocks.advice.util.StockValidationUtils.validateObjectId;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class StockService {
     private static final String TOKEN_SEPARATOR = " ";
+    private static final int CURSOR_PAGE_NUMBER = 0;
 
     private String token;
 
@@ -105,8 +110,52 @@ public class StockService {
         return MinutePriceSimpleResponse.from(response, code);
     }
 
-    public CandlePriceHistoryResponse getCandlePriceHistoryByCode(Pageable pageable, String code) {
-        Page<MinutePrice> minutePricePage = minutePriceRepository.findAllByCode(pageable, code);
-        return CandlePriceHistoryResponse.of(minutePricePage, code);
+    public CandlePriceHistoryResponse getCandlePriceHistoryByCode(String code, String cursorId, int size) {
+        List<MinutePrice> minutePriceChart = findMinutePriceChart(code, cursorId, size);
+        boolean hasNext = checkHasNext(minutePriceChart, size);
+        List<MinutePrice> slicedMinutePriceChart = sliceBySize(minutePriceChart, size, hasNext);
+
+        return CandlePriceHistoryResponse.of(slicedMinutePriceChart, code, hasNext, getLastObjectId(slicedMinutePriceChart));
+    }
+
+    private List<MinutePrice> findMinutePriceChart(String code, String cursorId, int size) {
+        if (cursorId == null || cursorId.isEmpty()) {
+            return findFirstPage(code, size);
+        }
+        return findNextPage(code, cursorId, size);
+    }
+
+    private List<MinutePrice> findFirstPage(String code, int size) {
+        return minutePriceRepository.findByCodeOrderByMinutePriceIdAsc(
+                code,
+                PageRequest.of(CURSOR_PAGE_NUMBER, size + 1));
+    }
+
+    private List<MinutePrice> findNextPage(String code, String cursorId, int size) {
+        validateObjectId(cursorId);
+        ObjectId objectId = new ObjectId(cursorId);
+
+        return minutePriceRepository.findByCodeAndMinutePriceIdGreaterThanOrderByMinutePriceIdAsc(
+                code,
+                objectId,
+                PageRequest.of(CURSOR_PAGE_NUMBER, size + 1)
+        );
+    }
+
+    private boolean checkHasNext(List<MinutePrice> minutePriceChart, int size) {
+        return minutePriceChart.size() > size;
+    }
+
+    private List<MinutePrice> sliceBySize(List<MinutePrice> minutePriceChart, int size, boolean hasNext) {
+        if (!hasNext) {
+            return minutePriceChart;
+        }
+        return minutePriceChart.subList(0, size);
+    }
+
+    private String getLastObjectId(List<MinutePrice> slicedMinutePriceChart) {
+        validateChartSize(slicedMinutePriceChart);
+
+        return String.valueOf(slicedMinutePriceChart.get(slicedMinutePriceChart.size() - 1).getMinutePriceId());
     }
 }

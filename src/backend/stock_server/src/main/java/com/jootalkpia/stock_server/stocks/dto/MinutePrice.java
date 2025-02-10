@@ -1,17 +1,13 @@
 package com.jootalkpia.stock_server.stocks.dto;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@Document(collection = "minute_price")
+@Document(collection = "minute_prices")
 public class MinutePrice {
     @Id
     private ObjectId minutePriceId;
@@ -19,31 +15,22 @@ public class MinutePrice {
     @Indexed(background = true)
     private String code;
 
-    @Field("stock_name")
     private String stockName;
 
-    @Field("business_date")
     private String businessDate;
 
-    @Field("trading_time")
     private String tradingTime;
 
-    @Field("current_price")
     private String currentPrice;
 
-    @Field("open_price")
     private String openPrice;
 
-    @Field("high_price")
     private String highPrice;
 
-    @Field("low_price")
     private String lowPrice;
 
-    @Field("trading_volume")
     private String tradingVolume;
 
-    @Field("total_trade_amount")
     private String totalTradeAmount;
 
     protected MinutePrice() {
