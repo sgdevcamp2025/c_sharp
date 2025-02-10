@@ -13,9 +13,11 @@ export default function RootLayout({
     >
       <body>
         <header className="h-[68px] w-full flex items-center justify-between px-4 py-1 bg-muted">
-          <Header />
+          <Header authContent={<p>login</p>} />
         </header>
-        <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">{children}</div>
+        <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">
+          {children}
+        </div>
       </body>
     </html>
   );

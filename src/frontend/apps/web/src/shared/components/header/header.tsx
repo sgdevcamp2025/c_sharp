@@ -1,19 +1,10 @@
 'use client';
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@workspace/ui/components';
-import ProfileContainer from './profile-container';
-import { CircleUserRound } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components';
 import Link from 'next/link';
 
 //로고 이미지 경로 변경 필요
-const Header = () => {
+const Header = ({ authContent }: { authContent: React.ReactNode }) => {
   return (
     <>
       <Link href={'/'}>
@@ -24,26 +15,7 @@ const Header = () => {
           </AvatarFallback>
         </Avatar>
       </Link>
-
-      <Popover>
-        <PopoverTrigger asChild>
-          <Avatar
-            variant="default"
-            className="cursor-pointer"
-          >
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>
-              <CircleUserRound size={40} />
-            </AvatarFallback>
-          </Avatar>
-        </PopoverTrigger>
-        <PopoverContent
-          align="end"
-          className="w-72 "
-        >
-          <ProfileContainer />
-        </PopoverContent>
-      </Popover>
+      {authContent}
     </>
   );
 };

@@ -3,7 +3,7 @@
 import { Button, Input, Label } from '@workspace/ui/components';
 import { Pencil } from 'lucide-react';
 
-const Nickname = () => {
+const ProfileNickname = () => {
   //임시변수
   const isNameEditMode = false;
   const name = '공작새';
@@ -26,4 +26,4 @@ const Nickname = () => {
     </div>
   );
 };
-export default Nickname;
+export default ProfileNickname;
