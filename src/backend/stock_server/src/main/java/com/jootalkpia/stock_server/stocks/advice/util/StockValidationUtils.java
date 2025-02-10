@@ -1,11 +1,12 @@
 package com.jootalkpia.stock_server.stocks.advice.util;
 
+import com.jootalkpia.stock_server.stocks.advice.exception.InvalidMinutePriceFromApiException;
 import com.jootalkpia.stock_server.stocks.advice.exception.InvalidObjectIdFormatException;
 import com.jootalkpia.stock_server.stocks.advice.exception.NoSuchMinutePriceException;
 import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
+import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceDetailedResponse;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class StockValidationUtils {
     private StockValidationUtils() {
@@ -30,5 +31,11 @@ public class StockValidationUtils {
         }
 
         return cursorId.matches("[0-9a-fA-F]{24}");
+    }
+
+    public static void validateMinutePriceOutput(MinutePriceDetailedResponse minutePriceDetailedResponse) {
+        if (minutePriceDetailedResponse.output2().size() < 2) {
+            throw new InvalidMinutePriceFromApiException();
+        }
     }
 }
