@@ -30,5 +30,5 @@ group:
   minute: minute-price-save-consumer-group
   chat: chat-message-handle-consumer-group
 
-server:
-  port: ${CHAT_PORT1}
+#server:
+#  port: ${CHAT1_PORT}
