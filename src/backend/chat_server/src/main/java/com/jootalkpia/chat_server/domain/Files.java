@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 @Entity
 @Getter
 @Setter
-public class Files {
+public class Files extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fileId;
@@ -21,6 +21,4 @@ public class Files {
     private String fileType;
     private Long fileSize;
     private String mimeType;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }
