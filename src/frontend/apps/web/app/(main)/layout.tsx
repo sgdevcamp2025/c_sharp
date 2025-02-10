@@ -1,6 +1,6 @@
 import { LoginButton } from '@/src/features/auth';
 import AuthWrapper from '@/src/features/auth/ui/auth-wrapper';
-import ProfilePopover from '@/src/features/user/ui/profile-popover';
+import { ProfilePopover } from '@/src/features/user';
 import { Header } from '@/src/shared';
 import '@workspace/ui/globals.css';
 
