@@ -3,6 +3,8 @@ package com.jootalkpia.signaling_server.rtc;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
+import com.jootalkpia.signaling_server.exception.common.CustomException;
+import com.jootalkpia.signaling_server.exception.common.ErrorCode;
 import com.jootalkpia.signaling_server.model.Huddle;
 import com.jootalkpia.signaling_server.service.HuddleService;
 import com.jootalkpia.signaling_server.service.KurentoManager;
@@ -39,7 +41,9 @@ public class KurentoHandler extends TextWebSocketHandler {
             case "leaveRoom" -> handleLeaveRoom(session, json);
             case "offer" -> handleOffer(session, json);
             case "iceCandidate" -> handleIceCandidate(session, json);
-            default -> log.warn("Unknown message type received: {}", id);
+            default ->
+                    log.warn("Unknown message type received: {}", id);
+//                    throw new CustomException(ErrorCode.BAD_REQUEST.getCode(), ErrorCode.BAD_REQUEST.getMsg());
         }
     }
 
