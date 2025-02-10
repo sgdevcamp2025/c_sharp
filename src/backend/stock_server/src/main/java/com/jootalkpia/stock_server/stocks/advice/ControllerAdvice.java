@@ -13,4 +13,9 @@ public class ControllerAdvice {
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e) {
         return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.internalServerError().body(new ErrorResponse(e.getMessage()));
+    }
 }
