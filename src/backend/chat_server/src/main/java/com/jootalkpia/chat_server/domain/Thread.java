@@ -3,19 +3,15 @@ package com.jootalkpia.chat_server.domain;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import lombok.Getter;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Entity
+@Table(name = "Threads")
 @Getter
-public class Files extends BaseTimeEntity {
+public class Thread extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long fileId;
-
-    private String url;
-    private String urlThumbnail;
-    private String fileType;
-    private Long fileSize;
-    private String mimeType;
+    private Long threadId;
 }
