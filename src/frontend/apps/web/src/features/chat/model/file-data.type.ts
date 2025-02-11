@@ -1,8 +1,6 @@
 export type FileData = {
-  id: string;
-  name: string;
-  file: File;
-  preview: string;
-  thumbnailUrl?: string;
-  type: 'image' | 'video';
+  workspaceId: string;
+  channelId: string;
+  file: File[];
+  thumbnailUrl?: File[];
 };
