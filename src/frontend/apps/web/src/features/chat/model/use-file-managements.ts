@@ -54,6 +54,14 @@ export const useFileManagements = (workspaceId: number, channelId: number) => {
         return;
       }
 
+      selectedFiles.forEach((fileData) => {
+        fileData.file.forEach((file) => {
+          if (file instanceof File && file.type.startsWith('video/')) {
+            URL.revokeObjectURL(file.name);
+          }
+        });
+      });
+
       // 선택한 파일들을 순서대로 전처리
       const processedResults = await Promise.all(files.map(processFile));
       const processedFiles = processedResults.filter(
