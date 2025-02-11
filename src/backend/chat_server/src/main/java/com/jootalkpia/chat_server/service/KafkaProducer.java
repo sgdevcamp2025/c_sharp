@@ -1,7 +1,6 @@
 package com.jootalkpia.chat_server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.jootalkpia.chat_server.dto.ChatMessageToKafka;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
