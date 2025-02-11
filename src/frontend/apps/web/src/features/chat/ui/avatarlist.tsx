@@ -29,7 +29,7 @@ const AvatarList = ({
 
   return (
     <div
-      className="px-1 py-1 pr-40 mb-0.5 flex gap-1 items-center justify-between hover:shadow-md cursor-pointer"
+      className="px-1 py-1 pr-10 mb-0.5 flex gap-1 items-center justify-between hover:shadow-md cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => setIsThreadOpen(true)}
