@@ -26,6 +26,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -91,7 +92,7 @@ public class StockService {
     }
 
     private MinutePriceSimpleResponse getStockPrice(String code) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         String currentTime = now.format(DateTimeFormatter.ofPattern("HHmmss"));
 
         MinutePriceDetailedResponse response = stockCaller.getMinutePrice(
