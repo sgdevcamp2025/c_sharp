@@ -5,29 +5,22 @@ import type {
   JsonValue,
   ApiErrorResponse,
   ApiResponse,
+  ApiServerType,
 } from '@/src/shared/services/models';
+import { getBaseUrl } from '@/src/shared/services/lib/utils';
 
 export async function fetchInstance<TResponse, TBody = JsonValue>(
+  serverType: ApiServerType,
   url: string,
   method: HttpMethod,
   options: FetchOptions<TBody> = {},
 ): Promise<TResponse> {
   try {
-    // 브라우저 환경에서만 localStorage 접근할 수 있도록
+    // 🟢 브라우저 환경에서만 localStorage 접근
     const token =
       typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
-    /**
-     * options 객체에서 필요한 값들을 구조분해할당합니다
-     * @template TBody - 요청 본문의 타입
-     * @typedef {object} ExtractedOptions
-     * @property {TBody} [body] - 요청 본문 데이터
-     * @property {Record<string, string>} [params] - URL 쿼리 파라미터
-     * @property {RequestCache} [cache] - Next.js 캐시 전략
-     * @property {string[]} [tags] - 캐시 무효화 태그
-     * @property {number} [revalidate] - 캐시 재검증 시간(초)
-     * @property {boolean} [includeAuthToken=true] - 토큰을 헤더에 추가할지 여부
-     */
+    // 🟢 options 객체에서 필요한 값들을 구조 분해 할당
     const {
       body,
       params,
@@ -38,68 +31,52 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
       ...restOptions
     } = options;
 
-    // URL 쿼리 파라미터 추가
+    const BASE_URL = getBaseUrl(serverType);
+    // 🟢 URL에 쿼리 파라미터 추가
     const queryParams = params
       ? `?${new URLSearchParams(params).toString()}`
       : '';
-    const finalUrl = `${url}${queryParams}`;
+    const finalUrl = `${BASE_URL}${url}${queryParams}`;
 
-    // 기본 헤더 설정
-    const defaultHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    // 🟢 기본 헤더 설정 (Content-Type 자동 처리)
+    const finalHeaders: Record<string, string> = {
+      ...(includeAuthToken && token
+        ? { Authorization: `Bearer ${token}` }
+        : {}),
+      ...(body && !(body instanceof FormData)
+        ? { 'Content-Type': 'application/json' }
+        : {}),
+      ...(restOptions.headers as Record<string, string>),
     };
 
-    // includeAuthToken이 true일 때만 토큰을 헤더에 추가
-    if (includeAuthToken) {
-      const token =
-        typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      if (token) {
-        defaultHeaders.Authorization = `Bearer ${token}`;
-      }
-    }
-
-    // 최종 fetch 옵션 구성
+    // 🟢 최종 fetch 옵션 구성
     const finalOptions: RequestInit = {
       method,
       ...restOptions,
-      headers: {
-        ...defaultHeaders,
-        ...(restOptions.headers as Record<string, string>),
-      },
-      // cache, tags, revalidate 옵션이 있을 경우 next 프로퍼티에 추가
+      headers: finalHeaders,
       ...(cache && { cache }),
       ...(revalidate && { next: { revalidate } }),
       ...(tags && { next: { tags } }),
     };
 
-    // body 데이터가 있고 GET 요청이 아닐 때만 body 필드 추가
+    // body 데이터가 있고, GET 요청이 아닐 때만 body 필드 추가
     if (body && method !== 'GET') {
-      finalOptions.body = JSON.stringify(body);
+      finalOptions.body =
+        body instanceof FormData ? body : JSON.stringify(body);
     }
 
+    // API 호출
     const response = await fetch(finalUrl, finalOptions);
 
     // 성공 응답 처리
     if (response.ok) {
       const contentType = response.headers.get('content-type');
-      // JSON 응답일 경우 JSON 파싱
+
       if (contentType?.includes('application/json')) {
         const data = await response.json();
-        // ApiResponse 형태로 응답이 왔다면 data 필드를 반환
-        if (
-          data &&
-          typeof data === 'object' &&
-          'code' in data &&
-          'message' in data
-        ) {
-          // ApiResponse 형태면 data 필드만 추출
-          return (data as ApiResponse<TResponse>).data as TResponse;
-        }
-        // 일반 JSON 응답이면 그대로 반환
-        return data as TResponse;
+        return (data as ApiResponse<TResponse>).data ?? (data as TResponse);
       }
-      // JSON이 아닌 경우 텍스트로 반환
+
       return response.text() as unknown as TResponse;
     }
 
@@ -108,7 +85,6 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
     try {
       errorResponse = (await response.json()) as ApiErrorResponse;
     } catch {
-      // JSON 파싱 실패시 기본 에러 응답 생성
       errorResponse = {
         code: String(response.status),
         message: response.statusText || 'Unknown error occurred',
@@ -124,14 +100,13 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
       response: ApiErrorResponse;
     };
 
-    // 에러 객체에 상세 정보 추가
     error.status = response.status;
     error.code = errorResponse.code;
     error.response = errorResponse;
 
     throw error;
   } catch (error) {
-    console.error('fetchInstance error:', error);
+    console.error('❌ fetchInstance error:', error);
     throw error;
   }
 }
