@@ -21,7 +21,7 @@ export const FilePreviewItem = ({
 
   return (
     <div className="relative group flex-shrink-0">
-      <div className="w-20 h-20 rounded-lg relative overflow-hidden border border-black">
+      {/* <div className="w-20 h-20 rounded-lg relative overflow-hidden border border-black">
         {fileData.type === 'image' ? (
           <ImagePreivew
             preview={fileData.preview}
@@ -41,15 +41,15 @@ export const FilePreviewItem = ({
           color="#EA4335"
           className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
         />
-      </div>
-      {isModalOpen && (
+      </div> */}
+      {/* {isModalOpen && (
         <FileModal
           isOpen={isModalOpen}
           setIsOpen={setIsModalOpen}
           size="default"
           fileData={fileData}
         />
-      )}
+      )} */}
     </div>
   );
 };

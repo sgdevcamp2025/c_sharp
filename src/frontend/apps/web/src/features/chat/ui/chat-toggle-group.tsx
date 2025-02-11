@@ -30,10 +30,10 @@ const ChatToggleGroup = ({ name, onSend }: ChatToggleGroupsProps) => {
     <div className="flex flex-col justify-between gap-2">
       {error && <div className="text-red-500">{error.message}</div>}
 
-      <FilePreviewList
+      {/* <FilePreviewList
         selectedFiles={selectedFiles}
         onRemoveFile={() => {}}
-      />
+      /> */}
       <div className="flex flex-row justify-between">
         <div className="flex flex-row gap-4 items-center">
           <FileUploadTrigger

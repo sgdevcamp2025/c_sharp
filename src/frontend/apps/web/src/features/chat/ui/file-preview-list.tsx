@@ -19,13 +19,13 @@ export const FilePreviewList = ({
   return (
     <div className="overflow-x-auto w-full">
       <div className="flex gap-2 pb-2 w-max">
-        {selectedFiles.map((fileData) => (
+        {/* {selectedFiles.map((fileData) => (
           <FilePreviewItem
             key={fileData.id}
             fileData={fileData}
             onRemove={onRemoveFile}
           />
-        ))}
+        ))} */}
       </div>
     </div>
   );
