@@ -8,7 +8,7 @@ spring:
       cors:
         mappings:
           "/**":  # 모든 경로에 대해 CORS 설정
-            allowedOrigins: "https://your-frontend.com"  # 허용할 도메인 (프론트엔드)
+            allowedOrigins: "http://localhost:3000"  # 허용할 도메인 (프론트엔드)
             allowedMethods:
               - GET
               - POST
