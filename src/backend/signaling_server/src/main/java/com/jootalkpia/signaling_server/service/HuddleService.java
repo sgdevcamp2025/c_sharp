@@ -30,9 +30,14 @@ public class HuddleService {
         String huddleId = "huddle-" + System.currentTimeMillis();
         Huddle huddle = new Huddle(huddleId, channelId, userId, LocalDateTime.now());
 
+        // 레디스에 허들 메타데이터(허들아이디, 채널아이디, 만든유저아이디, 생성시간) 저장
         huddleCacheRepository.saveHuddle(huddle);
-        huddleParticipantsRepository.addParticipant(huddleId, userId); // 초기 참여자 등록
-        channelHuddleRepository.saveChannelHuddle(channelId, huddleId); // 채널과 허들 매핑
+
+        // 각 허들의 참여자만 관리하는 셋에 참여자 등록
+//        huddleParticipantsRepository.addParticipant(huddleId, userId);
+
+        // 채널과 허들 매핑
+        channelHuddleRepository.saveChannelHuddle(channelId, huddleId);
 
         return huddle;
     }

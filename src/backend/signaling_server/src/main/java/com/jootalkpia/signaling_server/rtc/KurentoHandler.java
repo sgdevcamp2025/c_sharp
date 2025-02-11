@@ -58,13 +58,15 @@ public class KurentoHandler extends TextWebSocketHandler {
             Long channelId = getLongValueFromJson(json, "channelId");
             Long userId = getLongValueFromJson(json, "userId");
 
-            // 허들 생성, 저장
+            // 허들 메타데이터 생성
             Huddle newHuddle = huddleService.createHuddle(channelId, userId);
+
+            // 🚀 KurentoRoom 생성 (Redis에 저장)
             kurentoManager.createRoom(newHuddle.huddleId());
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "roomCreated", "huddleId", newHuddle.huddleId()))));
 
-            // 자동으로 허들 입장도 처리
+            // 자동으로 허들 입장 처리
             handleJoinRoom(session, Map.of(
                     "id", "joinRoom",
                     "huddleId", newHuddle.huddleId(),
@@ -82,13 +84,15 @@ public class KurentoHandler extends TextWebSocketHandler {
             Long userId = getLongValueFromJson(json, "userId");
             String huddleId = (String) json.get("huddleId");
 
-            // Redis에 참여자 추가
-            huddleParticipantsRepository.addParticipant(huddleId, userId);
-
-            // WebRTC 엔드포인트 생성
+            // 🚀 WebRTC 엔드포인트 생성 및 저장
             WebRtcEndpoint webRtcEndpoint = kurentoManager.addParticipantToRoom(huddleId, userId);
 
-            // Redis에 WebRTC 엔드포인트 저장
+            // 파이프라인에 엔드포인트 추가
+            webRtcEndpoint.connect(webRtcEndpoint);
+
+            // 🚀 Redis에 WebRTC 엔드포인트 정보 저장
+            // ✅ Redis에 참가자 추가
+            huddleParticipantsRepository.addParticipant(huddleId, userId);
             huddleParticipantsRepository.saveUserEndpoint(huddleId, userId, webRtcEndpoint.getId());
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "joinedRoom", "huddleId", huddleId))));
@@ -104,11 +108,11 @@ public class KurentoHandler extends TextWebSocketHandler {
             Long userId = getLongValueFromJson(json, "userId");
             String huddleId = (String) json.get("huddleId");
 
-            // Redis에서 참여자 제거
+            // 🚀 Redis에서 참여자 제거
             huddleParticipantsRepository.removeParticipant(huddleId, userId);
             huddleParticipantsRepository.removeUserEndpoint(huddleId, userId);
 
-            // Kurento에서 제거
+            // 🚀 Kurento에서 엔드포인트 제거
             kurentoManager.removeParticipantFromRoom(huddleId, userId);
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "leftRoom", "huddleId", huddleId))));
@@ -124,7 +128,8 @@ public class KurentoHandler extends TextWebSocketHandler {
             String huddleId = (String) json.get("huddleId");
             String sdpOffer = (String) json.get("sdpOffer");
 
-            WebRtcEndpoint webRtcEndpoint = kurentoManager.getRoom(huddleId).getParticipant(userId);
+            // 🚀 변경된 부분: getRoom().getParticipant() 대신 getParticipantEndpoint() 사용
+            WebRtcEndpoint webRtcEndpoint = kurentoManager.getParticipantEndpoint(huddleId, userId);
             if (webRtcEndpoint == null) {
                 log.warn("User session not found for userId: {}", userId);
                 return;
@@ -150,7 +155,8 @@ public class KurentoHandler extends TextWebSocketHandler {
             String huddleId = (String) json.get("huddleId");
             String candidate = (String) json.get("candidate");
 
-            WebRtcEndpoint webRtcEndpoint = kurentoManager.getRoom(huddleId).getParticipant(userId);
+            // 🚀 변경된 부분: getRoom().getParticipant() 대신 getParticipantEndpoint() 사용
+            WebRtcEndpoint webRtcEndpoint = kurentoManager.getParticipantEndpoint(huddleId, userId);
             if (webRtcEndpoint != null) {
                 webRtcEndpoint.addIceCandidate(new IceCandidate(candidate, "", 0));
             }
