@@ -50,8 +50,8 @@ public class S3Service {
                             .build(),
                     tempFile);
 
-            log.info("파일 업로드 완료 - S3 Key: {}", "https://" + bucketName +".s3"+region+".amazonaws.com/" + key);
-            return "https://" + bucketName +".s3"+region+".amazonaws.com/" + key;
+            log.info("파일 업로드 완료 - S3 Key: {}", "https://" + bucketName +".s3."+region+".amazonaws.com/" + key);
+            return "https://" + bucketName +".s3."+region+".amazonaws.com/" + key;
 
         } catch (IOException e) {
             log.error("파일 업로드 중 IOException 발생: {}", e.getMessage(), e);
