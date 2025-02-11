@@ -1,8 +1,12 @@
+server:
+  port: ${AUTH_PORT} 
+
 spring:
   data:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+      
 
   datasource:
     driver-class-name: org.postgresql.Driver
