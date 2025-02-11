@@ -1,1 +1,5 @@
-export { formatStockChartInfo } from './stock.util';
+export {
+  formatCandleChart,
+  formatLineChart,
+  formatHistogramChart,
+} from './stock.util';
