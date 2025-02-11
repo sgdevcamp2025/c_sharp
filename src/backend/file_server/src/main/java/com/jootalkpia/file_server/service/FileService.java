@@ -36,6 +36,8 @@ public class FileService {
         List<String> fileTypes = new ArrayList<>();
         List<Long> fileIds = new ArrayList<>();
 
+        log.info("make fileId arraylist empty");
+
         for (int i = 0; i < files.length; i++) {
             Long fileId = null;
             Files filesEntity = new Files();
@@ -63,6 +65,7 @@ public class FileService {
                 String thumbnailUrl = uploadEachFile(fileType, fileId, thumbnail);
                 filesEntity.setUrlThumbnail(thumbnailUrl);
             }
+            log.info("now saving filesentity");
             fileRepository.save(filesEntity);
         }
         return new UploadFileResponseDto(fileTypes, fileIds);

@@ -32,6 +32,7 @@ public class S3Service {
 
     public String uploadFile(MultipartFile file, String folder, Long fileId) {
         Path tempFile = null;
+        log.info("Ready to upload file to S3 bucket: {}", bucketName);
         try {
 
             // S3에 저장될 파일 키 생성
