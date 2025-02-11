@@ -4,9 +4,10 @@ import {
   ResizablePanelGroup,
 } from '@workspace/ui/components';
 import StockChartItem from './stock-chart-item';
-import { ChartType } from '../model';
+import { ChartType, dummyStockData } from '../model';
 
 const StockChartContainer = () => {
+  const data = dummyStockData;
   return (
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel
@@ -16,7 +17,7 @@ const StockChartContainer = () => {
         className="flex items-center justify-center bg-gray-200"
       >
         <StockChartItem
-          data={[]}
+          data={data}
           type={ChartType.Candlestick}
         />
       </ResizablePanel>
@@ -28,7 +29,7 @@ const StockChartContainer = () => {
         className="flex items-center justify-center bg-gray-300"
       >
         <StockChartItem
-          data={[]}
+          data={data}
           type={ChartType.Histogram}
         />
       </ResizablePanel>
