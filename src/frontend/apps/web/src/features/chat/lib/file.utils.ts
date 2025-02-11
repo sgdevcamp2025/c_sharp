@@ -29,12 +29,32 @@ export const validateFileSize = (file: File) => {
 };
 
 /**
- * 주어진 동영상 파일로부터 썸네일(이미지)을 생성하는 함수
+ * 다중 선택된 파일들의 총 크기가 1000MB를 넘지 않도록 검증하는 함수
+ *
+ * @param files - 업로드할 파일 배열
+ * @returns 제한 초과 시 false 반환, 허용 범위 내면 true 반환
+ */
+export const MAX_TOTAL_FILE_SIZE = 1000 * 1024 * 1024; // 1000MB
+
+export const validateTotalFileSize = (files: File[]) => {
+  const totalSize = files.reduce((acc, file) => acc + file.size, 0);
+
+  if (totalSize > MAX_TOTAL_FILE_SIZE) {
+    alert(
+      `총 파일 크기가 1000MB를 초과할 수 없습니다. (현재: ${formatFileSize(totalSize)})`,
+    );
+    return false;
+  }
+  return true;
+};
+
+/**
+ * 주어진 동영상 파일로부터 썸네일(이미지) File 객체를 생성하는 함수
  *
  * @param file - 비디오 File 객체
- * @returns Promise. 성공 시 base64 Data URL 문자열, 실패 시 빈 문자열
+ * @returns Promise. 성공 시 썸네일 File 객체, 실패 시 null
  */
-export const generateVideoThumbnail = (file: File): Promise<string> => {
+export const generateVideoThumbnail = (file: File): Promise<File | null> => {
   return new Promise((resolve) => {
     const video = document.createElement('video');
     video.autoplay = false;
@@ -45,6 +65,7 @@ export const generateVideoThumbnail = (file: File): Promise<string> => {
     video.src = videoUrl;
 
     video.onloadedmetadata = () => {
+      // 영상의 중간 지점으로 이동하여 썸네일을 생성
       video.currentTime = video.duration / 2;
     };
 
@@ -52,6 +73,7 @@ export const generateVideoThumbnail = (file: File): Promise<string> => {
       const canvas = document.createElement('canvas');
       const aspectRatio = video.videoWidth / video.videoHeight;
 
+      // 썸네일의 너비를 300px로 설정하고 높이는 비율에 맞게 계산
       const thumbnailWidth = 300;
       const thumbnailHeight = thumbnailWidth / aspectRatio;
 
@@ -59,16 +81,34 @@ export const generateVideoThumbnail = (file: File): Promise<string> => {
       canvas.height = thumbnailHeight;
 
       const ctx = canvas.getContext('2d');
-      ctx?.drawImage(video, 0, 0, thumbnailWidth, thumbnailHeight);
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, thumbnailWidth, thumbnailHeight);
+      }
 
-      URL.revokeObjectURL(videoUrl);
-      resolve(canvas.toDataURL('image/jpeg', 0.7));
+      // canvas.toBlob을 사용해 Blob 객체로 변환 후 File 객체 생성
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(videoUrl);
+          if (blob) {
+            // 생성된 Blob을 기반으로 File 객체 생성 (파일명은 thumbnail.jpg)
+            const thumbnailFile = new File([blob], 'thumbnail.jpg', {
+              type: 'image/jpeg',
+            });
+            resolve(thumbnailFile);
+          } else {
+            console.error('Error generating thumbnail blob');
+            resolve(null);
+          }
+        },
+        'image/jpeg',
+        0.7,
+      );
     };
 
     video.onerror = () => {
       console.error('Error generating video thumbnail');
       URL.revokeObjectURL(videoUrl);
-      resolve('');
+      resolve(null);
     };
   });
 };
