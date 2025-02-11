@@ -20,7 +20,6 @@ spring:
       uri: ${MONGO_URI}
   jackson:
     property-naming-strategy: LOWER_CAMEL_CASE
-    time-zone: Asia/Seoul
 
 logging:
   level:
