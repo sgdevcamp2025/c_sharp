@@ -5,6 +5,7 @@ import com.jootalkpia.signaling_server.repository.HuddleCacheRepository;
 import com.jootalkpia.signaling_server.repository.HuddleParticipantsRepository;
 import com.jootalkpia.signaling_server.repository.ChannelHuddleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class HuddleService {
 
     private final HuddleCacheRepository huddleCacheRepository;
@@ -33,9 +35,6 @@ public class HuddleService {
         // 레디스에 허들 메타데이터(허들아이디, 채널아이디, 만든유저아이디, 생성시간) 저장
         huddleCacheRepository.saveHuddle(huddle);
 
-        // 각 허들의 참여자만 관리하는 셋에 참여자 등록
-//        huddleParticipantsRepository.addParticipant(huddleId, userId);
-
         // 채널과 허들 매핑
         channelHuddleRepository.saveChannelHuddle(channelId, huddleId);
 
@@ -49,8 +48,13 @@ public class HuddleService {
         if (huddleCacheRepository.getHuddleById(huddleId) == null) {
             throw new IllegalStateException("존재하지 않는 허들입니다.");
         }
+        if (!canUserJoinHuddle(userId)) {
+            throw new IllegalStateException("유저는 하나의 허들에만 참여할 수 있습니다.");
+        }
+    }
 
-        huddleParticipantsRepository.addParticipant(huddleId, userId);
+    public boolean canUserJoinHuddle(Long userId) {
+        return huddleParticipantsRepository.getUserHuddle(userId) == null;
     }
 
     /**
@@ -60,14 +64,14 @@ public class HuddleService {
         if (huddleCacheRepository.getHuddleById(huddleId) == null) {
             throw new IllegalStateException("존재하지 않는 허들입니다.");
         }
-
-        huddleParticipantsRepository.removeParticipant(huddleId, userId);
-
-        // 허들에 남아있는 참여자가 없으면 삭제
-        Set<Long> remainingParticipants = huddleParticipantsRepository.getParticipants(huddleId);
-        if (remainingParticipants.isEmpty()) {
-            deleteHuddle(huddleId);
-        }
+//
+//        huddleParticipantsRepository.removeParticipant(huddleId, userId);
+//
+//        // 허들에 남아있는 참여자가 없으면 삭제
+//        Set<Long> remainingParticipants = huddleParticipantsRepository.getParticipants(huddleId);
+//        if (remainingParticipants.isEmpty()) {
+//            deleteHuddle(huddleId);
+//        }
     }
 
     /**
@@ -75,9 +79,18 @@ public class HuddleService {
      */
     private void deleteHuddle(String huddleId) {
         Huddle huddle = huddleCacheRepository.getHuddleById(huddleId);
-        if (huddle == null) return;
+        if (huddle == null) {
+            log.warn("허들을 찾을 수 없음: huddleId={}", huddleId);
+            return;
+        }
 
+        // Redis에서 허들 삭제
         huddleCacheRepository.deleteHuddle(huddleId);
-        channelHuddleRepository.deleteChannelHuddle(huddle.channelId()); // 채널 매핑 제거
+
+        // 채널-허들 매핑 삭제
+        if (huddle.channelId() != null) {
+            channelHuddleRepository.deleteChannelHuddle(huddle.channelId());
+        }
     }
+
 }

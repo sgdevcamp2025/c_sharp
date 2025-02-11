@@ -6,9 +6,11 @@ import org.springframework.data.redis.core.ValueOperations;
 
 @Repository
 public class ChannelHuddleRepository {
+    private final RedisTemplate<String, String> redisTemplate;
     private final ValueOperations<String, String> valueOps;
 
     public ChannelHuddleRepository(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
         this.valueOps = redisTemplate.opsForValue();
     }
 
