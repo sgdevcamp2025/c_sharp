@@ -1,14 +1,15 @@
 package com.jootalkpia.chat_server.service;
 
 import com.jootalkpia.chat_server.domain.Files;
+import com.jootalkpia.chat_server.domain.Thread;
 import com.jootalkpia.chat_server.domain.User;
-import com.jootalkpia.chat_server.dto.messgaeDto.ChatMessageRequest;
 import com.jootalkpia.chat_server.dto.messgaeDto.CommonResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.ImageResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.MessageResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.TextResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.VideoResponse;
 import com.jootalkpia.chat_server.repository.FileRepository;
+import com.jootalkpia.chat_server.repository.ThreadRepository;
 import com.jootalkpia.chat_server.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,19 +22,28 @@ public class ChatService {
 
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
+    private final ThreadRepository threadRepository;
 
-    public List<MessageResponse> createMessage(ChatMessageRequest request) {
+    public CommonResponse createCommonData(Long userId, Long channelId){
+        User user = userRepository.findByUserId(userId);
+        Thread thread = new Thread();   // todo:transaction처리 , 예외처리 필요
+        threadRepository.save(thread);
+
+        return new CommonResponse(
+                channelId,
+                user.getUserId(),
+                thread.getThreadId(),
+                user.getNickname(),
+                user.getProfileImage());
+    }
+
+    public List<MessageResponse> createMessageData(String content,  List<Long> attachmentList) {
         List<MessageResponse> response = new ArrayList<>();
 
-        User user = userRepository.findByUserId(request.userId());
-        response.add(new CommonResponse(user.getUserId(), user.getNickname(), user.getProfileImage()));
-
-        String content = request.content();
         if (content != null && !content.isEmpty()) {
             response.add(new TextResponse(content));
         }
 
-        List<Long> attachmentList = request.attachmentList();
         if (attachmentList != null && !attachmentList.isEmpty()) {
             for (Long fileId : attachmentList) {
                 Files file = fileRepository.findById(fileId)
