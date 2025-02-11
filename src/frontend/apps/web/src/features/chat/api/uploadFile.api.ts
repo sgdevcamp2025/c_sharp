@@ -34,5 +34,9 @@ export async function uploadFiles({
     console.log('debugging', key, value);
   }
 
-  return postRequest<FileUploadItem[], FormData>('/api/v1/files', formData);
+  return postRequest<FileUploadItem[], FormData>(
+    'file',
+    '/api/v1/files',
+    formData,
+  );
 }
