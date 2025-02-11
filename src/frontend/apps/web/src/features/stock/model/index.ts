@@ -4,3 +4,4 @@ export {
   type StockChart,
 } from './stock.types';
 export { columns } from './stocks-table.columns';
+export { dummyStockData } from './stock-chart.mock';
