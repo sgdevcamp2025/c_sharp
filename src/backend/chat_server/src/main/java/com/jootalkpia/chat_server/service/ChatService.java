@@ -31,8 +31,8 @@ public class ChatService {
 
         return new CommonResponse(
                 channelId,
-                user.getUserId(),
                 thread.getThreadId(),
+                user.getUserId(),
                 user.getNickname(),
                 user.getProfileImage());
     }
