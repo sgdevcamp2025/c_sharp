@@ -37,25 +37,36 @@ public class ChatService {
                 user.getProfileImage());
     }
 
-    public List<MessageResponse> createMessageData(String content,  List<Long> attachmentList) {
+    public List<MessageResponse> createMessageData(String content, List<Long> attachmentList) {
         List<MessageResponse> response = new ArrayList<>();
-
         if (content != null && !content.isEmpty()) {
-            response.add(new TextResponse(content));
+            response.add(createTextMessage(content));
         }
+        response.addAll(createAttachmentList(attachmentList));
+        return response;
+    }
 
+    private TextResponse createTextMessage(String content) {
+        return new TextResponse(content);
+    }
+
+    private List<MessageResponse> createAttachmentList(List<Long> attachmentList) {
+        List<MessageResponse> list = new ArrayList<>();
         if (attachmentList != null && !attachmentList.isEmpty()) {
             for (Long fileId : attachmentList) {
                 Files file = fileRepository.findById(fileId)
-                        .orElseThrow(() -> new IllegalArgumentException("File not found for fileId: " + fileId)); // todo : 예외 처리 추가
-                switch (file.getFileType()) {
-                    case "IMAGE" -> response.add(new ImageResponse(file.getUrl()));
-                    case "VIDEO" -> response.add(new VideoResponse(file.getUrlThumbnail(),file.getUrl()));
-                    default -> throw new IllegalArgumentException("Unsupported file type: " + file.getFileType()); // todo : 예외 처리 추가
-                }
+                        .orElseThrow(() -> new IllegalArgumentException("File not found for fileId: " + fileId));   // todo:예외처리 추가
+                list.add(createAttachmentData(file));
             }
         }
+        return list;
+    }
 
-        return response;
+    private MessageResponse createAttachmentData(Files file) {
+        return switch (file.getFileType()) {
+            case "IMAGE" -> new ImageResponse(file.getUrl());
+            case "VIDEO" -> new VideoResponse(file.getUrlThumbnail(), file.getUrl());
+            default -> throw new IllegalArgumentException("Unsupported file type: " + file.getFileId()); // todo:예외처리 추가
+        };
     }
 }
