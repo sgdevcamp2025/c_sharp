@@ -28,3 +28,9 @@ export type StockChart = {
   close: number;
   tradingVolume: number;
 };
+
+export enum ChartType {
+  Candlestick = 'candlestick',
+  Line = 'line',
+  Histogram = 'histogram',
+}
