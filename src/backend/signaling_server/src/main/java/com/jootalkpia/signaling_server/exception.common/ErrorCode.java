@@ -18,6 +18,8 @@ public enum ErrorCode {
     WORKSPACE_NOT_FOUND("R40401", "등록되지 않은 워크스페이스입니다."),
     CHANNEL_NOT_FOUND("R40402", "등록되지 않은 채널입니다."),
     USER_NOT_FOUND("R40403", "등록되지 않은 유저입니다."),
+    HUDDLE_NOT_FOUND("R40404", "등록되지 않은 허들입니다."),
+    HUDDLE_NOT_IN_CHANNEL("R40405", "채널에 해당 허들이 존재하지 않습니다."),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR("R50001", "서버 내부 오류가 발생했습니다."),

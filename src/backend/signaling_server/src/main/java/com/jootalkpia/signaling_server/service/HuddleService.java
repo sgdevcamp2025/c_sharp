@@ -2,10 +2,12 @@ package com.jootalkpia.signaling_server.service;
 
 import com.jootalkpia.signaling_server.model.Huddle;
 import com.jootalkpia.signaling_server.repository.HuddleCacheRepository;
+import com.jootalkpia.signaling_server.repository.HuddleParticipantsRepository;
+import com.jootalkpia.signaling_server.repository.ChannelHuddleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -13,64 +15,64 @@ import java.util.Set;
 public class HuddleService {
 
     private final HuddleCacheRepository huddleCacheRepository;
+    private final HuddleParticipantsRepository huddleParticipantsRepository;
+    private final ChannelHuddleRepository channelHuddleRepository;
 
+    /**
+     * 허들 생성
+     */
     public Huddle createHuddle(Long channelId, Long userId) {
-        if (huddleCacheRepository.getHuddleByChannel(channelId) != null) {
-            throw new IllegalStateException("이미 해당 채널에 허들이 존재합니다.");
+        String existingHuddleId = channelHuddleRepository.getHuddleByChannel(channelId);
+        if (existingHuddleId != null) {
+            throw new IllegalStateException("해당 채널에 이미 허들이 존재합니다.");
         }
 
-        Set<Long> initialParticipants = new HashSet<>();
-//        initialParticipants.add(userId);
-
-        Huddle huddle = new Huddle(
-                "huddle-" + System.currentTimeMillis(),
-                channelId,
-                userId,
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                initialParticipants
-        );
+        String huddleId = "huddle-" + System.currentTimeMillis();
+        Huddle huddle = new Huddle(huddleId, channelId, userId, LocalDateTime.now());
 
         huddleCacheRepository.saveHuddle(huddle);
+        huddleParticipantsRepository.addParticipant(huddleId, userId); // 초기 참여자 등록
+        channelHuddleRepository.saveChannelHuddle(channelId, huddleId); // 채널과 허들 매핑
+
         return huddle;
     }
 
-    public Huddle joinHuddle(String huddleId, Long userId, Long channelId) {
+    /**
+     * 허들 참가
+     */
+    public void joinHuddle(String huddleId, Long userId) {
+        if (huddleCacheRepository.getHuddleById(huddleId) == null) {
+            throw new IllegalStateException("존재하지 않는 허들입니다.");
+        }
+
+        huddleParticipantsRepository.addParticipant(huddleId, userId);
+    }
+
+    /**
+     * 허들 퇴장
+     */
+    public void exitHuddle(String huddleId, Long userId) {
+        if (huddleCacheRepository.getHuddleById(huddleId) == null) {
+            throw new IllegalStateException("존재하지 않는 허들입니다.");
+        }
+
+        huddleParticipantsRepository.removeParticipant(huddleId, userId);
+
+        // 허들에 남아있는 참여자가 없으면 삭제
+        Set<Long> remainingParticipants = huddleParticipantsRepository.getParticipants(huddleId);
+        if (remainingParticipants.isEmpty()) {
+            deleteHuddle(huddleId);
+        }
+    }
+
+    /**
+     * 허들 삭제 (참여자가 아무도 없을 때)
+     */
+    private void deleteHuddle(String huddleId) {
         Huddle huddle = huddleCacheRepository.getHuddleById(huddleId);
-        if (huddle == null) throw new IllegalStateException("허들이 존재하지 않습니다.");
+        if (huddle == null) return;
 
-        Huddle updatedHuddle = new Huddle(
-                huddle.huddleId(),
-                huddle.channelId(),
-                huddle.createdByUserId(),
-                huddle.createdAt(),
-                LocalDateTime.now(),
-                addParticipant(huddle.participants(), userId)  // 참가자 추가
-        );
-
-        huddleCacheRepository.saveHuddle(updatedHuddle);
-        return updatedHuddle;
-    }
-
-    // 참가자 추가
-    private Set<Long> addParticipant(Set<Long> participants, Long userId) {
-        Set<Long> updatedParticipants = new HashSet<>(participants);
-        updatedParticipants.add(userId);
-        return updatedParticipants;
-    }
-
-    public void exitHuddle(String huddleId, Long userId, Long channelId) {
-        Huddle huddle = huddleCacheRepository.getHuddleById(huddleId);
-        if (huddle == null) throw new IllegalStateException("허들이 존재하지 않습니다.");
-
-        Set<Long> updatedParticipants = new HashSet<>(huddle.participants());
-        updatedParticipants.remove(userId);
-
-        Huddle updatedHuddle = huddle.updateParticipants(updatedParticipants);
-        huddleCacheRepository.saveHuddle(updatedHuddle);
-    }
-
-    public Huddle getHuddleByChannel(Long channelId) {
-        return huddleCacheRepository.getHuddleByChannel(channelId);
+        huddleCacheRepository.deleteHuddle(huddleId);
+        channelHuddleRepository.deleteChannelHuddle(huddle.channelId()); // 채널 매핑 제거
     }
 }

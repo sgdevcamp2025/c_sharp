@@ -1,4 +1,4 @@
-package com.jootalkpia.signaling_server.rtc;
+package com.jootalkpia.signaling_server.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
