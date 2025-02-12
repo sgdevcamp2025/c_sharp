@@ -6,23 +6,28 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@workspace/ui/lib/utils';
 
-const avatarVariants = cva('relative flex h-10 w-10 shrink-0 overflow-hidden', {
+const avatarVariants = cva('relative flex shrink-0 overflow-hidden', {
   variants: {
     variant: {
       default: 'rounded-full',
-      square: 'rounded-md', // 로고용
+      square: 'rounded-md',
+    },
+    size: {
+      default: 'h-10 w-10',
+      sm: 'w-6 h-6',
     },
   },
   defaultVariants: {
     variant: 'default',
+    size: 'default',
   },
 });
 interface AvatarProps extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>, VariantProps<typeof avatarVariants> {}
 
-const Avatar = React.forwardRef<React.ElementRef<typeof AvatarPrimitive.Root>, AvatarProps>(({ className, variant, ...props }, ref) => (
+const Avatar = React.forwardRef<React.ElementRef<typeof AvatarPrimitive.Root>, AvatarProps>(({ className, variant, size, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
-    className={cn(avatarVariants({ variant }), className)}
+    className={cn(avatarVariants({ variant, size }), className)}
     {...props}
   />
 ));

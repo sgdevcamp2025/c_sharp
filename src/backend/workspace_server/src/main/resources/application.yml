@@ -1,5 +1,5 @@
 server:
-  port: 8080                  # 애플리케이션 실행 포트
+  port: ${WORKSPACE_PORT}                 # 애플리케이션 실행 포트
 
 spring:
   application:

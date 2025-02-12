@@ -1,12 +1,16 @@
 package com.jootalkpia.stock_server.stocks.service;
 
-import com.jootalkpia.stock_server.stocks.advice.StockCaller;
+import com.google.gson.Gson;
+import com.jootalkpia.stock_server.stocks.advice.caller.StockCaller;
 import com.jootalkpia.stock_server.stocks.domain.Schedule;
 import com.jootalkpia.stock_server.stocks.domain.StockCode;
+import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
 import com.jootalkpia.stock_server.stocks.dto.request.TokenRequestBody;
-import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceResponse;
+import com.jootalkpia.stock_server.stocks.dto.response.CandlePriceHistoryResponse;
+import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceDetailedResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.MinutePriceSimpleResponse;
 import com.jootalkpia.stock_server.stocks.dto.response.TokenResponse;
+import com.jootalkpia.stock_server.stocks.repository.MinutePriceRepository;
 import com.jootalkpia.stock_server.support.config.TaskSchedulerConfiguration;
 import com.jootalkpia.stock_server.support.property.BaseProperties;
 import com.jootalkpia.stock_server.support.property.MinutePriceProperties;
@@ -14,29 +18,38 @@ import com.jootalkpia.stock_server.support.property.TokenProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import static com.jootalkpia.stock_server.stocks.advice.util.StockValidationUtils.validateChartSize;
+import static com.jootalkpia.stock_server.stocks.advice.util.StockValidationUtils.validateObjectId;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class StockService {
     private static final String TOKEN_SEPARATOR = " ";
+    private static final int CURSOR_PAGE_NUMBER = 0;
 
     private String token;
-
-    //테스트용, 토큰 1일 발급 횟수 제한
-    private String fakeToken = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6ImE5YzBlOTQ2LTdkYjMtNDBiNS1iYzRmLTViNGI2NzM3MzBlMyIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTczNzYwNTY4MiwiaWF0IjoxNzM3NTE5MjgyLCJqdGkiOiJQU3B2NHhVejRpNkZzZzRhWENyTlY3VDJhN3JiZWdldmJKTDgifQ.8rnxngtudIEBBZLKiIM4Iq83fHnoxSnjpdxQRDOgvQ_1mPaNbRdo7PReDcJHiQsE34ltOU-g9Rvea9eElWwTcQ";
 
     private final StockCaller stockCaller;
     private final BaseProperties baseProperties;
     private final MinutePriceProperties minutePriceProperties;
     private final TokenProperties tokenProperties;
     private final TaskSchedulerConfiguration taskSchedulerConfiguration;
+    private final MinutePriceRepository minutePriceRepository;
+    private final Gson gson = new Gson();
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @PostConstruct
     public void initScheduledTasks() {
@@ -44,18 +57,9 @@ public class StockService {
         taskSchedulerConfiguration.configureTasks(taskRegistrar);
 
         taskRegistrar.addCronTask(new CronTask(this::refreshToken, Schedule.MIDNIGHT.getTime()));
-
-        for (StockCode stockCode : StockCode.values()) {
-            createMinutePriceTask(stockCode, taskRegistrar);
-        }
+        registerMinutePriceSchedulers(taskRegistrar);
 
         taskRegistrar.afterPropertiesSet();
-    }
-
-    private void createMinutePriceTask(StockCode stockCode, ScheduledTaskRegistrar taskRegistrar) {
-        for (Schedule schedule : Schedule.values()) {
-            taskRegistrar.addCronTask(new CronTask(() -> getStockPrice(stockCode.getCode()), schedule.getTime()));
-        }
     }
 
     @PostConstruct
@@ -64,12 +68,35 @@ public class StockService {
         token = tokenResponse.tokenType() + TOKEN_SEPARATOR + tokenResponse.accessToken();
     }
 
+    private void registerMinutePriceSchedulers(ScheduledTaskRegistrar taskRegistrar) {
+        for (StockCode stockCode : StockCode.values()) {
+            createMinutePriceTask(stockCode, taskRegistrar);
+        }
+    }
+
+    private void createMinutePriceTask(StockCode stockCode, ScheduledTaskRegistrar taskRegistrar) {
+        for (Schedule schedule : Schedule.values()) {
+            taskRegistrar.addCronTask(new CronTask(() -> {
+                MinutePriceSimpleResponse minutePriceSimpleResponse = getStockPrice(stockCode.getCode());
+                String jsonMinutePrice = gson.toJson(minutePriceSimpleResponse);
+                minutePriceRepository.save(minutePriceSimpleResponse.toDocument());
+                kafkaTemplate.send("jootalkpia.stock.prd.minute", jsonMinutePrice).whenComplete((result, ex) -> {
+                    if (ex == null) {
+                        log.info(result.toString());
+                    } else {
+                        log.error(ex.getMessage(), ex); //추후 예외처리
+                    }
+                });
+            }, schedule.getTime()));
+        }
+    }
+
     private MinutePriceSimpleResponse getStockPrice(String code) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         String currentTime = now.format(DateTimeFormatter.ofPattern("HHmmss"));
 
-        MinutePriceResponse response = stockCaller.getMinutePrice(
-                fakeToken,
+        MinutePriceDetailedResponse response = stockCaller.getMinutePrice(
+                token,
                 baseProperties.appKey(),
                 baseProperties.appSecret(),
                 minutePriceProperties.trId(),
@@ -82,5 +109,54 @@ public class StockService {
         );
 
         return MinutePriceSimpleResponse.from(response, code);
+    }
+
+    public CandlePriceHistoryResponse getCandlePriceHistoryByCode(String code, String cursorId, int size) {
+        List<MinutePrice> minutePriceChart = findMinutePriceChart(code, cursorId, size);
+        boolean hasNext = checkHasNext(minutePriceChart, size);
+        List<MinutePrice> slicedMinutePriceChart = sliceBySize(minutePriceChart, size, hasNext);
+
+        return CandlePriceHistoryResponse.of(slicedMinutePriceChart, code, hasNext, getLastObjectId(slicedMinutePriceChart));
+    }
+
+    private List<MinutePrice> findMinutePriceChart(String code, String cursorId, int size) {
+        if (cursorId == null || cursorId.isEmpty()) {
+            return findFirstPage(code, size);
+        }
+        return findNextPage(code, cursorId, size);
+    }
+
+    private List<MinutePrice> findFirstPage(String code, int size) {
+        return minutePriceRepository.findByCodeOrderByMinutePriceIdAsc(
+                code,
+                PageRequest.of(CURSOR_PAGE_NUMBER, size + 1));
+    }
+
+    private List<MinutePrice> findNextPage(String code, String cursorId, int size) {
+        validateObjectId(cursorId);
+        ObjectId objectId = new ObjectId(cursorId);
+
+        return minutePriceRepository.findByCodeAndMinutePriceIdGreaterThanOrderByMinutePriceIdAsc(
+                code,
+                objectId,
+                PageRequest.of(CURSOR_PAGE_NUMBER, size + 1)
+        );
+    }
+
+    private boolean checkHasNext(List<MinutePrice> minutePriceChart, int size) {
+        return minutePriceChart.size() > size;
+    }
+
+    private List<MinutePrice> sliceBySize(List<MinutePrice> minutePriceChart, int size, boolean hasNext) {
+        if (!hasNext) {
+            return minutePriceChart;
+        }
+        return minutePriceChart.subList(0, size);
+    }
+
+    private String getLastObjectId(List<MinutePrice> slicedMinutePriceChart) {
+        validateChartSize(slicedMinutePriceChart);
+
+        return String.valueOf(slicedMinutePriceChart.get(slicedMinutePriceChart.size() - 1).getMinutePriceId());
     }
 }

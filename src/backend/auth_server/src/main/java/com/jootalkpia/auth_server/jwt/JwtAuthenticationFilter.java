@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null && jwtTokenProvider.validateToken(token) == VALID_JWT) {
                 Long memberId = jwtTokenProvider.getUserFromJwt(token);
 
-                UserAuthentication authentication = new UserAuthentication(memberId.toString(), null);
+                UserAuthentication authentication = new UserAuthentication(memberId.toString(),null, null);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else if (jwtTokenProvider.validateToken(token) == EXPIRED_JWT_TOKEN) {
