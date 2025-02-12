@@ -39,7 +39,7 @@ public class KafkaConsumer {
     }
 
     @KafkaListener(
-            topics = "${topic.chat}",
+            topics = "jootalkpia.chat.prd.message", //"${topic.chat}",
             groupId = "${group.chat}", //추후 그룹 ID에 동적인 컨테이너 ID 삽입
             concurrency = "2"
     )
@@ -49,7 +49,6 @@ public class KafkaConsumer {
             ChatMessageToKafka chatMessage = objectMapper.readValue(kafkaMessage, ChatMessageToKafka.class);
             String chatDataJson = objectMapper.writeValueAsString(chatMessage);
 
-            // todo : 로컬 메모리와 유저 ID를 비교하는 로직 추가 필요
             messagingTemplate.convertAndSend("/subscribe/chat." + channelId, chatDataJson);
             log.info("Broadcasted chat message via WebSocket: {}", chatDataJson);
 

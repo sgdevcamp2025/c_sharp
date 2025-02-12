@@ -1,7 +1,7 @@
 package com.jootalkpia.chat_server.dto.messgaeDto;
 
 public record ImageResponse(
-        String url
+        String imageUrl
 ) implements MessageResponse {
     @Override
     public String type() {

@@ -1,8 +1,8 @@
 package com.jootalkpia.chat_server.dto.messgaeDto;
 
 public record VideoResponse(
-        String urlThumbnail,
-        String url
+        String thumbnailUrl,
+        String videoUrl
 ) implements MessageResponse {
     @Override
     public String type() {
