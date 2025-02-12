@@ -10,7 +10,7 @@ import lombok.Getter;
 @Entity
 @Table(name = "ReplyThreads")
 @Getter
-public class ReplayThread extends BaseTimeEntity {
+public class ReplyThread extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ReplyThreadId;

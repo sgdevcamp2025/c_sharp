@@ -17,12 +17,12 @@ public class KafkaProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Value("${topic.chat}")
-    private String chatTopic;
+    private String topicChat;
 
     public void sendChatMessage(ChatMessageToKafka chatMessageToKafka, Long channelId) {
         try {
             String jsonChatMessage = objectMapper.writeValueAsString(chatMessageToKafka);
-            kafkaTemplate.send(chatTopic, String.valueOf(channelId), jsonChatMessage)
+            kafkaTemplate.send(topicChat, String.valueOf(channelId), jsonChatMessage)
                     .whenComplete((result, ex) -> { //키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
                         if (ex == null) {
                             log.info("Kafka message sent: {}", result.toString());
