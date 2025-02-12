@@ -8,12 +8,12 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 
 @Entity
-@Table(name = "ReplayThreads")
+@Table(name = "ReplyThreads")
 @Getter
 public class ReplayThread extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long RelayThreadId;
+    private Long ReplyThreadId;
 
     private Long ThreadId;
 }
