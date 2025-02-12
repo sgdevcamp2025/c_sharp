@@ -1,5 +1,5 @@
 'use client';
-import { useCallback } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@workspace/ui/components';
 
@@ -15,33 +15,30 @@ type ChatToggleGroupsProps = {
 };
 
 const ChatToggleGroup = ({ name, onSend }: ChatToggleGroupsProps) => {
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const {
     selectedFiles,
     handleFileChange,
     handleRemoveFile,
     isLoading,
     error,
-  } = useFileManagements();
+  } = useFileManagements(1, 1);
+
+  console.log('123', selectedFiles);
 
   return (
     <div className="flex flex-col justify-between gap-2">
       {error && <div className="text-red-500">{error.message}</div>}
 
-      <FilePreviewList
+      {/* <FilePreviewList
         selectedFiles={selectedFiles}
-        onRemoveFile={useCallback(
-          (id) => handleRemoveFile(id),
-          [handleRemoveFile],
-        )}
-      />
+        onRemoveFile={() => {}}
+      /> */}
       <div className="flex flex-row justify-between">
         <div className="flex flex-row gap-4 items-center">
           <FileUploadTrigger
             name={name}
-            onFileChange={useCallback(
-              (event) => handleFileChange(event),
-              [handleFileChange],
-            )}
+            onFileChange={handleFileChange}
           />
           {isLoading && (
             <Loader

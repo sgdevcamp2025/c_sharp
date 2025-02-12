@@ -21,3 +21,22 @@ export type ApiResponse<T> = {
 };
 
 export type ApiErrorResponse = Omit<ApiResponse<never>, 'data'>;
+
+export const API_SERVER_TYPES = {
+  gateway: 'gateway',
+  auth: 'auth',
+  stock: 'stock',
+  file: 'file',
+  chat1: 'chat1',
+  chat2: 'chat2',
+  history: 'history',
+  workspace: 'workspace',
+  push: 'push',
+  state: 'state',
+  signaling: 'signaling',
+} as const;
+
+/**
+ * API 서버 타입을 유추하도록 타입 생성
+ */
+export type ApiServerType = keyof typeof API_SERVER_TYPES;

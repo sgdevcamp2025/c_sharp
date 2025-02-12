@@ -29,7 +29,7 @@ const FileModal = ({
       <div className="p-6">
         {/* 헤더 */}
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-3">
+          {/* <div className="flex items-center gap-3">
             <span className="p-2 bg-gray-100 rounded-lg">
               {fileData.type === 'image' ? '🖼️' : '🎥'}
             </span>
@@ -42,12 +42,12 @@ const FileModal = ({
                 {formatFileSize(fileData.file.size)}
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* 컨텐츠 영역 */}
         <div className="rounded-xl overflow-hidden bg-gray-50">
-          {fileData.type === 'image' ? (
+          {/* {fileData.type === 'image' ? (
             <div className="relative w-full h-[40vh]">
               <Image
                 src={fileData.preview}
@@ -70,7 +70,7 @@ const FileModal = ({
                 Your browser does not support the video tag.
               </video>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* 푸터 */}

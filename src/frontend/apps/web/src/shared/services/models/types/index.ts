@@ -7,4 +7,5 @@ export type {
   FetchOptions,
   ApiErrorResponse,
   ApiResponse,
+  ApiServerType,
 } from './fetch-types.js';

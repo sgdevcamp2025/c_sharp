@@ -1,5 +1,8 @@
-import type { FetchOptions, JsonValue } from '@/src/shared/services/models';
-
+import type {
+  ApiServerType,
+  FetchOptions,
+  JsonValue,
+} from '@/src/shared/services/models';
 import { fetchInstance } from './fetch-instance.api';
 
 type RequestOptions<TBody = never> = Omit<FetchOptions<TBody>, 'body'>;
@@ -24,12 +27,16 @@ type RequestOptions<TBody = never> = Omit<FetchOptions<TBody>, 'body'>;
  * const data = await getRequest<UserData>('/api/users/me');
  *
  * // 쿼리 파라미터와 캐시 옵션과 토큰이 없을때 GET 요청
- * const users = await getRequest<User[]>('/api/users', {
- *   params: { page: '1', size: '10' },
- *   cache: 'force-cache',
- *   tags: ['users'],
- *   includeAuthToken: false,
- * });
+ * const users = await getRequest<User[]>(
+ *   "auth",
+ *   '/api/users',
+ *   {
+ *    params: { page: '1', size: '10' },
+ *    cache: 'force-cache',
+ *    tags: ['users'],
+ *    includeAuthToken: false,
+ *   }
+ * );
  * ```
  *
  * * GET 요청을 보내는 함수입니다.
@@ -38,10 +45,11 @@ type RequestOptions<TBody = never> = Omit<FetchOptions<TBody>, 'body'>;
  */
 
 export async function getRequest<TResponse>(
+  serverType: ApiServerType,
   url: string,
   options?: RequestOptions,
 ): Promise<TResponse> {
-  return fetchInstance<TResponse>(url, 'GET', options);
+  return fetchInstance<TResponse>(serverType, url, 'GET', options);
 }
 
 /**
@@ -62,6 +70,7 @@ export async function getRequest<TResponse>(
  * ```typescript
  * // 사용자 생성 요청
  * const newUser = await postRequest<User, CreateUserDto>(
+ *   "auth",
  *   '/api/users',
  *   { name: 'John', email: 'john@example.com' }
  * );
@@ -73,11 +82,15 @@ export async function getRequest<TResponse>(
  */
 
 export async function postRequest<TResponse, TBody = JsonValue>(
+  serverType: ApiServerType,
   url: string,
   body: TBody,
   options?: RequestOptions<TBody>,
 ): Promise<TResponse> {
-  return fetchInstance<TResponse, TBody>(url, 'POST', { ...options, body });
+  return fetchInstance<TResponse, TBody>(serverType, url, 'POST', {
+    ...options,
+    body,
+  });
 }
 
 /**
@@ -98,6 +111,7 @@ export async function postRequest<TResponse, TBody = JsonValue>(
  * ```typescript
  * // 사용자 정보 업데이트
  * const updatedUser = await patchRequest<User, UpdateUserDto>(
+ *   "auth",
  *   `/api/users/${userId}`,
  *   { name: 'Updated Name' },
  *   { tags: ['user-profile'] }
@@ -110,11 +124,15 @@ export async function postRequest<TResponse, TBody = JsonValue>(
  *
  */
 export async function patchRequest<TResponse, TBody = JsonValue>(
+  serverType: ApiServerType,
   url: string,
   body: TBody,
   options?: RequestOptions<TBody>,
 ): Promise<TResponse> {
-  return fetchInstance<TResponse, TBody>(url, 'PATCH', { ...options, body });
+  return fetchInstance<TResponse, TBody>(serverType, url, 'PATCH', {
+    ...options,
+    body,
+  });
 }
 
 /**
@@ -138,6 +156,7 @@ export async function patchRequest<TResponse, TBody = JsonValue>(
  *
  * // 본문과 함께 삭제 요청
  * await deleteRequest<void, DeletePostDto>(
+ *   "file",
  *   `/api/posts/${postId}`,
  *   { reason: 'spam' },
  *   { tags: ['posts'] }
@@ -149,9 +168,13 @@ export async function patchRequest<TResponse, TBody = JsonValue>(
  * @throws {NetworkError} 네트워크 연결에 문제가 있을 때 발생합니다
  */
 export async function deleteRequest<TResponse, TBody = JsonValue>(
+  serverType: ApiServerType,
   url: string,
   body?: TBody,
   options?: RequestOptions<TBody>,
 ): Promise<TResponse> {
-  return fetchInstance<TResponse, TBody>(url, 'DELETE', { ...options, body });
+  return fetchInstance<TResponse, TBody>(serverType, url, 'DELETE', {
+    ...options,
+    body,
+  });
 }
