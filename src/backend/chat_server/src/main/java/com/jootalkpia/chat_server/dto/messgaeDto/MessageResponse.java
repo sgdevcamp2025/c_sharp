@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = CommonResponse.class, name = "COMMON"),
         @JsonSubTypes.Type(value = TextResponse.class, name = "TEXT"),
         @JsonSubTypes.Type(value = VideoResponse.class, name = "VIDEO"),
         @JsonSubTypes.Type(value = ImageResponse.class, name = "IMAGE")
