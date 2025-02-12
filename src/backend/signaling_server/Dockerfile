@@ -5,7 +5,7 @@ FROM azul/zulu-openjdk:17
 WORKDIR /app
 
 # 빌드된 JAR 파일 복사
-ARG JAR_FILE=build/libs/signaling_server-0.0.1-SNAPSHOT.jar app.jar
+COPY build/libs/*.jar app.jar
 
 # 애플리케이션 실행
 ENTRYPOINT ["java", "-jar", "app.jar"]

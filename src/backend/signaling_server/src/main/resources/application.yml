@@ -6,7 +6,6 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-#      database: ${SIGNALING_REDIS}
 
 kurento:
   ws:
