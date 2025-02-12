@@ -3,6 +3,21 @@ server:
   tomcat:
     max-swallow-size: -1
 spring:
+  web:
+    mvc:
+      cors:
+        mappings:
+          "/**":  # 모든 경로에 대해 CORS 설정
+            allowedOrigins: "http://localhost:3000"  # 허용할 도메인 (프론트엔드)
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
   application:
     name: file_server
   datasource:

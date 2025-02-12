@@ -4,7 +4,11 @@ import { fontFamily } from 'tailwindcss/defaultTheme';
 
 const config = {
   darkMode: ['class'],
-  content: ['app/**/*.{ts,tsx}', 'components/**/*.{ts,tsx}', '../../packages/ui/src/components/**/*.{ts,tsx}'],
+  content: [
+    'app/**/*.{ts,tsx}',
+    'src/**/*.{ts,tsx}',
+    '../../packages/ui/src/components/**/*.{ts,tsx}',
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -13,6 +17,13 @@ const config = {
       },
       colors: {
         kakao: '#FEE500',
+        live: '#fff4e1',
+        thread: '#1264a3',
+        chatboxHover: '#F1F5F9',
+        toggle: '#E59A43',
+        black: {
+          100: 'rgba(0, 0, 0, 0.5)',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -45,6 +56,16 @@ const config = {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
+        },
+        sidebar: {
+          DEFAULT: 'hsl(var(--sidebar-background))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          primary: 'hsl(var(--sidebar-primary))',
+          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+          accent: 'hsl(var(--sidebar-accent))',
+          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+          border: 'hsl(var(--sidebar-border))',
+          ring: 'hsl(var(--sidebar-ring))',
         },
       },
       borderRadius: {

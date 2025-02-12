@@ -1,0 +1,17 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+  kafka:
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    bootstrap-servers: ${KAFKA_SERVER}
+
+topic:
+  chat: jootalkpia.chat.prd.message
+group:
+  history: chat-message-save-consumer-group
+
+server:
+  port: ${HISTORY_PORT}

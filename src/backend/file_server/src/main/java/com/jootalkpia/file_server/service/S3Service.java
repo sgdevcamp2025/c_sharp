@@ -32,6 +32,7 @@ public class S3Service {
 
     public String uploadFile(MultipartFile file, String folder, Long fileId) {
         Path tempFile = null;
+        log.info("Ready to upload file to S3 bucket: {}", bucketName);
         try {
 
             // S3에 저장될 파일 키 생성
@@ -50,8 +51,8 @@ public class S3Service {
                             .build(),
                     tempFile);
 
-            log.info("파일 업로드 완료 - S3 Key: {}", "https://" + bucketName +".s3"+region+".amazonaws.com/" + key);
-            return "https://" + bucketName +".s3"+region+".amazonaws.com/" + key;
+            log.info("파일 업로드 완료 - S3 Key: {}", "https://" + bucketName +".s3."+region+".amazonaws.com/" + key);
+            return "https://" + bucketName +".s3."+region+".amazonaws.com/" + key;
 
         } catch (IOException e) {
             log.error("파일 업로드 중 IOException 발생: {}", e.getMessage(), e);
