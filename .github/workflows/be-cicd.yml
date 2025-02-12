@@ -27,6 +27,7 @@ jobs:
           - history_server
           - push_server
           - state_server
+          - signaling_server
 
     steps:
       - name: Checkout code
