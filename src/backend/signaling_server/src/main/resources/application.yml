@@ -1,6 +1,12 @@
 server:
-  port: 8080
+  port: ${SIGNALING_PORT}
+
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 kurento:
   ws:
-    url: "ws://192.168.0.14:8888/kurento"
+    url: "ws://${HOST}:8888/kurento"

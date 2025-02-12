@@ -1,35 +1,55 @@
 package com.jootalkpia.signaling_server.rtc;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.kurento.client.MediaPipeline;
 import org.kurento.client.WebRtcEndpoint;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@RequiredArgsConstructor
 @Getter
-public class KurentoRoom {
-    private final String huddleId;
-    private final MediaPipeline pipeline;
-    private final Map<Long, WebRtcEndpoint> participants = new ConcurrentHashMap<>();
+@Setter
+@NoArgsConstructor // 기본 생성자 추가 (Jackson 역직렬화 가능하게 함)
+public class KurentoRoom implements Serializable {
+    private String huddleId;
+    private String pipelineId; // MediaPipeline 객체 대신 ID만 저장
 
-    // 참가자가 이미 존재하는지 확인! ❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️ 다 넣기
-    public boolean hasParticipant(String userId) {
-        return participants.containsKey(userId);
+    @JsonIgnore // JSON 직렬화에서 제외
+    private transient MediaPipeline pipeline;
+
+    @JsonIgnore // WebRtcEndpoint 객체 직렬화 방지
+    private transient Map<Long, WebRtcEndpoint> participants = new ConcurrentHashMap<>();
+
+    // 새로운 방 생성 시 사용
+    public KurentoRoom(String huddleId, MediaPipeline pipeline) {
+        this.huddleId = huddleId;
+        this.pipeline = pipeline;
+        this.pipelineId = pipeline.getId();
     }
 
-    // 이미 있는 WebRtcEndpoint 반환 or 새로운 WebRtcEndpoint 생성
-    public WebRtcEndpoint addParticipant(Long userId) {
-        if (participants.containsKey(userId)) {
-            // ❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️❗️
-            return participants.get(userId);
-        }
+    // Redis 역직렬화 시 사용할 생성자
+    public KurentoRoom(String huddleId, String pipelineId) {
+        this.huddleId = huddleId;
+        this.pipelineId = pipelineId;
+    }
 
-        WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
-        participants.put(userId, webRtcEndpoint);
-        return webRtcEndpoint;
+    // pipeline 복원 함수
+    public void restorePipeline(MediaPipeline pipeline) {
+        this.pipeline = pipeline;
+    }
+
+    // 참가자 추가
+    public WebRtcEndpoint addParticipant(Long userId) {
+        return participants.computeIfAbsent(userId, id -> new WebRtcEndpoint.Builder(pipeline).build());
+    }
+
+    // 특정 참가자의 WebRTC 엔드포인트 가져오기
+    public WebRtcEndpoint getParticipant(Long userId) {
+        return participants.get(userId);
     }
 
     // 참가자 제거
@@ -42,10 +62,10 @@ public class KurentoRoom {
 
     // 방 닫기 (모든 참가자 해제)
     public void closeRoom() {
-        for (WebRtcEndpoint endpoint : participants.values()) {
-            endpoint.release();
-        }
+        participants.values().forEach(WebRtcEndpoint::release);
         participants.clear();
-        pipeline.release();
+        if (pipeline != null) {
+            pipeline.release();
+        }
     }
 }
