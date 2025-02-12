@@ -49,7 +49,6 @@ public class KafkaConsumer {
             ChatMessageToKafka chatMessage = objectMapper.readValue(kafkaMessage, ChatMessageToKafka.class);
             String chatDataJson = objectMapper.writeValueAsString(chatMessage);
 
-            // todo : 로컬 메모리와 유저 ID를 비교하는 로직 추가 필요
             messagingTemplate.convertAndSend("/subscribe/chat." + channelId, chatDataJson);
             log.info("Broadcasted chat message via WebSocket: {}", chatDataJson);
 
