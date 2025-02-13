@@ -11,6 +11,7 @@ import com.jootalkpia.chat_server.dto.messgaeDto.VideoResponse;
 import com.jootalkpia.chat_server.repository.FileRepository;
 import com.jootalkpia.chat_server.repository.ThreadRepository;
 import com.jootalkpia.chat_server.repository.UserRepository;
+import com.jootalkpia.chat_server.util.DateTimeUtil;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class ChatService {
         return new CommonResponse(
                 channelId,
                 thread.getThreadId(),
+                DateTimeUtil.formatDateTime(thread.getCreatedAt()),
                 user.getUserId(),
                 user.getNickname(),
                 user.getProfileImage());
