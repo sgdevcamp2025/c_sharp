@@ -1,16 +1,24 @@
 import { Client } from '@stomp/stompjs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-const fetchMessages = async (topic: string): Promise<unknown[]> => {
-  const response = await fetch(`/api/messages/${topic}`);
-  if (!response.ok) throw new Error('Failed to fetch messages');
-  return response.json();
+import { getRequest } from '../services';
+import type { ApiServerType } from '../services';
+
+const fetchMessages = async (serverType: ApiServerType, topic: string) => {
+  try {
+    return await getRequest<unknown[]>(serverType, `/api/messages/${topic}`, {
+      cache: 'no-store',
+    });
+  } catch (error) {
+    console.error('❌ 메시지 불러오기 실패:', error);
+    return [];
+  }
 };
 
-export const useMessages = (topic: string) => {
+export const useMessages = (serverType: ApiServerType, topic: string) => {
   return useQuery({
     queryKey: ['messages', topic],
-    queryFn: () => fetchMessages(topic),
+    queryFn: () => fetchMessages(serverType, topic),
     staleTime: Infinity,
     initialData: [],
   });
@@ -34,9 +42,14 @@ export const useSendMessage = (stompClient: Client | null, topic: string) => {
       queryClient.setQueryData(
         ['messages', topic],
         (oldData: unknown[] = []) => {
-          return [...oldData, newMessage];
+          return [...oldData, newMessage].sort(
+            (a, b) =>
+              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+          );
         },
       );
+
+      queryClient.invalidateQueries(['messages', topic]);
     },
   });
 };
