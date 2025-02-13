@@ -64,8 +64,11 @@ public class ChatService {
 
     private MessageResponse createAttachmentData(Files file) {
         return switch (file.getFileType()) {
-            case "IMAGE" -> new ImageResponse(file.getUrl());
-            case "VIDEO" -> new VideoResponse(file.getUrlThumbnail(), file.getUrl());
+            case "IMAGE" -> new ImageResponse(file.getFileId(),file.getUrl());
+            case "VIDEO" -> new VideoResponse(file.getFileId(),
+                                                fileRepository.findByUrl(file.getUrlThumbnail()).getFileId(),
+                                                file.getUrlThumbnail(),
+                                                file.getUrl());
             default -> throw new IllegalArgumentException("Unsupported file type: " + file.getFileId()); // todo:예외처리 추가
         };
     }
