@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@stomp/stompjs": "^7.0.0",
     "@tanstack/react-query": "^5.64.2",
     "@tanstack/react-table": "^8.20.6",
     "@workspace/ui": "workspace:*",
@@ -18,6 +19,7 @@
     "next-themes": "^0.4.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "sockjs-client": "^1.6.1",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
@@ -29,6 +31,7 @@
     "@workspace/typescript-config": "workspace:*",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
+    "typedoc": "^0.27.7",
     "typescript": "^5.7.3"
   }
 }
