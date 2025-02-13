@@ -1,42 +1,37 @@
 package com.jootalkpia.history_server.domain;
 
-import lombok.Getter;
-import org.bson.types.ObjectId;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import java.util.List;
 
 @Getter
-@Document(collation = "chatMessage")
-public class ChatMessage extends BaseTimeEntity {
+@Builder
+@Document(collation = "chat_messages")
+public class ChatMessage extends BaseTimeEntity  {
 
     @Id
-    private ObjectId messageId;       // 메시지 ID
+    private String id;  // MongoDB의 ObjectId 자동 생성
 
-    private Long channelId;          // 채널 ID
+    @Field("channel_id")
+    private Long channelId;
 
-    private Long userId;             // 유저 ID
+    @Field("thread_id")
+    private Long threadId;
 
-    private String message;          // 내용
+    @Field("thread_date_time")
+    private String threadDateTime;
 
-    private MessageType messageType = MessageType.TEXT;      // 메시지 타입
+    @Field("user_id")
+    private Long userId;
 
-    private Boolean isAttachment = false;    // 파일 첨부 여부
+    @Field("user_nickname")
+    private String userNickname;
 
-    private Long threadId = null;           // 원본 메시지 ID 최초일경우 null
+    @Field("user_profile_image")
+    private String userProfileImage;
 
-    protected ChatMessage() {
-    }
-
-    private ChatMessage(Long channelId, Long userId, String message, MessageType messageType, Boolean isAttachment, Long threadId) {
-        this.channelId = channelId;
-        this.userId = userId;
-        this.message = message;
-        this.messageType = messageType;
-        this.isAttachment = isAttachment;
-        this.threadId = threadId;
-    }
-
-    public static ChatMessage of(Long channelId, Long userId, String message, MessageType messageType, Boolean isAttachment, Long threadId) {
-        return new ChatMessage(channelId, userId, message, messageType, isAttachment, threadId);
-    }
+    @Field("messages")
+    private List<Message> messages;
 }
