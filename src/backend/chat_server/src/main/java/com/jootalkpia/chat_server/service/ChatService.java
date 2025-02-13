@@ -69,7 +69,10 @@ public class ChatService {
 
     private MessageResponse createAttachmentData(Files file) {
         return switch (file.getFileType()) {
-            case "IMAGE" -> new ImageResponse(file.getFileId(),file.getUrl());
+            case "IMAGE" -> ImageResponse.builder()
+                                        .imageId(file.getFileId())
+                                        .imageUrl(file.getUrl())
+                                        .build();
             case "VIDEO" -> new VideoResponse(file.getFileId(),
                                                 fileRepository.findByUrl(file.getUrlThumbnail()).getFileId(),
                                                 file.getUrlThumbnail(),
