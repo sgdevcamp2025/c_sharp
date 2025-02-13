@@ -4,6 +4,7 @@ import com.jootalkpia.signaling_server.model.Huddle;
 import com.jootalkpia.signaling_server.repository.HuddleCacheRepository;
 import com.jootalkpia.signaling_server.repository.HuddleParticipantsRepository;
 import com.jootalkpia.signaling_server.repository.ChannelHuddleRepository;
+import com.jootalkpia.signaling_server.repository.UserHuddleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class HuddleService {
     private final HuddleCacheRepository huddleCacheRepository;
     private final HuddleParticipantsRepository huddleParticipantsRepository;
     private final ChannelHuddleRepository channelHuddleRepository;
+    private final UserHuddleRepository userHuddleRepository;
 
     /**
      * 허들 생성
@@ -54,7 +56,7 @@ public class HuddleService {
     }
 
     public boolean canUserJoinHuddle(Long userId) {
-        return huddleParticipantsRepository.getUserHuddle(userId) == null;
+        return userHuddleRepository.getUserHuddle(userId) == null;
     }
 
     public boolean isValidHuddle(String huddleId) {
