@@ -24,7 +24,7 @@ public class KafkaConsumer {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            ChatMessageSaveRequest chatMessageSaveRequest = mapper.readValue(kafkaMessage, ChatMessageSaveRequest.class); //메시지 DTO 변경, 임시 DTO
+            ChatMessageSaveRequest chatMessageSaveRequest = mapper.readValue(kafkaMessage, ChatMessageSaveRequest.class);
             historyCommandService.saveChatMessage(chatMessageSaveRequest.toDocument());
 
             log.info("dto ===> " + chatMessageSaveRequest);
