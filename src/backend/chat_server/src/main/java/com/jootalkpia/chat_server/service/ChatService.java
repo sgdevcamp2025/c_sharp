@@ -73,10 +73,12 @@ public class ChatService {
                                         .imageId(file.getFileId())
                                         .imageUrl(file.getUrl())
                                         .build();
-            case "VIDEO" -> new VideoResponse(file.getFileId(),
-                                                fileRepository.findByUrl(file.getUrlThumbnail()).getFileId(),
-                                                file.getUrlThumbnail(),
-                                                file.getUrl());
+            case "VIDEO" -> VideoResponse.builder()
+                                        .videoId(file.getFileId())
+                                        .videoThumbnailId(fileRepository.findByUrl(file.getUrlThumbnail()).getFileId())
+                                        .videoUrl(file.getUrl())
+                                        .thumbnailUrl(file.getUrlThumbnail())
+                                        .build();
             default -> throw new IllegalArgumentException("Unsupported file type: " + file.getFileId()); // todo:예외처리 추가
         };
     }
