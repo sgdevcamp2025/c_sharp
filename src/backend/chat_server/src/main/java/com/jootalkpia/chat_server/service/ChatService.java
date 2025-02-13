@@ -50,7 +50,9 @@ public class ChatService {
     }
 
     private TextResponse createTextMessage(String content) {
-        return new TextResponse(content);
+        return TextResponse.builder()
+                .text(content)
+                .build();
     }
 
     private List<MessageResponse> createAttachmentList(List<Long> attachmentList) {
