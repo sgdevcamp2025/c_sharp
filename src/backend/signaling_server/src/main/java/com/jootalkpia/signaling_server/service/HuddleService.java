@@ -57,6 +57,15 @@ public class HuddleService {
         return huddleParticipantsRepository.getUserHuddle(userId) == null;
     }
 
+    public boolean isValidHuddle(String huddleId) {
+        return huddleCacheRepository.getHuddleById(huddleId) != null;
+    }
+
+    public boolean isUserInHuddle(String huddleId, Long userId) {
+        Set<Long> participants = huddleParticipantsRepository.getParticipants(huddleId);
+        return participants != null && participants.contains(userId);
+    }
+
     /**
      * 허들 퇴장
      */
@@ -69,20 +78,32 @@ public class HuddleService {
     /**
      * 허들 삭제 (참여자가 아무도 없을 때)
      */
-    private void deleteHuddle(String huddleId) {
+    public void deleteHuddle(String huddleId) {
         Huddle huddle = huddleCacheRepository.getHuddleById(huddleId);
         if (huddle == null) {
-            log.warn("허들을 찾을 수 없음: huddleId={}", huddleId);
+            log.warn("삭제하려는 허들이 이미 없음: huddleId={}", huddleId);
             return;
         }
+
+        log.info("허들 삭제 진행: {}", huddleId);
 
         // Redis에서 허들 삭제
         huddleCacheRepository.deleteHuddle(huddleId);
 
-        // 채널-허들 매핑 삭제
+        // 채널-허들 매핑 삭제 (채널 ID는 Long 타입이어야 함)
         if (huddle.channelId() != null) {
-            channelHuddleRepository.deleteChannelHuddle(huddle.channelId());
+            channelHuddleRepository.deleteChannelHuddle(huddle.channelId());  // Long 타입 전달
         }
+    }
+
+    /**
+     * 허들에 남아있는 참가자 수 조회
+     */
+    public int getParticipantCount(String huddleId) {
+        Set<Long> participants = huddleParticipantsRepository.getParticipants(huddleId);
+        log.info("참가자 수: {}", participants.size());
+
+        return participants == null ? 0 : participants.size();
     }
 
 }

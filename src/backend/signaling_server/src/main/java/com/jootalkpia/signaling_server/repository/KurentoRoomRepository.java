@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class KurentoRoomRepository {
+public class KurentoRoomRepository {  // 파이프라인, 허들id 저장
 
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -22,7 +22,7 @@ public class KurentoRoomRepository {
     // KurentoRoom을 Redis에 저장 (MediaPipeline 객체가 아닌 ID만 저장)
     public void saveRoom(String huddleId, KurentoRoom room) {
         try {
-            // MediaPipeline을 직접 저장하지 않고 pipelineId만 저장
+            // MediaPipeline을 직접 저장하지 않고 pipelineId만 저장 with huddleId
             String roomJson = objectMapper.writeValueAsString(new KurentoRoom(room.getHuddleId(), room.getPipelineId()));
             redisTemplate.opsForValue().set("huddle:" + huddleId + ":kurento", roomJson);
         } catch (JsonProcessingException e) {

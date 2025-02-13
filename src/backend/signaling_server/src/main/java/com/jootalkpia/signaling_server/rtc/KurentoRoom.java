@@ -42,7 +42,7 @@ public class KurentoRoom implements Serializable {
         this.pipeline = pipeline;
     }
 
-    // 참가자 추가
+    // 파이프라인에 참가자 엔드포인트 추가
     public WebRtcEndpoint addParticipant(Long userId) {
         return participants.computeIfAbsent(userId, id -> new WebRtcEndpoint.Builder(pipeline).build());
     }

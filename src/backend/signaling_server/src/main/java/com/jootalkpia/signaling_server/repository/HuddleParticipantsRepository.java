@@ -54,19 +54,19 @@ public class HuddleParticipantsRepository {
         return null;
     }
 
-    // 🔹 **WebRTC 엔드포인트 정보 저장**
+    // WebRTC 엔드포인트 정보 저장
     public void saveUserEndpoint(String huddleId, Long userId, String endpointId) {
         String key = "huddle:" + huddleId + ":endpoints";
         hashOps.put(key, userId.toString(), endpointId);
     }
 
-    // 🔹 **WebRTC 엔드포인트 정보 조회**
+    // WebRTC 엔드포인트 정보 조회
     public String getUserEndpoint(String huddleId, Long userId) {
         String key = "huddle:" + huddleId + ":endpoints";
         return hashOps.get(key, userId.toString());
     }
 
-    // 🔹 **WebRTC 엔드포인트 삭제**
+    // WebRTC 엔드포인트 삭제
     public void removeUserEndpoint(String huddleId, Long userId) {
         String key = "huddle:" + huddleId + ":endpoints";
         hashOps.delete(key, userId.toString());
