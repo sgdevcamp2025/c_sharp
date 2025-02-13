@@ -3,6 +3,8 @@ package com.jootalkpia.chat_server.service;
 import com.jootalkpia.chat_server.domain.Files;
 import com.jootalkpia.chat_server.domain.Thread;
 import com.jootalkpia.chat_server.domain.User;
+import com.jootalkpia.chat_server.dto.ChatMessageToKafka;
+import com.jootalkpia.chat_server.dto.messgaeDto.ChatMessageRequest;
 import com.jootalkpia.chat_server.dto.messgaeDto.CommonResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.ImageResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.MessageResponse;
@@ -12,6 +14,7 @@ import com.jootalkpia.chat_server.repository.FileRepository;
 import com.jootalkpia.chat_server.repository.ThreadRepository;
 import com.jootalkpia.chat_server.repository.UserRepository;
 import com.jootalkpia.chat_server.util.DateTimeUtil;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +24,20 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ChatService {
 
+    private final KafkaProducer kafkaProducer;
+
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
     private final ThreadRepository threadRepository;
+
+    @Transactional
+    public void processChatMessage(ChatMessageRequest request, Long channelId) {
+        CommonResponse commonData = createCommonData(request.userId(), channelId);
+        List messageData = createMessageData(request.content(), request.attachmentList());
+
+        ChatMessageToKafka chatMessageToKafka = new ChatMessageToKafka(commonData, messageData);
+        kafkaProducer.sendChatMessage(chatMessageToKafka, channelId); // Kafka 전송 (트랜잭션 영향 X)
+    }
 
     public CommonResponse createCommonData(Long userId, Long channelId){
         User user = userRepository.findByUserId(userId);
