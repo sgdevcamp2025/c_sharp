@@ -33,13 +33,13 @@ public class ChatService {
     @Transactional
     public void processChatMessage(ChatMessageRequest request, Long channelId) {
         CommonResponse commonData = createCommonData(request.userId(), channelId);
-        List messageData = createMessageData(request.content(), request.attachmentList());
+        List<MessageResponse> messageData = createMessageData(request.content(), request.attachmentList());
 
         ChatMessageToKafka chatMessageToKafka = new ChatMessageToKafka(commonData, messageData);
         kafkaProducer.sendChatMessage(chatMessageToKafka, channelId); // Kafka 전송 (트랜잭션 영향 X)
     }
 
-    public CommonResponse createCommonData(Long userId, Long channelId){
+    private CommonResponse createCommonData(Long userId, Long channelId){
         User user = userRepository.findByUserId(userId);
         Thread thread = new Thread();   // todo:transaction처리 , 예외처리 필요
         threadRepository.save(thread);
@@ -54,7 +54,7 @@ public class ChatService {
                 .build();
     }
 
-    public List<MessageResponse> createMessageData(String content, List<Long> attachmentList) {
+    private List<MessageResponse> createMessageData(String content, List<Long> attachmentList) {
         List<MessageResponse> response = new ArrayList<>();
         if (content != null && !content.isEmpty()) {
             response.add(createTextMessage(content));
