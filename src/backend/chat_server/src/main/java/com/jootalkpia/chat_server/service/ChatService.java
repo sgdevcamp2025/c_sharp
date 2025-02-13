@@ -30,13 +30,14 @@ public class ChatService {
         Thread thread = new Thread();   // todo:transaction처리 , 예외처리 필요
         threadRepository.save(thread);
 
-        return new CommonResponse(
-                channelId,
-                thread.getThreadId(),
-                DateTimeUtil.formatDateTime(thread.getCreatedAt()),
-                user.getUserId(),
-                user.getNickname(),
-                user.getProfileImage());
+        return CommonResponse.builder()
+                .channelId(channelId)
+                .threadId(thread.getThreadId())
+                .threadDateTime(DateTimeUtil.formatDateTime(thread.getCreatedAt()))
+                .userId(user.getUserId())
+                .userNickname(user.getNickname())
+                .userProfileImage(user.getProfileImage())
+                .build();
     }
 
     public List<MessageResponse> createMessageData(String content, List<Long> attachmentList) {

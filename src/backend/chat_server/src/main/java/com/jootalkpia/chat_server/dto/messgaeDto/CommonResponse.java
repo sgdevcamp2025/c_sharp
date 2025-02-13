@@ -1,5 +1,8 @@
 package com.jootalkpia.chat_server.dto.messgaeDto;
 
+import lombok.Builder;
+
+@Builder
 public record CommonResponse(
         Long channelId,
         Long threadId,
