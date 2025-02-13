@@ -147,20 +147,38 @@ public class KurentoHandler extends TextWebSocketHandler {
         try {
             Long userId = getLongValueFromJson(json, "userId");
             String huddleId = (String) json.get("huddleId");
-            String candidate = (String) json.get("candidate");
 
-            if (candidate == null || candidate.isEmpty()) {
-                log.warn("잘못된 ICE Candidate 수신: userId={}", userId);
+            // `candidate` 필드가 `LinkedTreeMap` 형태로 들어올 가능성 있음
+            Object candidateObj = json.get("candidate");
+
+            String candidate;
+            String sdpMid = "";
+            int sdpMLineIndex = 0;
+
+            if (candidateObj instanceof String) {
+                // String 타입이면 그대로 사용
+                candidate = (String) candidateObj;
+            } else if (candidateObj instanceof Map) {
+                // Map 형태면 필드별로 추출
+                Map<String, Object> candidateMap = (Map<String, Object>) candidateObj;
+                candidate = (String) candidateMap.get("candidate");
+                sdpMid = (String) candidateMap.getOrDefault("sdpMid", "");
+                sdpMLineIndex = ((Number) candidateMap.getOrDefault("sdpMLineIndex", 0)).intValue();
+            } else {
+                log.error("Invalid ICE Candidate format: {}", candidateObj);
                 return;
             }
 
+            // WebRTC Endpoint 가져오기
             WebRtcEndpoint webRtcEndpoint = kurentoManager.getParticipantEndpoint(huddleId, userId);
             if (webRtcEndpoint == null) {
                 log.warn("허들에 참여 중이지 않은 유저입니다: userId={}", userId);
                 return;
             }
 
-            webRtcEndpoint.addIceCandidate(new IceCandidate(candidate, "", 0));
+            // ICE Candidate 적용
+            webRtcEndpoint.addIceCandidate(new IceCandidate(candidate, sdpMid, sdpMLineIndex));
+
         } catch (Exception e) {
             log.error("Error handling ICE candidate", e);
         }

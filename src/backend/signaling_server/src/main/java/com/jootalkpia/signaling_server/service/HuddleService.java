@@ -64,14 +64,6 @@ public class HuddleService {
         if (huddleCacheRepository.getHuddleById(huddleId) == null) {
             throw new IllegalStateException("존재하지 않는 허들입니다.");
         }
-//
-//        huddleParticipantsRepository.removeParticipant(huddleId, userId);
-//
-//        // 허들에 남아있는 참여자가 없으면 삭제
-//        Set<Long> remainingParticipants = huddleParticipantsRepository.getParticipants(huddleId);
-//        if (remainingParticipants.isEmpty()) {
-//            deleteHuddle(huddleId);
-//        }
     }
 
     /**
