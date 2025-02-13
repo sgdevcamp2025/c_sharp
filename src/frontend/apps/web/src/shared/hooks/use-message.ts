@@ -1,5 +1,9 @@
 import { Client } from '@stomp/stompjs';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useSuspenseQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import { getRequest } from '../services';
 import type { ApiServerType } from '../services';
@@ -16,11 +20,10 @@ const fetchMessages = async (serverType: ApiServerType, topic: string) => {
 };
 
 export const useMessages = (serverType: ApiServerType, topic: string) => {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ['messages', topic],
     queryFn: () => fetchMessages(serverType, topic),
     staleTime: Infinity,
-    initialData: [],
   });
 };
 
@@ -42,14 +45,9 @@ export const useSendMessage = (stompClient: Client | null, topic: string) => {
       queryClient.setQueryData(
         ['messages', topic],
         (oldData: unknown[] = []) => {
-          return [...oldData, newMessage].sort(
-            (a, b) =>
-              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-          );
+          return [...oldData, newMessage];
         },
       );
-
-      queryClient.invalidateQueries(['messages', topic]);
     },
   });
 };
