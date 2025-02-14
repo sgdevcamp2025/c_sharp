@@ -16,27 +16,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class ValidationUtils {
-    private static UserHuddleRepository userHuddleRepository;
-    private static HuddleParticipantsRepository huddleParticipantsRepository;
-    private static HuddleCacheRepository huddleCacheRepository;
-    private static HuddlePipelineRepository huddlePipelineRepository;
-    private static ChannelHuddleRepository channelHuddleRepository;
+    private final UserHuddleRepository userHuddleRepository;
+    private final HuddleParticipantsRepository huddleParticipantsRepository;
+    private final HuddleCacheRepository huddleCacheRepository;
+    private final HuddlePipelineRepository huddlePipelineRepository;
+    private final ChannelHuddleRepository channelHuddleRepository;
 
-    public ValidationUtils(
-            UserHuddleRepository userHuddleRepository,
-            HuddleParticipantsRepository huddleParticipantsRepository,
-            HuddleCacheRepository huddleCacheRepository,
-            HuddlePipelineRepository huddlePipelineRepository,
-            ChannelHuddleRepository channelHuddleRepository
-    ) {
-        ValidationUtils.userHuddleRepository = userHuddleRepository;
-        ValidationUtils.huddleParticipantsRepository = huddleParticipantsRepository;
-        ValidationUtils.huddleCacheRepository = huddleCacheRepository;
-        ValidationUtils.huddlePipelineRepository = huddlePipelineRepository;
-        ValidationUtils.channelHuddleRepository = channelHuddleRepository;
-    }
-
-    public static void canUserJoinHuddle(String huddleId, Long userId) {
+    public void canUserJoinHuddle(String huddleId, Long userId) {
         try {
             if (userHuddleRepository.getUserHuddle(userId) != null) {
                 throw new CustomException(ErrorCode.VALIDATION_FAILED.getCode(), "유저는 하나의 허들에만 참여할 수 있습니다.");
@@ -49,7 +35,7 @@ public class ValidationUtils {
         }
     }
 
-    public static void isHuddleValid(String huddleId) {
+    public void isHuddleValid(String huddleId) {
         try {
             if (huddleCacheRepository.getHuddleById(huddleId) == null) {
                 throw new CustomException(ErrorCode.HUDDLE_NOT_FOUND.getCode(), ErrorCode.HUDDLE_NOT_FOUND.getMsg());
@@ -59,19 +45,19 @@ public class ValidationUtils {
         }
     }
 
-    public static String isChannelInHuddle(Long channelId) {
-        try {
+    public String isHuddleInChannel(Long channelId) {
+//        try {
             String huddleId = channelHuddleRepository.getHuddleByChannel(channelId);
             if (huddleId == null) {
                 throw new CustomException(ErrorCode.HUDDLE_NOT_IN_CHANNEL.getCode(), ErrorCode.HUDDLE_NOT_IN_CHANNEL.getMsg());
             }
             return huddleId;
-        } catch (Exception e) {
-            throw new CustomException(ErrorCode.UNEXPECTED_ERROR.getCode(), "채널-허들 검증 중 오류 발생");
-        }
+//        } catch (Exception e) {
+//            throw new CustomException(ErrorCode.UNEXPECTED_ERROR.getCode(), "채널-허들 검증 중 오류 발생");
+//        }
     }
 
-    public static void isUserInHuddle(String huddleId, Long userId) {
+    public void isUserInHuddle(String huddleId, Long userId) {
         try {
             Set<Long> participants = huddleParticipantsRepository.getParticipants(huddleId);
             if (participants == null || !participants.contains(userId)) {
@@ -82,7 +68,7 @@ public class ValidationUtils {
         }
     }
 
-    public static void canUserExitHuddle(String huddleId, Long userId) {
+    public void canUserExitHuddle(String huddleId, Long userId) {
         try {
             if (huddleCacheRepository.getHuddleById(huddleId) == null) {
                 throw new CustomException(ErrorCode.HUDDLE_NOT_FOUND.getCode(), ErrorCode.HUDDLE_NOT_FOUND.getMsg());
@@ -92,7 +78,7 @@ public class ValidationUtils {
         }
     }
 
-    public static void isPipelineInChannel(String huddleId) {
+    public void isPipelineInChannel(String huddleId) {
         try {
             if (huddlePipelineRepository.getPipeline(huddleId) == null) {
                 throw new CustomException(ErrorCode.PIPELINE_NOT_FOUND.getCode(), ErrorCode.PIPELINE_NOT_FOUND.getMsg());
@@ -102,8 +88,8 @@ public class ValidationUtils {
         }
     }
 
-    // ✅ 허들:참여자 확인 후 삭제
-    public static void removeParticipantIfExists(String huddleId, Long userId) {
+    // 허들:참여자 확인 후 삭제
+    public void removeParticipantIfExists(String huddleId, Long userId) {
         try {
             Set<Long> participants = huddleParticipantsRepository.getParticipants(huddleId);
 
@@ -119,8 +105,8 @@ public class ValidationUtils {
         }
     }
 
-    // ✅ 허들:엔드포인트 확인 후 삭제
-    public static void removeUserEndpointIfExists(String huddleId, Long userId) {
+    // 허들:엔드포인트 확인 후 삭제
+    public void removeUserEndpointIfExists(String huddleId, Long userId) {
         try {
             String endpointId = huddleParticipantsRepository.getUserEndpoint(huddleId, userId);
 
@@ -136,8 +122,8 @@ public class ValidationUtils {
         }
     }
 
-    // ✅ 유저:허들 확인 후 삭제
-    public static void removeUserHuddleIfExists(Long userId) {
+    // 유저:허들 확인 후 삭제
+    public void removeUserHuddleIfExists(Long userId) {
         try {
             String huddleId = userHuddleRepository.getUserHuddle(userId);
 
