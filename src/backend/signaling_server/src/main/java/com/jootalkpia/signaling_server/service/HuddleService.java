@@ -26,6 +26,7 @@ public class HuddleService {
     private final ChannelHuddleRepository channelHuddleRepository;
     private final UserHuddleRepository userHuddleRepository;
     private final HuddlePipelineRepository huddlePipelineRepository;
+    private final ValidationUtils validationUtils;
 
     public Huddle createHuddle(Long channelId, Long userId) {
         String existingHuddleId = channelHuddleRepository.getHuddleByChannel(channelId);
@@ -82,41 +83,41 @@ public class HuddleService {
     public void recoverIfErrorJoining(Long userId, Long channelId) {
         try {
             // 채널이 허들에 존재하는지 확인하고 허들 ID 가져오기
-            String huddleId = ValidationUtils.isChannelInHuddle(channelId);
+            String huddleId = validationUtils.isHuddleInChannel(channelId);
 
-            // ✅ 허들:참여자 확인 후 삭제
-            ValidationUtils.removeParticipantIfExists(huddleId, userId);
+            // 허들:참여자 확인 후 삭제
+            validationUtils.removeParticipantIfExists(huddleId, userId);
 
-            // ✅ 허들:엔드포인트 확인 후 삭제
-            ValidationUtils.removeUserEndpointIfExists(huddleId, userId);
+            // 허들:엔드포인트 확인 후 삭제
+            validationUtils.removeUserEndpointIfExists(huddleId, userId);
 
-            // ✅ 유저:허들 확인 후 삭제
-            ValidationUtils.removeUserHuddleIfExists(userId);
+            // 유저:허들 확인 후 삭제
+            validationUtils.removeUserHuddleIfExists(userId);
 
-            // ✅ 허들에 남은 참가자가 없으면 삭제
+            // 허들에 남은 참가자가 없으면 삭제
             if (huddleParticipantsRepository.getParticipants(huddleId).isEmpty()) {
-                // ✅ 허들 데이터 확인 후 삭제
+                // 허들 데이터 확인 후 삭제
                 String storedHuddleId = channelHuddleRepository.getHuddleByChannel(channelId);
                 if (storedHuddleId != null && storedHuddleId.equals(huddleId)) {
                     channelHuddleRepository.deleteChannelHuddle(channelId);
                     log.info("채널-허들 매핑 삭제 완료: channelId={}, huddleId={}", channelId, huddleId);
                 }
 
-                // ✅ 허들:파이프라인 확인 후 삭제
+                // 허들:파이프라인 확인 후 삭제
                 String pipelineId = huddlePipelineRepository.getPipelineId(huddleId);
                 if (pipelineId != null) {
                     huddlePipelineRepository.deleteHuddlePipeline(huddleId);
                     log.info("허들-파이프라인 삭제 완료: huddleId={}, pipelineId={}", huddleId, pipelineId);
                 }
 
-                // ✅ 채널:허들 확인 후 삭제
+                // 채널:허들 확인 후 삭제
                 String storedChannelHuddle = channelHuddleRepository.getHuddleByChannel(channelId);
                 if (storedChannelHuddle != null && storedChannelHuddle.equals(huddleId)) {
                     channelHuddleRepository.deleteChannelHuddle(channelId);
                     log.info("채널-허들 데이터 삭제 완료: channelId={}", channelId);
                 }
 
-                // ✅ 허들에 남은 참가자가 없으면 최종 삭제
+                // 허들에 남은 참가자가 없으면 최종 삭제
                 if (getParticipantCount(huddleId) == 0) {
                     deleteHuddle(huddleId);
                     log.info("참여자가 없어 허들 삭제: {}", huddleId);
