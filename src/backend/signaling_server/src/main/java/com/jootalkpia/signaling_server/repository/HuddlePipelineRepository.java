@@ -40,23 +40,22 @@ public class HuddlePipelineRepository {
             // pipelineId를 이용해서 MediaPipeline을 다시 가져옴
             return kurentoClient.getById(pipelineId, MediaPipeline.class);
         } catch (Exception e) {
-            log.error("Redis 조회 오류: Huddle-Pipeline 변환 실패", e);
+            return null;
         }
-        return null;
     }
 
     public String getPipelineId(String huddleId) {
-        try {
+//        try {
             String key = "huddle:" + huddleId + ":pipeline";
             String pipelineId = redisTemplate.opsForValue().get(key);
             if (pipelineId == null) {
                 log.warn("해당 huddleId={}에 대한 pipelineId 없음", huddleId);
-                throw new CustomException(ErrorCode.PIPELINE_NOT_FOUND.getCode(), ErrorCode.PIPELINE_NOT_FOUND.getMsg());
+//                throw new CustomException(ErrorCode.PIPELINE_NOT_FOUND.getCode(), ErrorCode.PIPELINE_NOT_FOUND.getMsg());
             }
             return pipelineId;
-        } catch (Exception e) {
-            throw new CustomException(ErrorCode.PIPELINE_NOT_FOUND.getCode(), ErrorCode.PIPELINE_NOT_FOUND.getMsg());
-        }
+//        } catch (Exception e) {
+//            throw new CustomException(ErrorCode.PIPELINE_NOT_FOUND.getCode(), ErrorCode.PIPELINE_NOT_FOUND.getMsg());
+//        }
     }
 
     // 허들 삭제 (Redis에서 pipeline 매핑 제거)
