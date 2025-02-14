@@ -34,6 +34,12 @@ public class KurentoService {
 
         String pipelineId = kurentoClient.createMediaPipeline().getId();
         huddlePipelineRepository.saveHuddlePipeline(huddleId, pipelineId);
+
+        // Redis에 올바르게 저장되었는지 검증
+        String savedPipelineId = huddlePipelineRepository.getPipelineId(huddleId);
+        if (savedPipelineId == null || !savedPipelineId.equals(pipelineId)) {
+            throw new CustomException(ErrorCode.PIPELINE_NOT_FOUND.getCode(), "파이프라인이 정상적으로 저장되지 않았습니다.");
+        }
     }
 
     // 방 정보 조회
@@ -69,6 +75,10 @@ public class KurentoService {
 
     // 참가자의 WebRTC 엔드포인트 가져오기
     public WebRtcEndpoint getParticipantEndpoint(String huddleId, Long userId) {
+        if (huddleId == null) {
+            throw new CustomException(ErrorCode.HUDDLE_NOT_FOUND.getCode(), "허들 ID가 null입니다.");
+        }
+
         // 저장된 엔드포인트 ID 가져오기
         String endpointId = huddleParticipantsRepository.getUserEndpoint(huddleId, userId);
 
