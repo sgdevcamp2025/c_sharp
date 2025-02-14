@@ -20,6 +20,8 @@ public enum ErrorCode {
     USER_NOT_FOUND("R40403", "등록되지 않은 유저입니다."),
     HUDDLE_NOT_FOUND("R40404", "등록되지 않은 허들입니다."),
     HUDDLE_NOT_IN_CHANNEL("R40405", "채널에 해당 허들이 존재하지 않습니다."),
+    PIPELINE_NOT_FOUND("R40406", "파이프라인이 존재하지 않습니다."),
+    ENDPOINT_NOT_FOUND("R40407", "엔드포인트가 존재하지 않습니다"),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR("R50001", "서버 내부 오류가 발생했습니다."),

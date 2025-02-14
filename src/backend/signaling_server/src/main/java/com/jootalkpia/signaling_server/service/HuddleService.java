@@ -1,10 +1,14 @@
 package com.jootalkpia.signaling_server.service;
 
+import com.jootalkpia.signaling_server.exception.common.CustomException;
+import com.jootalkpia.signaling_server.exception.common.ErrorCode;
 import com.jootalkpia.signaling_server.model.Huddle;
 import com.jootalkpia.signaling_server.repository.HuddleCacheRepository;
 import com.jootalkpia.signaling_server.repository.HuddleParticipantsRepository;
 import com.jootalkpia.signaling_server.repository.ChannelHuddleRepository;
+import com.jootalkpia.signaling_server.repository.HuddlePipelineRepository;
 import com.jootalkpia.signaling_server.repository.UserHuddleRepository;
+import com.jootalkpia.signaling_server.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,10 +25,8 @@ public class HuddleService {
     private final HuddleParticipantsRepository huddleParticipantsRepository;
     private final ChannelHuddleRepository channelHuddleRepository;
     private final UserHuddleRepository userHuddleRepository;
+    private final HuddlePipelineRepository huddlePipelineRepository;
 
-    /**
-     * 허들 생성
-     */
     public Huddle createHuddle(Long channelId, Long userId) {
         String existingHuddleId = channelHuddleRepository.getHuddleByChannel(channelId);
         if (existingHuddleId != null) {
@@ -37,49 +39,21 @@ public class HuddleService {
         // 레디스에 허들 메타데이터(허들아이디, 채널아이디, 만든유저아이디, 생성시간) 저장
         huddleCacheRepository.saveHuddle(huddle);
 
-        // 채널과 허들 매핑
-        channelHuddleRepository.saveChannelHuddle(channelId, huddleId);
-
         return huddle;
     }
 
-    /**
-     * 허들 참가
-     */
-    public void joinHuddle(String huddleId, Long userId) {
-        if (huddleCacheRepository.getHuddleById(huddleId) == null) {
-            throw new IllegalStateException("존재하지 않는 허들입니다.");
-        }
-        if (!canUserJoinHuddle(userId)) {
-            throw new IllegalStateException("유저는 하나의 허들에만 참여할 수 있습니다.");
-        }
+    public void saveHuddleChannel(Long channelId, String huddleId) {
+        channelHuddleRepository.saveChannelHuddle(channelId, huddleId);
     }
 
-    public boolean canUserJoinHuddle(Long userId) {
-        return userHuddleRepository.getUserHuddle(userId) == null;
+    public void addUserHuddle(Long userId, String huddleId) {
+        userHuddleRepository.saveUserHuddle(userId, huddleId);
     }
 
-    public boolean isValidHuddle(String huddleId) {
-        return huddleCacheRepository.getHuddleById(huddleId) != null;
+    public void saveHuddleParticipant(Long userId, String huddleId) {
+        huddleParticipantsRepository.addParticipant(huddleId, userId);
     }
 
-    public boolean isUserInHuddle(String huddleId, Long userId) {
-        Set<Long> participants = huddleParticipantsRepository.getParticipants(huddleId);
-        return participants != null && participants.contains(userId);
-    }
-
-    /**
-     * 허들 퇴장
-     */
-    public void exitHuddle(String huddleId, Long userId) {
-        if (huddleCacheRepository.getHuddleById(huddleId) == null) {
-            throw new IllegalStateException("존재하지 않는 허들입니다.");
-        }
-    }
-
-    /**
-     * 허들 삭제 (참여자가 아무도 없을 때)
-     */
     public void deleteHuddle(String huddleId) {
         Huddle huddle = huddleCacheRepository.getHuddleById(huddleId);
         if (huddle == null) {
@@ -98,9 +72,6 @@ public class HuddleService {
         }
     }
 
-    /**
-     * 허들에 남아있는 참가자 수 조회
-     */
     public int getParticipantCount(String huddleId) {
         Set<Long> participants = huddleParticipantsRepository.getParticipants(huddleId);
         log.info("참가자 수: {}", participants.size());
@@ -108,4 +79,51 @@ public class HuddleService {
         return participants == null ? 0 : participants.size();
     }
 
+    public void recoverIfErrorJoining(Long userId, Long channelId) {
+        try {
+            // 채널이 허들에 존재하는지 확인하고 허들 ID 가져오기
+            String huddleId = ValidationUtils.isChannelInHuddle(channelId);
+
+            // ✅ 허들:참여자 확인 후 삭제
+            ValidationUtils.removeParticipantIfExists(huddleId, userId);
+
+            // ✅ 허들:엔드포인트 확인 후 삭제
+            ValidationUtils.removeUserEndpointIfExists(huddleId, userId);
+
+            // ✅ 유저:허들 확인 후 삭제
+            ValidationUtils.removeUserHuddleIfExists(userId);
+
+            // ✅ 허들에 남은 참가자가 없으면 삭제
+            if (huddleParticipantsRepository.getParticipants(huddleId).isEmpty()) {
+                // ✅ 허들 데이터 확인 후 삭제
+                String storedHuddleId = channelHuddleRepository.getHuddleByChannel(channelId);
+                if (storedHuddleId != null && storedHuddleId.equals(huddleId)) {
+                    channelHuddleRepository.deleteChannelHuddle(channelId);
+                    log.info("채널-허들 매핑 삭제 완료: channelId={}, huddleId={}", channelId, huddleId);
+                }
+
+                // ✅ 허들:파이프라인 확인 후 삭제
+                String pipelineId = huddlePipelineRepository.getPipelineId(huddleId);
+                if (pipelineId != null) {
+                    huddlePipelineRepository.deleteHuddlePipeline(huddleId);
+                    log.info("허들-파이프라인 삭제 완료: huddleId={}, pipelineId={}", huddleId, pipelineId);
+                }
+
+                // ✅ 채널:허들 확인 후 삭제
+                String storedChannelHuddle = channelHuddleRepository.getHuddleByChannel(channelId);
+                if (storedChannelHuddle != null && storedChannelHuddle.equals(huddleId)) {
+                    channelHuddleRepository.deleteChannelHuddle(channelId);
+                    log.info("채널-허들 데이터 삭제 완료: channelId={}", channelId);
+                }
+
+                // ✅ 허들에 남은 참가자가 없으면 최종 삭제
+                if (getParticipantCount(huddleId) == 0) {
+                    deleteHuddle(huddleId);
+                    log.info("참여자가 없어 허들 삭제: {}", huddleId);
+                }
+            }
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.UNEXPECTED_ERROR.getCode(), "허들 복구 과정 중 오류 발생");
+        }
+    }
 }

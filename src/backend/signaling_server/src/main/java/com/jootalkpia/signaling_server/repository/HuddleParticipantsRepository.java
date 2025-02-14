@@ -29,7 +29,6 @@ public class HuddleParticipantsRepository {
     public void addParticipant(String huddleId, Long userId) {
         String key = "huddle:" + huddleId + ":participants";
         setOps.add(key, userId);
-        userHuddleRepository.saveUserHuddle(userId, huddleId); // 유저-허들 매핑 저장
     }
 
     // 허들에서 참가자 제거 및 유저-허들 매핑 삭제
