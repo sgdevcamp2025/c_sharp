@@ -13,8 +13,9 @@ on:
       - 'src/backend/**'
 
 jobs:
-  ci:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         service:
@@ -38,7 +39,6 @@ jobs:
           ls -la
           echo "Checking src/backend/ directory..."
           ls -la src/backend/
-
       - name: Verify working directory
         run: ls -la src/backend/${{ matrix.service }}
 
@@ -49,35 +49,14 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Build Gradle project (CI)
+      - name: Build Gradle project
         working-directory: src/backend/${{ matrix.service }}
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
-
       - name: Verify JAR file existence
         working-directory: src/backend/${{ matrix.service }}
         run: ls -la build/libs/
-
-  cd:
-    needs: ci
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    strategy:
-      matrix:
-        service:
-          - stock_server
-          - auth_server
-          - workspace_server
-          - chat_server
-          - file_server
-          - history_server
-          - push_server
-          - state_server
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -91,9 +70,17 @@ jobs:
           docker build --platform linux/amd64 \
             --build-arg JAR_FILE=build/libs/${{ matrix.service }}-0.0.1-SNAPSHOT.jar \
             -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest .
-
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest
-
+  cd:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug Secrets
+        run: |
+          echo "SERVER_IP=${{ secrets.SERVER_IP }}"
+          echo "SERVER_USER=${{ secrets.SERVER_USER }}"
+          echo "SERVER_KEY Length=$(echo -n "${{ secrets.SECRET_KEY }}" | wc -c)"
+          
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
