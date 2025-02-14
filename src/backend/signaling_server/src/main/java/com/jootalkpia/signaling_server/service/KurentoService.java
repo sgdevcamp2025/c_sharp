@@ -49,6 +49,7 @@ public class KurentoService {
 
     // 참가자 추가
     public void addParticipantToRoom(String huddleId, Long userId) {
+        log.info("add participant to room in kurento service");
         // 해당 허들의 pipelineId 가져오기
         String pipelineId = redisTemplate.opsForValue().get("huddle:" + huddleId + ":pipeline");
 
@@ -62,14 +63,21 @@ public class KurentoService {
             throw new IllegalStateException("Kurento에서 pipelineId=" + pipelineId + "를 찾을 수 없습니다.");
         }
 
+        log.info(pipelineId);
+
         // WebRTC 엔드포인트 생성 및 해당 파이프라인에 추가
         WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
+
+        log.info("add participant to room in kurento service: 엔포 생성 및 파이프라인에 추가");
 
         // 허들:참가자 저장
         huddleService.saveHuddleParticipant(userId, huddleId);
 
+        log.info("add participant to room in kurento service: 허들:참가자 저장");
+
         // 허들:엔드포인트 저장
         huddleParticipantsRepository.saveUserEndpoint(huddleId, userId, webRtcEndpoint.getId());
+        log.info("add participant to room in kurento service: 허들 엔포 저장");
     }
 
 
@@ -81,6 +89,12 @@ public class KurentoService {
 
         // 저장된 엔드포인트 ID 가져오기
         String endpointId = huddleParticipantsRepository.getUserEndpoint(huddleId, userId);
+
+        if (endpointId == null) {
+            log.error("Redis에서 엔드포인트 조회 실패: key, userId={}", userId);
+        } else {
+            log.info("Redis에서 가져온 엔드포인트:  userId={}, endpointId={}", userId, endpointId);
+        }
 
         if (endpointId == null) {
             log.warn("참가자의 WebRTC 엔드포인트를 찾을 수 없음: huddleId={}, userId={}", huddleId, userId);
