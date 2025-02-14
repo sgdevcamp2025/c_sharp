@@ -1,6 +1,7 @@
 package com.jootalkpia.signaling_server.repository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Set;
 
 @Repository
+@Slf4j
 public class HuddleParticipantsRepository {
     private final SetOperations<String, Long> setOps;
     private final HashOperations<String, String, String> hashOps;
@@ -47,7 +49,19 @@ public class HuddleParticipantsRepository {
     public void saveUserEndpoint(String huddleId, Long userId, String endpointId) {
         String key = "huddle:" + huddleId + ":endpoints";
         hashOps.put(key, userId.toString(), endpointId);
+
+        // 저장 확인 로그 추가
+        log.info("WebRTC 엔드포인트 저장 완료: huddleId={}, userId={}, endpointId={}", huddleId, userId, endpointId);
+
+        // Redis에서 즉시 확인
+        String savedEndpoint = hashOps.get(key, userId.toString());
+        if (savedEndpoint == null) {
+            log.error("저장 후 조회 실패: huddleId={}, userId={}", huddleId, userId);
+        } else {
+            log.info("Redis에 저장된 엔드포인트 확인됨: {}", savedEndpoint);
+        }
     }
+
 
     // WebRTC 엔드포인트 정보 조회
     public String getUserEndpoint(String huddleId, Long userId) {
