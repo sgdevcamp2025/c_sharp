@@ -15,14 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final KafkaProducer kafkaProducer;
     private final ChatService chatService;
 
     @MessageMapping("/chat.{channelId}")
     public void sendMessage(ChatMessageRequest request, @DestinationVariable Long channelId) {
-        CommonResponse commonData = chatService.createCommonData(request.userId(), channelId);
-        List massageData = chatService.createMessageData(request.content(),request.attachmentList());  //Type 건들지말것
-        ChatMessageToKafka chatMessageToKafka = new ChatMessageToKafka(commonData, massageData);
-        kafkaProducer.sendChatMessage(chatMessageToKafka, channelId);
+        chatService.processChatMessage(request, channelId);
     }
 }
