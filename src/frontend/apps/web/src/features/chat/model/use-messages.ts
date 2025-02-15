@@ -16,12 +16,5 @@ export const useMessages = (topic: string) => {
     staleTime: Infinity,
   });
 
-  const addMessage = (msg: WebSocketResponsePayload) => {
-    queryClient.setQueryData<WebSocketResponsePayload[]>(
-      queryKey,
-      (prev = []) => [...prev, msg],
-    );
-  };
-
-  return { data: messages, addMessage };
+  return { data: messages };
 };
