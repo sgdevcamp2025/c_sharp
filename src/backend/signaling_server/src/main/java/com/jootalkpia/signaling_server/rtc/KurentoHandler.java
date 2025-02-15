@@ -3,16 +3,20 @@ package com.jootalkpia.signaling_server.rtc;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
+import com.jootalkpia.signaling_server.exception.common.CustomException;
+import com.jootalkpia.signaling_server.exception.common.ErrorCode;
 import com.jootalkpia.signaling_server.model.Huddle;
+import com.jootalkpia.signaling_server.repository.ChannelHuddleRepository;
 import com.jootalkpia.signaling_server.repository.HuddleParticipantsRepository;
 import com.jootalkpia.signaling_server.service.HuddleService;
-import com.jootalkpia.signaling_server.service.KurentoManager;
+import com.jootalkpia.signaling_server.service.KurentoService;
+import com.jootalkpia.signaling_server.util.ValidationUtils;
+import java.util.Timer;
 import java.util.TimerTask;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.IceCandidate;
 import org.kurento.client.WebRtcEndpoint;
-import java.util.Timer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -28,7 +32,9 @@ public class KurentoHandler extends TextWebSocketHandler {
     private final Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).create();
     private final HuddleService huddleService;
     private final HuddleParticipantsRepository huddleParticipantsRepository;
-    private final KurentoManager kurentoManager;
+    private final KurentoService kurentoService;
+    private final ChannelHuddleRepository channelHuddleRepository;
+    private final ValidationUtils validationUtils;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
@@ -60,18 +66,24 @@ public class KurentoHandler extends TextWebSocketHandler {
             Long channelId = getLongValueFromJson(json, "channelId");
             Long userId = getLongValueFromJson(json, "userId");
 
+            // 허들 메타데이터 저장
             Huddle newHuddle = huddleService.createHuddle(channelId, userId);
-            kurentoManager.createRoom(newHuddle.huddleId());
+
+            // 채널과 허들 매핑
+            huddleService.saveHuddleChannel(channelId, newHuddle.huddleId());
+
+            // 파이프라인 생성 및 허들과 파이프라인 매핑
+            kurentoService.createPipeline(newHuddle.huddleId());
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "roomCreated", "huddleId", newHuddle.huddleId()))));
 
             // 일정 시간 내 참가 없으면 삭제
-            scheduleHuddleDeletion(newHuddle.huddleId());
+//            scheduleHuddleDeletion(newHuddle.huddleId());
 
             // 자동으로 허들 입장 처리
             handleJoinRoom(session, Map.of(
                     "id", "joinRoom",
-                    "huddleId", newHuddle.huddleId(),
+                    "channelId", channelId,
                     "userId", userId
             ));
         } catch (Exception e) {
@@ -80,49 +92,39 @@ public class KurentoHandler extends TextWebSocketHandler {
         }
     }
 
+
     private void scheduleHuddleDeletion(String huddleId) {
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (huddleService.getParticipantCount(huddleId) == 0) { // 참가자가 없으면 삭제
-                    log.info("참가자가 없어 허들 삭제: {}", huddleId);
-                    huddleService.deleteHuddle(huddleId);
-                    kurentoManager.removeRoom(huddleId);
-                }
-            }
-        }, 300000); // 5분 후 실행 (300,000 밀리초 = 5분)
+
     }
 
     // 허들 입장
     private void handleJoinRoom(WebSocketSession session, Map<String, Object> json) throws IOException {
         Long userId = getLongValueFromJson(json, "userId");
-        String huddleId = (String) json.get("huddleId");
+//        String huddleId = (String) json.get("huddleId");
+        Long channelId = getLongValueFromJson(json, "channelId");
 
         try {
-            huddleService.joinHuddle(huddleId, userId);
+            String huddleId = validationUtils.isHuddleInChannel(channelId);
+            if (huddleId == null) {
+                throw new CustomException(ErrorCode.HUDDLE_NOT_FOUND.getCode(), "해당 채널에 매핑된 허들이 없습니다.");
+            }
+
+            validationUtils.canUserJoinHuddle(huddleId, userId);
+            validationUtils.isHuddleValid(huddleId);
+            validationUtils.isPipelineInChannel(huddleId);
 
             // WebRTC 엔드포인트 생성 및 저장
-            WebRtcEndpoint webRtcEndpoint = kurentoManager.addParticipantToRoom(huddleId, userId);
+            kurentoService.addParticipantToRoom(huddleId, userId);
+
+            // 유저:허들 저장
+            huddleService.addUserHuddle(userId, huddleId);
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "joinedRoom", "huddleId", huddleId))));
         } catch (Exception e) {
             log.error("Error joining room", e);
 
-            // ✅ **허들 ID 및 참가자가 유효한지 확인 후 삭제 수행**
-            if (huddleService.isValidHuddle(huddleId) && huddleService.isUserInHuddle(huddleId, userId)) {
-                kurentoManager.removeParticipantFromRoom(huddleId, userId);
-                kurentoManager.removeParticipantFromRoom(huddleId, userId);
-                log.info("참가 실패로 인해 사용자 제거: huddleId={}, userId={}", huddleId, userId);
-            } else {
-                log.warn("참가 실패 후 제거 불필요: 유효하지 않은 허들 또는 참가자 huddleId={}, userId={}", huddleId, userId);
-            }
-
-            // ✅ 허들에 남은 참가자가 없으면 삭제
-            if (huddleService.getParticipantCount(huddleId) == 0) {
-                huddleService.deleteHuddle(huddleId);
-                kurentoManager.removeRoom(huddleId);
-                log.info("참여자가 없어 허들 삭제: {}", huddleId);
-            }
+            // checking...
+            huddleService.recoverIfErrorJoining(userId, channelId);
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "error", "message", "Failed to join room"))));
         }
@@ -135,10 +137,10 @@ public class KurentoHandler extends TextWebSocketHandler {
             String huddleId = (String) json.get("huddleId");
 
             // Kurento에서 WebRTC 엔드포인트 삭제
-            kurentoManager.removeParticipantFromRoom(huddleId, userId);
+            kurentoService.removeParticipantFromRoom(huddleId, userId);
 
             // 허들에서 유저 제거
-            huddleService.exitHuddle(huddleId, userId);
+            validationUtils.canUserExitHuddle(huddleId, userId);
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "leftRoom", "huddleId", huddleId))));
         } catch (Exception e) {
@@ -153,7 +155,7 @@ public class KurentoHandler extends TextWebSocketHandler {
             String huddleId = (String) json.get("huddleId");
             String sdpOffer = (String) json.get("sdpOffer");
 
-            WebRtcEndpoint webRtcEndpoint = kurentoManager.getParticipantEndpoint(huddleId, userId);
+            WebRtcEndpoint webRtcEndpoint = kurentoService.getParticipantEndpoint(huddleId, userId);
 
             // 허들에 참여 중이 아닌 경우 Offer 처리 안함
             if (webRtcEndpoint == null) {
@@ -202,7 +204,7 @@ public class KurentoHandler extends TextWebSocketHandler {
             }
 
             // WebRTC Endpoint 가져오기
-            WebRtcEndpoint webRtcEndpoint = kurentoManager.getParticipantEndpoint(huddleId, userId);
+            WebRtcEndpoint webRtcEndpoint = kurentoService.getParticipantEndpoint(huddleId, userId);
             if (webRtcEndpoint == null) {
                 log.warn("허들에 참여 중이지 않은 유저입니다: userId={}", userId);
                 return;
