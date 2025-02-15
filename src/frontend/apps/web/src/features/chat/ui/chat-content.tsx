@@ -2,9 +2,12 @@ import ContentText from './content-text';
 import ContentAvatar from './content-avatar';
 
 import { MessageSquareText } from 'lucide-react';
+import type { WebSocketResponsePayload } from '../model';
+import { processMessages } from '../lib';
 
 export type ChatContentProps = {
   type?: 'default' | 'live';
+  messages?: WebSocketResponsePayload[];
 };
 
 export type ChatContentWithAvatarsProps = ChatContentProps & {
@@ -13,33 +16,55 @@ export type ChatContentWithAvatarsProps = ChatContentProps & {
 };
 
 const ChatContent = ({
-  type = 'live',
+  type = 'default',
+  messages = [],
   avatarUrls,
   setIsThreadOpen,
 }: ChatContentWithAvatarsProps) => {
+  if (!messages || messages.length === 0) return null;
+  console.log('🔗 ChatContent:', { messages });
+
   const backgroundColor = type === 'live' ? 'bg-live' : 'bg-white';
   const hoverColor = type === 'default' ? 'hover:bg-chatboxHover' : '';
 
+  const processedMessages = processMessages(messages);
+
   return (
-    <div
-      className={`flex w-full h-auto ${backgroundColor} pb-2 pl-5 pt-5 pr-6 gap-4 group relative ${hoverColor} transition-all duration-300`}
-    >
-      <ContentAvatar type={type} />
-      <div className="flex w-full items-start justify-between">
-        <ContentText
-          type={type}
-          avatarUrls={avatarUrls}
-          setIsThreadOpen={setIsThreadOpen}
-        />
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-          <MessageSquareText
-            size="15"
-            className="cursor-pointer hover:text-gray-600"
-            onClick={() => setIsThreadOpen(true)}
-          />
-        </div>
+    <>
+      <div
+        className={`flex flex-col w-full pb-2 overflow-auto h-auto ${backgroundColor}`}
+      >
+        {processedMessages.map((messageData, index) => (
+          <div
+            key={index}
+            className={`group relative flex w-full pl-5 ${
+              messageData.isConsecutive ? 'pt-2' : 'pt-5'
+            } ${
+              messageData.isConsecutive ? 'pl-[40px]' : 'pl-5'
+            } pr-6 gap-4 ${hoverColor} transition-all duration-300`}
+          >
+            {messageData.hideAvatar ? (
+              <></>
+            ) : (
+              <ContentAvatar
+                type={type}
+                userProfileImage={messageData.common.userProfileImage}
+              />
+            )}
+
+            <div className="flex w-full items-start justify-between">
+              <ContentText
+                type={type}
+                avatarUrls={avatarUrls}
+                message={messageData}
+                setIsThreadOpen={setIsThreadOpen}
+                hideUserInfo={messageData.isConsecutive}
+              />
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
+    </>
   );
 };
 

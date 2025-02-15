@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@workspace/ui/components';
 
@@ -12,9 +12,14 @@ import { useFileManagements } from '../model';
 type ChatToggleGroupsProps = {
   name: string;
   onSend?: () => void;
+  setAttachmentList?: (files: number[]) => void;
 };
 
-const ChatToggleGroup = ({ name, onSend }: ChatToggleGroupsProps) => {
+const ChatToggleGroup = ({
+  name,
+  onSend,
+  setAttachmentList,
+}: ChatToggleGroupsProps) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const {
     selectedFiles,
@@ -24,7 +29,11 @@ const ChatToggleGroup = ({ name, onSend }: ChatToggleGroupsProps) => {
     error,
   } = useFileManagements(1, 1);
 
-  console.log('123', selectedFiles);
+  // useEffect(() => {
+  //   if (setAttachmentList) {
+  //     setAttachmentList(selectedFiles.map((file) => file.id));
+  //   }
+  // }, [selectedFiles, setAttachmentList]);
 
   return (
     <div className="flex flex-col justify-between gap-2">
@@ -51,8 +60,9 @@ const ChatToggleGroup = ({ name, onSend }: ChatToggleGroupsProps) => {
           <Button
             onClick={onSend}
             size="sm"
+            disabled={isUploading || isLoading}
           >
-            Send
+            {isUploading || isLoading ? 'Uploading...' : 'Send'}
           </Button>
         )}
       </div>
