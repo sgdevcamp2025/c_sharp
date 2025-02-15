@@ -3,6 +3,7 @@
 import * as React from 'react';
 
 import { cn } from '@workspace/ui/lib/utils';
+import { handleShiftEnterIndent } from '@workspace/ui/lib/handle-shiftenter-indent.util';
 
 const Textarea = React.forwardRef<
   HTMLTextAreaElement,
@@ -21,8 +22,11 @@ const Textarea = React.forwardRef<
     if (e.key === 'Enter') {
       if (!e.shiftKey) {
         e.preventDefault();
+      } else {
+        handleShiftEnterIndent(e, autoResizeTextarea);
       }
     }
+
     onKeyDown?.(e);
     autoResizeTextarea();
   };
