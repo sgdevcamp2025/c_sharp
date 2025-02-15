@@ -1,4 +1,5 @@
 import { LoginButton } from '@/src/features/auth';
+import Image from 'next/image';
 
 export const metadata = {
   title: '주톡피아 - 카카오 로그인',
@@ -22,10 +23,20 @@ export const metadata = {
   },
 };
 
+//logo이미지가 생길 경우 추가 예정입니다.
 export default function Page() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <h1 className="text-3xl text-primary font-bold">주톡피아</h1>
+    <div className="flex flex-col items-center justify-center min-h-svh gap-4">
+      <div className="flex items-center gap-2">
+        <Image
+          src="/"
+          alt="logo"
+          width={40}
+          height={40}
+        />
+        <h1 className="text-3xl font-bold text-orange-500">주톡피아</h1>
+      </div>
+      <p className="text-gray-500 text-lg">주식 실시간 커뮤니티</p>
       <LoginButton />
     </div>
   );
