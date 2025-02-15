@@ -163,7 +163,7 @@ const StocksListTable = () => {
                 key={row.id}
                 className="cursor-pointer"
                 onClick={() => {
-                  router.push(`/${row.original.slug ?? ''}`);
+                  router.push(`/stock/${row.original.slug ?? ''}`);
                 }}
               >
                 {row.getVisibleCells().map((cell) => (

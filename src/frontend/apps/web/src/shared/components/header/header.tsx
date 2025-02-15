@@ -7,7 +7,7 @@ import Link from 'next/link';
 const Header = ({ authContent }: { authContent: React.ReactNode }) => {
   return (
     <>
-      <Link href={'/'}>
+      <Link href="/stock">
         <Avatar variant="square">
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback className="text-primary font-bold">
