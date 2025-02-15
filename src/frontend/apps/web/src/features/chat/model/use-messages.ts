@@ -1,0 +1,27 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { WebSocketResponsePayload } from '@/src/features/chat/model';
+
+export const useMessages = (topic: string) => {
+  const queryClient = useQueryClient();
+  const queryKey = ['messages', topic];
+
+  const { data: messages = [] } = useQuery<WebSocketResponsePayload[]>({
+    queryKey,
+    initialData: () =>
+      queryClient.getQueryData<WebSocketResponsePayload[]>([
+        'messages',
+        topic,
+      ]) ?? [],
+
+    staleTime: Infinity,
+  });
+
+  const addMessage = (msg: WebSocketResponsePayload) => {
+    queryClient.setQueryData<WebSocketResponsePayload[]>(
+      queryKey,
+      (prev = []) => [...prev, msg],
+    );
+  };
+
+  return { data: messages, addMessage };
+};
