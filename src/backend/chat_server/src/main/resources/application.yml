@@ -36,7 +36,7 @@ topic:
 
 group:
   minute: minute-price-save-consumer-group
-  chat: chat-message-handle-consumer-group
+  chat: chat-message-handle-consumer-group-${SERVER_PORT}
 
 server:
- port: ${CHAT1_PORT}
+ port: ${SERVER_PORT}
