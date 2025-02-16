@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class StompSubscriptionInterceptor implements ChannelInterceptor {
     private static final String CHANNEL_ID_DELIMITER = "\\.";
-    private static final long TAB_EXPIRY_HOURS = 4;
-    private static final String DEFAULT = "none";
+    private static final long SESSION_EXPIRY_HOURS = 4;
+    private static final String DEFAULT_CHANNEL = "none";
 
     private final RedisTemplate<String, String> stringOperRedisTemplate;
     private final RedisTemplate<String, Object> objectOperRedisTemplate;
@@ -85,7 +85,7 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
         stringOperRedisTemplate.opsForValue().set(
                 RedisKeys.sessionChannel(sessionId),
                 channelId,
-                TAB_EXPIRY_HOURS,
+                SESSION_EXPIRY_HOURS,
                 TimeUnit.HOURS
         );
     }
@@ -149,8 +149,8 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
     private void updateChannelFromSession(String sessionId) {
         stringOperRedisTemplate.opsForValue().set(
                 RedisKeys.sessionChannel(sessionId),
-                DEFAULT,
-                TAB_EXPIRY_HOURS,
+                DEFAULT_CHANNEL,
+                SESSION_EXPIRY_HOURS,
                 TimeUnit.HOURS
         );
     }
