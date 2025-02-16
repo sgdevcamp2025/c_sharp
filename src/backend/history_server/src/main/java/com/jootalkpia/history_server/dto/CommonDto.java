@@ -1,14 +1,10 @@
-package com.jootalkpia.chat_server.dto.messgaeDto;
+package com.jootalkpia.history_server.dto;
 
-import lombok.Builder;
-
-@Builder
-public record CommonResponse(
+public record CommonDto(
         Long channelId,
         Long threadId,
         String threadDateTime,
         Long userId,
         String userNickname,
         String userProfileImage
-) {
-}
+) {}
