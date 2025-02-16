@@ -1,4 +1,4 @@
-package com.jootalkpia.chat_server.config;
+package com.jootalkpia.chat_server.config.interceptor;
 
 import com.jootalkpia.chat_server.dto.RedisKeys;
 import lombok.RequiredArgsConstructor;
@@ -20,18 +20,16 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class StompSubscriptionInterceptor implements ChannelInterceptor {
-    private static final String HEADER_USER_ID = "X-User-Id";
-    private static final String SUBSCRIBE_CHAT_PREFIX = "/subscribe/chat.";
     private static final String CHANNEL_ID_DELIMITER = "\\.";
-    private static final long TAB_EXPIRY_HOURS = 4;
-    private static final String DEFAULT = "none";
+    private static final long SESSION_EXPIRY_HOURS = 4;
+    private static final String DEFAULT_CHANNEL = "none";
 
     private final RedisTemplate<String, String> stringOperRedisTemplate;
     private final RedisTemplate<String, Object> objectOperRedisTemplate;
 
     @Override
     public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex) {
-        if (!isValidMessage(message, sent, ex)) {
+        if (!isValidMessage(sent, ex)) {
             // todo: 예외 처리 로직 추가, Valid Method 분리
             return;
         }
@@ -39,12 +37,8 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
         handleStompCommand(StompHeaderAccessor.wrap(message));
     }
 
-    private boolean isValidMessage(Message<?> message, boolean sent, Exception ex) {
-        if (hasException(ex) || !sent) {
-            return false;
-        }
-
-        return true;
+    private boolean isValidMessage(boolean sent, Exception ex) {
+        return !hasException(ex) && sent;
     }
 
     private boolean hasException(Exception ex) {
@@ -57,8 +51,7 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
     }
 
     private void handleSubscription(StompHeaderAccessor accessor) {
-        if (!StompCommand.SUBSCRIBE.equals(accessor.getCommand()) ||
-                !(isValidCommand(accessor) && isValidChatDestination(accessor.getDestination()))) {
+        if (!StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
             return;
         }
 
@@ -73,26 +66,15 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
         handleChatUnsubscription(accessor);
     }
 
-    private boolean isValidCommand(StompHeaderAccessor accessor) {
-        return accessor != null && hasValidHeaders(accessor);
-    }
-
-    private boolean isValidChatDestination(String destination) {
-        return destination != null && destination.startsWith(SUBSCRIBE_CHAT_PREFIX);
-    }
-
-    private boolean hasValidHeaders(StompHeaderAccessor accessor) {
-        String userId = accessor.getFirstNativeHeader(HEADER_USER_ID);
-        return userId != null;
-    }
-
     private void handleChatSubscription(StompHeaderAccessor accessor) {
         String channelId = extractChannelId(accessor.getDestination());
         String sessionId = accessor.getSessionId();
-        String userId = accessor.getFirstNativeHeader(HEADER_USER_ID);
+        String userId = getUserIdFromSessionId(sessionId);
 
-        updateSessionChannel(channelId, sessionId);
-        updateChannelActiveUsers(channelId, userId, sessionId);
+        if (userId != null && !userId.trim().isEmpty()) {
+            updateSessionChannel(channelId, sessionId);
+            updateChannelActiveUsers(channelId, userId, sessionId);
+        }
     }
 
     private String extractChannelId(String destination) {
@@ -103,7 +85,7 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
         stringOperRedisTemplate.opsForValue().set(
                 RedisKeys.sessionChannel(sessionId),
                 channelId,
-                TAB_EXPIRY_HOURS,
+                SESSION_EXPIRY_HOURS,
                 TimeUnit.HOURS
         );
     }
@@ -150,8 +132,10 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
         String userId = getUserIdFromSessionId(sessionId);
         String channelId = getChannelIdFromSessionId(sessionId);
 
-        updateChannelFromSession(sessionId);
-        removeTabFromChannel(channelId, userId, sessionId);
+        if (userId != null && !userId.trim().isEmpty()) {
+            updateChannelFromSession(sessionId);
+            removeTabFromChannel(channelId, userId, sessionId);
+        }
     }
 
     private String getUserIdFromSessionId(String sessionId) {
@@ -165,8 +149,8 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
     private void updateChannelFromSession(String sessionId) {
         stringOperRedisTemplate.opsForValue().set(
                 RedisKeys.sessionChannel(sessionId),
-                DEFAULT,
-                TAB_EXPIRY_HOURS,
+                DEFAULT_CHANNEL,
+                SESSION_EXPIRY_HOURS,
                 TimeUnit.HOURS
         );
     }
