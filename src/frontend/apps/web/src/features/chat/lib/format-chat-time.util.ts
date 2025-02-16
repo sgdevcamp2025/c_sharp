@@ -20,6 +20,7 @@ export const formatChatTime = (
       hour12 = hour > 12 ? hour - 12 : hour;
     } else {
       if (hour === 0) {
+        period = '오전 ';
         hour12 = 12;
       }
     }
