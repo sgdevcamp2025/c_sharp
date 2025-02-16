@@ -39,7 +39,6 @@ jobs:
           ls -la
           echo "Checking src/backend/ directory..."
           ls -la src/backend/
-
       - name: Verify working directory
         run: ls -la src/backend/${{ matrix.service }}
 
@@ -55,7 +54,6 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
-
       - name: Verify JAR file existence
         working-directory: src/backend/${{ matrix.service }}
         run: ls -la build/libs/
@@ -72,9 +70,7 @@ jobs:
           docker build --platform linux/amd64 \
             --build-arg JAR_FILE=build/libs/${{ matrix.service }}-0.0.1-SNAPSHOT.jar \
             -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest .
-
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest
-
   cd:
     needs: build-and-deploy
     runs-on: ubuntu-latest
@@ -94,6 +90,3 @@ jobs:
           script: |
             cd ~
             ./deploy.sh
-
-
-
