@@ -1,0 +1,23 @@
+{
+  "groups": [
+    {
+      "name": "spring.data.redis",
+      "type": "com.jootalkpia.workspace_server.util.property.RedisProperties",
+      "sourceType": "com.jootalkpia.workspace_server.util.property.RedisProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "spring.data.redis.host",
+      "type": "java.lang.String",
+      "sourceType": "com.jootalkpia.workspace_server.util.property.RedisProperties"
+    },
+    {
+      "name": "spring.data.redis.port",
+      "type": "java.lang.Integer",
+      "sourceType": "com.jootalkpia.workspace_server.util.property.RedisProperties",
+      "defaultValue": 0
+    }
+  ],
+  "hints": []
+}
