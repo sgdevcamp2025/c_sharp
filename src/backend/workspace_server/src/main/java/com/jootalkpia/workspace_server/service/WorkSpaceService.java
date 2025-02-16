@@ -9,25 +9,30 @@ import com.jootalkpia.workspace_server.entity.Users;
 import com.jootalkpia.workspace_server.entity.WorkSpace;
 import com.jootalkpia.workspace_server.exception.common.CustomException;
 import com.jootalkpia.workspace_server.exception.common.ErrorCode;
+import com.jootalkpia.workspace_server.exception.common.RedisKeys;
 import com.jootalkpia.workspace_server.repository.ChannelRepository;
 import com.jootalkpia.workspace_server.repository.UserChannelRepository;
 import com.jootalkpia.workspace_server.repository.UserRepository;
 import com.jootalkpia.workspace_server.repository.WorkSpaceRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class WorkSpaceService {
+    private static final long SESSION_EXPIRY_HOURS = 4;
 
     private final ChannelRepository channelRepository;
     private final UserChannelRepository userChannelRepository;
     private final WorkSpaceRepository workSpaceRepository;
     private final UserRepository userRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public ChannelListDTO getChannels(Long userId, Long workspaceId) {
         // workspaceId로 모든 채널 조회
@@ -122,15 +127,27 @@ public class WorkSpaceService {
                 .channels(channel)
                 .mute(false)
                 .build();
+
         userChannelRepository.save(userChannel);
 
+        addMemberToRedis(channelId, userId);
+
         return "success";
+    }
+
+    private void addMemberToRedis(Long channelId, Long userId) {
+        redisTemplate.opsForSet().add(
+                RedisKeys.channelSubscriber(String.valueOf(channelId)),
+                String.valueOf(userId)
+        );
     }
 
     private void IsChannelInWorkSpace(Long workspaceId, Long channelId) {
         List<Channels> channelList = fetchAllChannels(workspaceId);
         for (Channels channel : channelList) {
-            if (channel.getChannelId().equals(channelId)) { return ; }
+            if (channel.getChannelId().equals(channelId)) {
+                return;
+            }
         }
         throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND.getCode(), ErrorCode.CHANNEL_NOT_FOUND.getMsg());
     }
