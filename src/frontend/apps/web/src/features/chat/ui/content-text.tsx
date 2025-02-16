@@ -55,10 +55,10 @@ const ContentText = ({
           {message.message.map((msg, idx) => (
             <div
               key={idx}
-              className="text-base flex gap-3 items-center"
+              className="text-base flex gap-4 items-center"
             >
               {hideUserInfo && (
-                <div className="flex flex-col h-full text-sm text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                <div className="flex flex-col items-end w-10 h-full text-sm text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
                   {formattedTime}
                 </div>
               )}
