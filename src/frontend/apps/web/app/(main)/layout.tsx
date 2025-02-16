@@ -20,7 +20,7 @@ export default function RootLayout({
           <Header authContent={user ? <ProfilePopover /> : <LoginButton />} />
         </header>
         <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">
-          <AuthWrapper> {children}</AuthWrapper>
+          <AuthWrapper>{children}</AuthWrapper>
         </div>
       </body>
     </html>
