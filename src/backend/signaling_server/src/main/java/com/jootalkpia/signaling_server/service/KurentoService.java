@@ -4,10 +4,17 @@ import com.jootalkpia.signaling_server.exception.common.CustomException;
 import com.jootalkpia.signaling_server.exception.common.ErrorCode;
 import com.jootalkpia.signaling_server.repository.HuddleParticipantsRepository;
 import com.jootalkpia.signaling_server.repository.HuddlePipelineRepository;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.print.attribute.standard.Media;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kurento.client.IceCandidate;
 import org.kurento.client.KurentoClient;
+import org.kurento.client.MediaElement;
+import org.kurento.client.MediaObject;
 import org.kurento.client.MediaPipeline;
 import org.kurento.client.WebRtcEndpoint;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -48,7 +55,7 @@ public class KurentoService {
     }
 
     // 참가자 추가
-    public void addParticipantToRoom(String huddleId, Long userId) {
+    public WebRtcEndpoint addParticipantToRoom(String huddleId, Long userId) {
         log.info("add participant to room in kurento service");
         // 해당 허들의 pipelineId 가져오기
         String pipelineId = redisTemplate.opsForValue().get("huddle:" + huddleId + ":pipeline");
@@ -63,12 +70,27 @@ public class KurentoService {
             throw new IllegalStateException("Kurento에서 pipelineId=" + pipelineId + "를 찾을 수 없습니다.");
         }
 
-        log.info(pipelineId);
+        log.info("🍎🍎🍎🍎🍎🍎");
 
         // WebRTC 엔드포인트 생성 및 해당 파이프라인에 추가
         WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
 
         log.info("add participant to room in kurento service: 엔포 생성 및 파이프라인에 추가");
+
+        List<MediaObject> mediaObjects = pipeline.getChildren();
+        int webRtcEndpointCount = 0;
+
+        for (MediaObject obj : mediaObjects) {
+            if (obj instanceof MediaElement) {  // MediaElement인지 확인
+                MediaElement element = (MediaElement) obj;  // 안전한 다운캐스팅
+                if (element instanceof WebRtcEndpoint) {
+                    webRtcEndpointCount++;
+                }
+            }
+        }
+
+        log.info("😄😄😄😄😄현재 허들 " + huddleId + "에 연결된 WebRtcEndpoint 개수: " + webRtcEndpointCount);
+
 
         // 허들:참가자 저장
         huddleService.saveHuddleParticipant(userId, huddleId);
@@ -78,10 +100,11 @@ public class KurentoService {
         // 허들:엔드포인트 저장
         huddleParticipantsRepository.saveUserEndpoint(huddleId, userId, webRtcEndpoint.getId());
         log.info("add participant to room in kurento service: 허들 엔포 저장");
+
+        return webRtcEndpoint;
     }
 
 
-    // 참가자의 WebRTC 엔드포인트 가져오기
     public WebRtcEndpoint getParticipantEndpoint(String huddleId, Long userId) {
         if (huddleId == null) {
             throw new CustomException(ErrorCode.HUDDLE_NOT_FOUND.getCode(), "허들 ID가 null입니다.");
@@ -91,17 +114,11 @@ public class KurentoService {
         String endpointId = huddleParticipantsRepository.getUserEndpoint(huddleId, userId);
 
         if (endpointId == null) {
-            log.error("Redis에서 엔드포인트 조회 실패: key, userId={}", userId);
-        } else {
-            log.info("Redis에서 가져온 엔드포인트:  userId={}, endpointId={}", userId, endpointId);
-        }
-
-        if (endpointId == null) {
-            log.warn("참가자의 WebRTC 엔드포인트를 찾을 수 없음: huddleId={}, userId={}", huddleId, userId);
+            log.error("Redis에서 엔드포인트 조회 실패: userId={}", userId);
             throw new CustomException(ErrorCode.ENDPOINT_NOT_FOUND.getCode(), ErrorCode.ENDPOINT_NOT_FOUND.getMsg());
         }
 
-        // 엔드포인트 ID를 이용해서 WebRtcEndpoint 복원
+        // 엔드포인트 ID를 이용하여 WebRtcEndpoint 복원
         WebRtcEndpoint endpoint = kurentoClient.getById(endpointId, WebRtcEndpoint.class);
 
         if (endpoint == null) {
@@ -109,8 +126,47 @@ public class KurentoService {
             throw new CustomException(ErrorCode.ENDPOINT_NOT_FOUND.getCode(), ErrorCode.ENDPOINT_NOT_FOUND.getMsg());
         }
 
+        // ICE Candidate 감지 이벤트 리스너 추가
+        endpoint.addIceCandidateFoundListener(event -> {
+            IceCandidate candidate = event.getCandidate();
+            log.info("ICE Candidate found for user {} in huddle {}: {}", userId, huddleId, candidate.getCandidate());
+        });
+
+        // 대신 ICE Candidate 감지 이벤트 리스너 추가
+        endpoint.addIceCandidateFoundListener(event -> {
+            log.info("ICE Candidate found for user {}: {}", userId, event.getCandidate().getCandidate());
+        });
+
         return endpoint;
     }
+
+    public Map<Long, WebRtcEndpoint> getParticipants(String huddleId) {
+        Map<Long, WebRtcEndpoint> participantsMap = new HashMap<>();
+
+        // 해당 huddleId의 참가자 목록 조회
+        Set<Long> participantsIds = huddleParticipantsRepository.getParticipants(huddleId);
+
+        for (Long userId : participantsIds) {
+            // 유저의 엔드포인트 ID 조회
+            String endpointId = huddleParticipantsRepository.getUserEndpoint(huddleId, userId);
+
+            if (endpointId != null) {
+                // 엔드포인트 ID를 이용하여 WebRtcEndpoint 복원
+                WebRtcEndpoint endpoint = kurentoClient.getById(endpointId, WebRtcEndpoint.class);
+
+                if (endpoint != null) {
+                    participantsMap.put(userId, endpoint);
+                } else {
+                    log.warn("WebRtcEndpoint not found for user {} in huddle {}", userId, huddleId);
+                }
+            } else {
+                log.warn("Endpoint ID not found for user {} in huddle {}", userId, huddleId);
+            }
+        }
+
+        return participantsMap;
+    }
+
 
 
     // 참가자 제거
