@@ -15,10 +15,16 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   logging:
     level:
       org.hibernate.SQL: DEBUG # Hibernate SQL 로그 출력
       org.hibernate.type.descriptor.sql: TRACE # SQL 매개변수 출력
+      com.jootalkpia.workspace_server.service: DEBUG    # workspace 서비스 패키지 로그
+      org.springframework.data.redis: DEBUG        # Redis 작업 로그
 management:
   endpoints:
     web:
