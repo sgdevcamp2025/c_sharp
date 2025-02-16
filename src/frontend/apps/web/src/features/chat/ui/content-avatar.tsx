@@ -3,9 +3,10 @@ import { Headset } from 'lucide-react';
 
 export type ContentAvatarProps = {
   type?: 'default' | 'live';
+  userProfileImage: string;
 };
 
-const ContentAvatar = ({ type }: ContentAvatarProps) => {
+const ContentAvatar = ({ type, userProfileImage }: ContentAvatarProps) => {
   return (
     <>
       {type === 'live' ? (
@@ -17,7 +18,7 @@ const ContentAvatar = ({ type }: ContentAvatarProps) => {
         </div>
       ) : (
         <Avatar variant="square">
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage src={userProfileImage} />
           <AvatarFallback>profile</AvatarFallback>
         </Avatar>
       )}
