@@ -21,6 +21,14 @@ spring:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+logging:
+  level:
+    com.jootalkpia.chat_server: DEBUG  # 또는 INFO
 
 topic:
   minute: jootalkpia.stock.prd.minute
@@ -28,7 +36,7 @@ topic:
 
 group:
   minute: minute-price-save-consumer-group
-  chat: chat-message-handle-consumer-group
+  chat: chat-message-handle-consumer-group-${SERVER_PORT}
 
 server:
  port: ${SERVER_PORT}
