@@ -2,6 +2,9 @@ server:
   port : ${GATEWAY_PORT}
 
 spring:
+  main:
+    web-application-type: reactive
+
   cloud:
     gateway:
       default-filters:
