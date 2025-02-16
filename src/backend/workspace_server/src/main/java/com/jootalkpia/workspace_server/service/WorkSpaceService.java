@@ -1,6 +1,5 @@
 package com.jootalkpia.workspace_server.service;
 
-
 import com.jootalkpia.workspace_server.dto.ChannelListDTO;
 import com.jootalkpia.workspace_server.dto.SimpleChannel;
 import com.jootalkpia.workspace_server.entity.Channels;
@@ -15,8 +14,11 @@ import com.jootalkpia.workspace_server.repository.UserRepository;
 import com.jootalkpia.workspace_server.repository.WorkSpaceRepository;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.jootalkpia.workspace_server.util.RedisKeys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,6 +30,7 @@ public class WorkSpaceService {
     private final UserChannelRepository userChannelRepository;
     private final WorkSpaceRepository workSpaceRepository;
     private final UserRepository userRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public ChannelListDTO getChannels(Long userId, Long workspaceId) {
         // workspaceId로 모든 채널 조회
@@ -124,7 +127,16 @@ public class WorkSpaceService {
                 .build();
         userChannelRepository.save(userChannel);
 
+        addMemberToRedis(channelId, userId);
+
         return "success";
+    }
+
+    private void addMemberToRedis(Long channelId, Long userId) {
+        redisTemplate.opsForSet().add(
+                RedisKeys.channelSubscriber(String.valueOf(channelId)),
+                String.valueOf(userId)
+        );
     }
 
     private void IsChannelInWorkSpace(Long workspaceId, Long channelId) {
