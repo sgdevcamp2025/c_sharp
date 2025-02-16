@@ -26,6 +26,7 @@ const ChatSectionContent = () => {
   const { connect, disconnect, publishMessage } = useWebSocketClient(
     'chat1',
     channelId,
+    currentUser.userId,
   );
 
   useEffect(() => {

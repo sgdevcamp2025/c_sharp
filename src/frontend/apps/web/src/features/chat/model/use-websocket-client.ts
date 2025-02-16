@@ -12,6 +12,7 @@ import type { ApiServerType } from '@/src/shared/services/models';
 export const useWebSocketClient = (
   serverType: ApiServerType,
   channelId: number,
+  userId: number,
 ) => {
   const queryClient = useQueryClient();
   const client = useRef<StompJs.Client | null>(null);
@@ -22,15 +23,20 @@ export const useWebSocketClient = (
       client.current.deactivate();
     }
 
+    // console.log('Connecting with userId:', userId);
     client.current = new StompJs.Client({
+      connectHeaders: {
+        'X-User-ID': userId.toString(),
+      },
       webSocketFactory: () => new SockJS(`${BASE_URL}/ws-connect`),
       reconnectDelay: 5000,
       debug: (msg: string) => console.log('[DEBUG]', msg),
       onConnect: () => {
+        // console.log('Broker connected with userId:', userId);
         client.current?.subscribe(`/subscribe/chat.${channelId}`, (message) => {
           try {
             const payload: WebSocketResponsePayload = JSON.parse(message.body);
-            // console.log('Parsed payload:', payload);
+            console.log('Parsed payload:', payload);
 
             queryClient.setQueryData<WebSocketResponsePayload[]>(
               ['messages', `/subscribe/chat.${channelId}`],
@@ -49,7 +55,7 @@ export const useWebSocketClient = (
     });
 
     client.current.activate();
-  }, [BASE_URL, channelId, queryClient]);
+  }, [BASE_URL, channelId, queryClient, userId]);
 
   const disconnect = useCallback(() => {
     if (client.current) {
