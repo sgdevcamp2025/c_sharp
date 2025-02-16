@@ -3,6 +3,8 @@ package com.jootalkpia.chat_server.service;
 import com.jootalkpia.chat_server.domain.Files;
 import com.jootalkpia.chat_server.domain.Thread;
 import com.jootalkpia.chat_server.domain.User;
+import com.jootalkpia.chat_server.dto.ChatMessageToKafka;
+import com.jootalkpia.chat_server.dto.messgaeDto.ChatMessageRequest;
 import com.jootalkpia.chat_server.dto.messgaeDto.CommonResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.ImageResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.MessageResponse;
@@ -11,6 +13,8 @@ import com.jootalkpia.chat_server.dto.messgaeDto.VideoResponse;
 import com.jootalkpia.chat_server.repository.FileRepository;
 import com.jootalkpia.chat_server.repository.ThreadRepository;
 import com.jootalkpia.chat_server.repository.UserRepository;
+import com.jootalkpia.chat_server.util.DateTimeUtil;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,24 +24,37 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ChatService {
 
+    private final KafkaProducer kafkaProducer;
+
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
     private final ThreadRepository threadRepository;
 
-    public CommonResponse createCommonData(Long userId, Long channelId){
+    @Transactional
+    public void processChatMessage(ChatMessageRequest request, Long channelId) {
+        CommonResponse commonData = createCommonData(request.userId(), channelId);
+        List<MessageResponse> messageData = createMessageData(request.content(), request.attachmentList());
+
+        ChatMessageToKafka chatMessageToKafka = new ChatMessageToKafka(commonData, messageData);
+        kafkaProducer.sendChatMessage(chatMessageToKafka, channelId); // Kafka 전송 (트랜잭션 영향 X)
+    }
+
+    private CommonResponse createCommonData(Long userId, Long channelId){
         User user = userRepository.findByUserId(userId);
         Thread thread = new Thread();   // todo:transaction처리 , 예외처리 필요
         threadRepository.save(thread);
 
-        return new CommonResponse(
-                channelId,
-                thread.getThreadId(),
-                user.getUserId(),
-                user.getNickname(),
-                user.getProfileImage());
+        return CommonResponse.builder()
+                .channelId(channelId)
+                .threadId(thread.getThreadId())
+                .threadDateTime(DateTimeUtil.formatDateTime(thread.getCreatedAt()))
+                .userId(user.getUserId())
+                .userNickname(user.getNickname())
+                .userProfileImage(user.getProfileImage())
+                .build();
     }
 
-    public List<MessageResponse> createMessageData(String content, List<Long> attachmentList) {
+    private List<MessageResponse> createMessageData(String content, List<Long> attachmentList) {
         List<MessageResponse> response = new ArrayList<>();
         if (content != null && !content.isEmpty()) {
             response.add(createTextMessage(content));
@@ -47,7 +64,9 @@ public class ChatService {
     }
 
     private TextResponse createTextMessage(String content) {
-        return new TextResponse(content);
+        return TextResponse.builder()
+                .text(content)
+                .build();
     }
 
     private List<MessageResponse> createAttachmentList(List<Long> attachmentList) {
@@ -64,8 +83,16 @@ public class ChatService {
 
     private MessageResponse createAttachmentData(Files file) {
         return switch (file.getFileType()) {
-            case "IMAGE" -> new ImageResponse(file.getUrl());
-            case "VIDEO" -> new VideoResponse(file.getUrlThumbnail(), file.getUrl());
+            case "IMAGE" -> ImageResponse.builder()
+                                        .imageId(file.getFileId())
+                                        .imageUrl(file.getUrl())
+                                        .build();
+            case "VIDEO" -> VideoResponse.builder()
+                                        .videoId(file.getFileId())
+                                        .videoThumbnailId(fileRepository.findByUrl(file.getUrlThumbnail()).getFileId())
+                                        .videoUrl(file.getUrl())
+                                        .thumbnailUrl(file.getUrlThumbnail())
+                                        .build();
             default -> throw new IllegalArgumentException("Unsupported file type: " + file.getFileId()); // todo:예외처리 추가
         };
     }
