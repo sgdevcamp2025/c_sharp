@@ -23,7 +23,9 @@ public class StompValidationInterceptor implements ChannelInterceptor {
         if (StompCommand.DISCONNECT.equals(accessor.getCommand()) ||
                 StompCommand.UNSUBSCRIBE.equals(accessor.getCommand()) ||
                 (StompCommand.CONNECT.equals(accessor.getCommand()) && hasValidHeaders(accessor)) ||
-                (StompCommand.SUBSCRIBE.equals(accessor.getCommand()) && isValidChatDestination(accessor.getDestination()))) {
+                (StompCommand.SUBSCRIBE.equals(accessor.getCommand()) && isValidChatDestination(accessor.getDestination())) ||
+                StompCommand.SEND.equals((accessor.getCommand())) ||
+                StompCommand.MESSAGE.equals(accessor.getCommand())) {
             return message;
         }
 
