@@ -40,7 +40,7 @@ const ChatContent = ({
             className={`group relative flex w-full pl-5 ${
               messageData.isConsecutive ? 'pt-2' : 'pt-5'
             } ${
-              messageData.isConsecutive ? 'pl-[40px]' : 'pl-5'
+              messageData.isConsecutive ? 'pl-9' : 'pl-5'
             } pr-6 gap-4 ${hoverColor} transition-all duration-300`}
           >
             {messageData.hideAvatar ? (
