@@ -1,6 +1,9 @@
 server:
   port : ${GATEWAY_PORT}
 
+auth_server:
+  path: http://${EC2_PRIVATE_IP}:${AUTH_PORT}
+
 spring:
   main:
     web-application-type: reactive
