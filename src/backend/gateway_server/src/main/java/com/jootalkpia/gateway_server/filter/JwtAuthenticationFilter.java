@@ -1,6 +1,8 @@
 package com.jootalkpia.gateway_server.filter;
 
+import com.jootalkpia.gateway_server.filter.paths.ExcludedPaths;
 import com.jootalkpia.passport.component.Passport;
+import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -17,6 +19,8 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
 
+    List<String> EXCLUDED_PATHS = ExcludedPaths.getAllPaths();
+
     private final WebClient authServerClient;
 
     public JwtAuthenticationFilter(WebClient.Builder webClientBuilder) {
@@ -27,6 +31,13 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+            String path = exchange.getRequest().getURI().getPath();
+
+            if (EXCLUDED_PATHS.contains(path)) {
+                System.out.println("⏩ JwtAuthenticationFilter 적용 제외: " + path);
+                return chain.filter(exchange);
+            }
+
             ServerHttpRequest request = exchange.getRequest();
             HttpHeaders headers = request.getHeaders();
 
