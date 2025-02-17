@@ -22,7 +22,12 @@ public class StateService {
         Set<String> onlineSessions = findOnlineSessions(subscriber);
         Set<String> activeSessions = findActiveSessions(channelId, subscriber);
 
+        log.info("[Notification Targets] Channel: {}", channelId);
+        log.info("├── Online Sessions: {}", onlineSessions);
+        log.info("├── Active Sessions: {}", activeSessions);
+
         onlineSessions.removeAll(activeSessions);
+        log.info("└── Target Sessions: {}", onlineSessions);
 
         return onlineSessions;
     }
