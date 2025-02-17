@@ -14,12 +14,12 @@ spring:
 
       routes:
         - id: auth
-          uri: http://auth_server:${AUTH_PORT}
+          uri: http://${EC2_PRIVATE_IP}:${AUTH_PORT}
           predicates:
             - Path=/api/v1/auth/**
 
         - id: user
-          uri: http://auth_server:${AUTH_PORT}
+          uri: http://${EC2_PRIVATE_IP}:${AUTH_PORT}
           predicates:
             - Path=/api/v1/user/**
 
