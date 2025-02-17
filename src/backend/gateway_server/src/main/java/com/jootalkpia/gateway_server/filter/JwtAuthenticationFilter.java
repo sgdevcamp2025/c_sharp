@@ -5,6 +5,7 @@ import com.jootalkpia.passport.component.Passport;
 import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -19,13 +20,14 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
 
-    List<String> EXCLUDED_PATHS = ExcludedPaths.getAllPaths();
-
+    private final List<String> EXCLUDED_PATHS = ExcludedPaths.getAllPaths();
     private final WebClient authServerClient;
 
-    public JwtAuthenticationFilter(WebClient.Builder webClientBuilder) {
+    public JwtAuthenticationFilter(WebClient.Builder webClientBuilder,
+                                   @Value("${auth_server.path}") String authServerPath) {
         super(Config.class);
-        this.authServerClient = webClientBuilder.baseUrl("http://localhost:8081").build();
+        log.info("Auth Server Path: {}", authServerPath);
+        this.authServerClient = webClientBuilder.baseUrl(authServerPath).build();
     }
 
     @Override
