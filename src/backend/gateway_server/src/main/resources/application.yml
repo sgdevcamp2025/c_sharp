@@ -8,28 +8,30 @@ spring:
   cloud:
     gateway:
       default-filters:
-        - StripPrefix=2
+        - JwtAuthenticationFilter
+        - PassportAuthorizationFilter
+        - PassportRelayFilter
 
       routes:
         - id: auth
           uri: http://localhost:${AUTH_PORT}
           predicates:
-            - Path= /auth/**
+            - Path=/auth/**
 
         - id: user
           uri: http://localhost:${AUTH_PORT}
           predicates:
-            - Path= /user/**
+            - Path=/api/v1/user/**
 
 #        - id: stock
 #          uri: http://localhost:${STOCK_PORT}
 #          predicates:
-#            - Path= /stock/**
+#            - Path=/stock/**
 #
 #        - id: file
 #          uri: http://localhost:${FILE_PORT}
 #          predicates:
-#            - Path= /file/**
+#            - Path=/files/**
 #
 #        - id: chat1
 #          uri: http://localhost:${CHAT_PORT1}
@@ -44,9 +46,9 @@ spring:
 #        - id: history
 #          uri: http://localhost:${HISTORY_PORT}
 #          predicates:
-#            - Path= /history/**
+#            - Path=/history/**
 #
 #        - id: workspace
 #          uri: http://localhost:${WORKSPACE_PORT}
 #          predicates:
-#            - Path= /workspace/**
+#            - Path=/workspace/**
