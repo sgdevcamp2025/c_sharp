@@ -33,7 +33,7 @@ public class PassportAuthorizationFilter extends AbstractGatewayFilterFactory<Pa
             String path = exchange.getRequest().getURI().getPath();
 
             if (EXCLUDED_PATHS.contains(path)) {
-                System.out.println("PassportAuthorizationFilter 적용 제외: " + path);
+                log.info("PassportAuthorizationFilter 적용 제외: {}", path);
                 return chain.filter(exchange);
             }
 

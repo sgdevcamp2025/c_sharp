@@ -28,7 +28,7 @@ public class PassportRelayFilter extends AbstractGatewayFilterFactory<PassportRe
             String path = exchange.getRequest().getURI().getPath();
 
             if (EXCLUDED_PATHS.contains(path)) {
-                System.out.println("PassportRelayFilter 적용 제외: " + path);
+                log.info("PassportRelayFilter 적용 제외: {}", path);
                 return chain.filter(exchange);
             }
 

@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
             String path = exchange.getRequest().getURI().getPath();
 
             if (EXCLUDED_PATHS.contains(path)) {
-                System.out.println("⏩ JwtAuthenticationFilter 적용 제외: " + path);
+                log.info("JwtAuthenticationFilter 적용 제외: {}", path);
                 return chain.filter(exchange);
             }
 
