@@ -8,4 +8,4 @@ export type {
   ApiErrorResponse,
   ApiResponse,
   ApiServerType,
-} from './fetch-types.js';
+} from './fetch-types';
