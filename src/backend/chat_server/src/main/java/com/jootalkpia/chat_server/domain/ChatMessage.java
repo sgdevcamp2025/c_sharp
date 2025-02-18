@@ -1,4 +1,4 @@
-package com.jootalkpia.history_server.domain;
+package com.jootalkpia.chat_server.domain;
 
 import lombok.Builder;
 import lombok.Getter;

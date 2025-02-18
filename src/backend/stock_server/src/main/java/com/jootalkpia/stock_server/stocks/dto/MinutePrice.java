@@ -12,7 +12,7 @@ public class MinutePrice {
     @Id
     private ObjectId minutePriceId;
 
-    @Indexed(background = true)
+    @Indexed
     private String code;
 
     private String stockName;

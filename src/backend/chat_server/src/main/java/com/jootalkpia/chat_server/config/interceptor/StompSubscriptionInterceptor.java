@@ -1,6 +1,9 @@
 package com.jootalkpia.chat_server.config.interceptor;
 
+import com.jootalkpia.chat_server.domain.ChatMessage;
 import com.jootalkpia.chat_server.dto.RedisKeys;
+import com.jootalkpia.chat_server.repository.UserChannelRepository;
+import com.jootalkpia.chat_server.repository.mongo.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,6 +13,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -23,9 +27,13 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
     private static final String CHANNEL_ID_DELIMITER = "\\.";
     private static final long SESSION_EXPIRY_HOURS = 4;
     private static final String DEFAULT_CHANNEL = "none";
+    private static final Long DEFAULT_ID = 1L;
 
     private final RedisTemplate<String, String> stringOperRedisTemplate;
     private final RedisTemplate<String, Object> objectOperRedisTemplate;
+
+    private final ChatMessageRepository chatMessageRepository;
+    private final UserChannelRepository userChannelRepository;
 
     @Override
     public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex) {
@@ -35,6 +43,24 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
         }
 
         handleStompCommand(StompHeaderAccessor.wrap(message));
+    }
+
+    @Transactional
+    public void handleChatUnsubscription(StompHeaderAccessor accessor) {
+        String sessionId = accessor.getSessionId();
+        String userId = getUserIdFromSessionId(sessionId);
+        String channelId = getChannelIdFromSessionId(sessionId);
+
+        if (userId != null && !userId.trim().isEmpty()) {
+            updateChannelFromSession(sessionId);
+            removeTabFromChannel(channelId, userId, sessionId);
+            userChannelRepository.updateLastReadId(
+                    userId,
+                    channelId,
+                    chatMessageRepository.findFirstByChannelIdOrderByThreadIdDesc(Long.valueOf(channelId))
+                            .map(ChatMessage::getThreadId)
+                            .orElse(DEFAULT_ID));
+        }
     }
 
     private boolean isValidMessage(boolean sent, Exception ex) {
@@ -125,17 +151,6 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
                 userId,
                 userTabs
         );
-    }
-
-    private void handleChatUnsubscription(StompHeaderAccessor accessor) {
-        String sessionId = accessor.getSessionId();
-        String userId = getUserIdFromSessionId(sessionId);
-        String channelId = getChannelIdFromSessionId(sessionId);
-
-        if (userId != null && !userId.trim().isEmpty()) {
-            updateChannelFromSession(sessionId);
-            removeTabFromChannel(channelId, userId, sessionId);
-        }
     }
 
     private String getUserIdFromSessionId(String sessionId) {
