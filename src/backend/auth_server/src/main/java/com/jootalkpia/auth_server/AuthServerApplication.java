@@ -9,8 +9,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @EnableFeignClients
-@SpringBootApplication
 @ImportAutoConfiguration(FeignAutoConfiguration.class)
+@SpringBootApplication(scanBasePackages = {
+        "com.jootalkpia.auth_server",
+        "com.jootalkpia.passport",
+        "com.jootalkpia.config",
+})
 public class AuthServerApplication {
 
     public static void main(String[] args) {

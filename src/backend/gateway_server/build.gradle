@@ -28,6 +28,9 @@ ext {
 }
 
 dependencies {
+	//common-module
+	implementation project(":common_module")
+
 	//gateway
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 
