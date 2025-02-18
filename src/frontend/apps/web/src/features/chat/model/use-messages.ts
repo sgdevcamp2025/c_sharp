@@ -8,13 +8,19 @@ export const useMessages = (topic: string) => {
   const { data: messages = [] } = useQuery<WebSocketResponsePayload[]>({
     queryKey,
     initialData: () =>
-      queryClient.getQueryData<WebSocketResponsePayload[]>([
-        'messages',
-        topic,
-      ]) ?? [],
-
+      queryClient.getQueryData<WebSocketResponsePayload[]>(queryKey) ?? [],
     staleTime: Infinity,
   });
 
-  return { data: messages };
+  const addOptimisticMessage = (newMessage: WebSocketResponsePayload) => {
+    queryClient.setQueryData(
+      queryKey,
+      (prevMessages: WebSocketResponsePayload[] = []) => [
+        ...prevMessages,
+        newMessage,
+      ],
+    );
+  };
+
+  return { data: messages, addOptimisticMessage };
 };

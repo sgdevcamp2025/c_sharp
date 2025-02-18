@@ -11,6 +11,7 @@ export type WebSocketCommon = {
   userId: number;
   userNickname: string;
   userProfileImage: string;
+  fakeThreadId?: number;
 };
 
 export type WebSocketMessage =

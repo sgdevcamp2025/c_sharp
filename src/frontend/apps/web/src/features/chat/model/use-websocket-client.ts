@@ -40,7 +40,16 @@ export const useWebSocketClient = (channelId: number) => {
 
           queryClient.setQueryData(
             ['messages', `/subscribe/chat.${channelId}`],
-            (prev: WebSocketResponsePayload[] = []) => [...prev, payload],
+            (prev: WebSocketResponsePayload[] = []) => {
+              return prev.map((msg) =>
+                msg.common.fakeThreadId === payload.common.threadId
+                  ? {
+                      ...payload,
+                      common: { ...payload.common, fakeThreadId: undefined },
+                    }
+                  : msg,
+              );
+            },
           );
         } catch (error) {
           console.error('❌ 메시지 파싱 실패:', error);
@@ -55,15 +64,20 @@ export const useWebSocketClient = (channelId: number) => {
   }, [client, channelId, queryClient]);
 
   const publishMessage = useCallback(
-    (payload: SendMessagePayload) => {
+    (payload: SendMessagePayload & { fakeThreadId: number }) => {
       if (!client || !client.connected) {
         console.error('❌ WebSocket 연결이 되어 있지 않습니다.');
         return;
       }
 
+      const enrichedPayload = {
+        ...payload,
+        fakeThreadId: payload.fakeThreadId,
+      };
+
       client.publish({
         destination: `/publish/chat.${channelId}`,
-        body: JSON.stringify(payload),
+        body: JSON.stringify(enrichedPayload),
       });
     },
     [client, channelId],
