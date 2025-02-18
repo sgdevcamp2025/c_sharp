@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Textarea } from '@workspace/ui/components';
 import ChatToggleGroup from './chat-toggle-group';
 
@@ -11,6 +11,7 @@ const ChatTextArea = ({
 }) => {
   const [message, setMessage] = useState('');
   const [attachmentList, setAttachmentList] = useState<number[]>([]);
+  const isComposing = useRef(false);
 
   const handleSendClick = () => {
     if (!message.trim() && attachmentList.length === 0) return;
@@ -20,7 +21,7 @@ const ChatTextArea = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposing.current) {
       e.preventDefault();
       handleSendClick();
     }
@@ -33,6 +34,13 @@ const ChatTextArea = ({
         value={message}
         onChange={(e) => {
           setMessage(e.target.value);
+        }}
+        onCompositionStart={() => {
+          isComposing.current = true;
+        }}
+        onCompositionEnd={(e) => {
+          isComposing.current = false;
+          setMessage(e.currentTarget.value);
         }}
         onKeyDown={handleKeyDown}
       />
