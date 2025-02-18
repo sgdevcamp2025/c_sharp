@@ -1,5 +1,3 @@
-'use client';
-
 import { ChatContainer } from '@/src/features/chat';
 import { StockDetailLayout } from '@/src/features/stock';
 import { RQProvider } from '@/src/shared';
