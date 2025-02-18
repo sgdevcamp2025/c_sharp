@@ -25,11 +25,13 @@ dependencies {
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     //db
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    //mongo
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -57,6 +59,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    //JDBC
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 }
 
 tasks.named('test') {
