@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Builder
-@Document(collation = "chat_messages")
+@Document(collection = "chat_messages")
 public class ChatMessage extends BaseTimeEntity  {
 
     @Id
