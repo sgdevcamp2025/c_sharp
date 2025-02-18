@@ -45,14 +45,3 @@ spring:
           uri: http://${EC2_PRIVATE_IP}:${WORKSPACE_PORT}
           predicates:
             - Path=/api/v1/workspace/**
-#
-#        - id: chat1
-#          uri: http://${EC2_PRIVATE_IP}:${CHAT_PORT1}
-#          predicates:
-#            - Path=
-#
-#        - id: chat2
-#          uri: http://${EC2_PRIVATE_IP}:${CHAT_PORT2}
-#          predicates:
-#            - Path=
-#

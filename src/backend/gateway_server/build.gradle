@@ -31,10 +31,10 @@ dependencies {
 	//common-module
 	implementation project(":common_module")
 
-	//gateway
+	//Spring Cloud Gateway
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 
-	//mono
+	//Reactor Core (Mono, Flux)
 	implementation 'io.projectreactor:reactor-core'
 
 	//lombok
