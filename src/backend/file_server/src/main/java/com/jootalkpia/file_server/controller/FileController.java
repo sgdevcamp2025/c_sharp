@@ -15,6 +15,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,15 +42,29 @@ public class FileController {
         return ResponseEntity.ok("Test successful");
     }
 
-//    @PostMapping("/init-upload")
-//    public ResponseEntity<?> initFileUpload(@RequestBody UploadChunkRequestDto request) {
-//        log.info("Received init-upload request: {}", request);
-//
-//        ValidationUtils.validateWorkSpaceId(request.getWorkspaceId());
-//        ValidationUtils.validateChannelId(request.getChannelId());
-//
-//        return ResponseEntity.ok();
+    @PostMapping("/init-upload/{tempFileIdentifier}")
+    public ResponseEntity<Void> initFileUpload(@PathVariable String tempFileIdentifier) {
+        log.info("init-upload 요청 받음: {}", tempFileIdentifier);
+        return ResponseEntity.ok().build();
+    }
+
+//    @DeleteMapping("/fileId")
+//    public ResponseEntity<Void> deleteFile(@PathVariable Long fileId) {
+//        log.info("got deleteFile id: {}", fileId);
+//        fileService.deleteFile(fileId);
+//        return ResponseEntity.ok().build();
 //    }
+
+    @PostMapping("/thumbnail")
+    public ResponseEntity<Void> uploadThumbnail(@RequestParam Long fileId, @RequestPart MultipartFile thumbnail) {
+        log.info("got uploadThumbnail id: {}", fileId);
+        ValidationUtils.validateFile(thumbnail);
+        ValidationUtils.validateFileId(fileId);
+        fileService.uploadThumbnail(fileId, thumbnail);
+        return ResponseEntity.ok().build();
+    }
+
+
 
     @PostMapping("/chunk")
     public ResponseEntity<?> uploadFileChunk(

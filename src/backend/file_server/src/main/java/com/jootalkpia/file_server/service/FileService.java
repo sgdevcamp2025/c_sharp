@@ -6,6 +6,7 @@ import com.jootalkpia.file_server.dto.UploadChunkRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileResponseDto;
 import com.jootalkpia.file_server.dto.UploadFilesResponseDto;
+import com.jootalkpia.file_server.dto.UploadThumbnailRequestDto;
 import com.jootalkpia.file_server.entity.Files;
 import com.jootalkpia.file_server.entity.User;
 import com.jootalkpia.file_server.exception.common.CustomException;
@@ -145,6 +146,29 @@ public class FileService {
 
         return mergedFile;
     }
+
+    @Transactional
+    public void uploadThumbnail(Long fileId, MultipartFile thumbnail) {
+        Files fileEntity = fileRepository.findById(fileId)
+                .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND.getCode(), ErrorCode.FILE_NOT_FOUND.getMsg()));
+
+        if (!"VIDEO".equals(fileEntity.getFileType())) {
+            throw new CustomException(ErrorCode.UNSUPPORTED_FILE_TYPE.getCode(), ErrorCode.UNSUPPORTED_FILE_TYPE.getMsg());
+        }
+
+        try {
+            File tempFile = File.createTempFile("thumbnail_", ".jpg"); // 확장자는 실제 타입에 맞게 변경
+            thumbnail.transferTo(tempFile);
+
+            String folder = "thumbnails/" + fileEntity.getFileId();
+            s3Service.uploadFileMultipart(tempFile, folder, fileId);
+
+            tempFile.delete();
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.FILE_PROCESSING_FAILED.getCode(), "Failed to process thumbnail file");
+        }
+    }
+
 
     @Transactional
     public UploadFilesResponseDto uploadFiles(Long userId, UploadFileRequestDto uploadFileRequestDto) {
