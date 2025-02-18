@@ -4,7 +4,7 @@ import type {
   WebSocketResponsePayload,
 } from '@/src/features/chat/model';
 import { useQueryClient } from '@tanstack/react-query';
-import { useStompWebSocket } from '@/src/shared/components/providers/stomp-websocket-provider';
+import { useStompWebSocket } from '@/src/shared/providers/stomp-websocket-provider';
 
 export const useWebSocketClient = (channelId: number) => {
   const queryClient = useQueryClient();
