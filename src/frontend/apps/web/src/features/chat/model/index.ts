@@ -6,3 +6,4 @@ export type {
 } from './websocket.type';
 export { useMessages } from './use-messages';
 export { useWebSocketClient } from './use-websocket-client';
+export { useChatAutoScroll } from './use-chat-autoscroll';
