@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 
             // Authorization 헤더가 없으면 에러 반환
             if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
-                return onError(exchange, "Missing Authorization Header", HttpStatus.UNAUTHORIZED);
+                return onError(exchange, "Missing Authorization Header", HttpStatus.UNAUTHORIZED,path);
             }
 
             // JWT 토큰 추출
@@ -65,13 +65,14 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                     })
                     .onErrorResume(e -> {
                         log.error("JWT Validation Failed: {}", e.getMessage());
-                        return onError(exchange, "Invalid Token", HttpStatus.UNAUTHORIZED);
+                        return onError(exchange, "Invalid Token", HttpStatus.UNAUTHORIZED, path);
                     });
         };
     }
 
-    private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
+    private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus, String path) {
         log.error("Authentication Error: {}", err);
+        log.error("Authentication Error: {}", path);
         exchange.getResponse().setStatusCode(httpStatus);
         return exchange.getResponse().setComplete();
     }
