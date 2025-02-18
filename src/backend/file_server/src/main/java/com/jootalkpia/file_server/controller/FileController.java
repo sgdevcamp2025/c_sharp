@@ -55,6 +55,7 @@ public class FileController {
 //        return ResponseEntity.ok().build();
 //    }
 
+
     @PostMapping("/thumbnail")
     public ResponseEntity<Void> uploadThumbnail(@RequestParam Long fileId, @RequestPart MultipartFile thumbnail) {
         log.info("got uploadThumbnail id: {}", fileId);
