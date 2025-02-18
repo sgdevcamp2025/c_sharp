@@ -1,5 +1,6 @@
 import localFont from 'next/font/local';
 
+import { cn } from '@workspace/ui/lib/utils';
 import '@workspace/ui/globals.css';
 
 const geistSans = localFont({
@@ -22,7 +23,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased `}
+        className={cn(
+          geistSans.variable,
+          geistMono.variable,
+          'font-sans antialiased',
+        )}
       >
         {children}
       </body>
