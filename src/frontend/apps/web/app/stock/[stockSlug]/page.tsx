@@ -6,8 +6,6 @@ import { RQProvider } from '@/src/shared';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export { generateMetadata } from './metadata';
-
 export default function StockDetailsPage({ params }) {
   const { stockSlug } = params;
   // console.log(1, stockSlug);
