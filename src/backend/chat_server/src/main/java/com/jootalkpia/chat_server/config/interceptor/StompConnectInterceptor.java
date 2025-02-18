@@ -24,6 +24,8 @@ public class StompConnectInterceptor implements ChannelInterceptor {
     private final RedisTemplate<String, String> stringOperRedisTemplate;
     private final RedisTemplate<String, Object> objectOperRedisTemplate;
 
+    private final StompSubscriptionInterceptor stompSubscriptionInterceptor;
+
     @Override
     public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex) {
         if (hasException(ex)) {
@@ -73,6 +75,7 @@ public class StompConnectInterceptor implements ChannelInterceptor {
         String userId = getUserIdFromSession(sessionId);
 
         if (userId != null && !userId.trim().isEmpty()) {
+            stompSubscriptionInterceptor.handleChatUnsubscription(accessor);
             cleanupUserSession(userId, sessionId);
         }
     }
