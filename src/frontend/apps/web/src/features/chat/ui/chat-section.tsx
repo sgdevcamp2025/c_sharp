@@ -6,7 +6,7 @@ import { useMessages, useWebSocketClient } from '@/src/features/chat/model';
 import ChatContent from './chat-content';
 import ChatTextarea from './chat-textarea';
 
-import { sendMessage } from '../lib';
+import { useSendMessage } from '../lib';
 // import ThreadPanel from './thread-panel';
 
 const ChatSection = () => {
@@ -24,17 +24,7 @@ const ChatSection = () => {
   // console.log('📚 메시지 목록:', messages);
   // const [isThreadOpen, setIsThreadOpen] = useState<boolean>(false);
 
-  const handleSendMessage = (content: string, attachmentList: number[]) => {
-    sendMessage({
-      content,
-      attachmentList,
-      channelId,
-      currentUser,
-      addOptimisticMessage,
-      publishMessage,
-      queryClient,
-    });
-  };
+  const handleSendMessage = useSendMessage(channelId, currentUser);
 
   return (
     <div className="relative flex flex-1 h-full">

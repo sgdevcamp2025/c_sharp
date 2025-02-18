@@ -8,7 +8,11 @@ import ChatSection from './chat-section';
 import { useWebSocketClient } from '../model';
 import { useEffect } from 'react';
 
-const ChatContainer = ({ stockSlug }: { stockSlug: string }) => {
+type ChatContainerProps = {
+  stockSlug: string;
+};
+
+const ChatContainer = ({ stockSlug }: ChatContainerProps) => {
   const channelId = 1;
   const { subscribe, isConnected } = useWebSocketClient(channelId);
 
