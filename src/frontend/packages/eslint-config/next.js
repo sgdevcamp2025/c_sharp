@@ -48,6 +48,8 @@ export const nextJsConfig = [
       'react/prop-types': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+      'tailwindcss/no-custom-classname': 'warn',
+      'no-template-curly-in-string': 'error',
     },
   },
 ];
