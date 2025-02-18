@@ -40,7 +40,7 @@ public class KafkaConsumer {
 
     @KafkaListener(
             topics = "${topic.chat}",
-            groupId = "${group.chat}", //추후 그룹 ID에 동적인 컨테이너 ID 삽입
+            groupId = "${group.chat}",
             concurrency = "2"
     )
     public void processChatMessage(@Header(KafkaHeaders.RECEIVED_KEY) String channelId, String kafkaMessage) {

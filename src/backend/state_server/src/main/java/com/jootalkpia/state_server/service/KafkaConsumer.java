@@ -1,14 +1,17 @@
 package com.jootalkpia.state_server.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jootalkpia.state_server.ChatMessageToKafka;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class KafkaConsumer {
+    private final StateService stateService;
 
     @KafkaListener(
             topics = "${topic.chat}",
@@ -20,11 +23,12 @@ public class KafkaConsumer {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            ChatMessageToKafka chatMessageToKafka = mapper.readValue(kafkaMessage, ChatMessageToKafka.class);
+            JsonNode rootNode = mapper.readTree(kafkaMessage);
+            JsonNode commonNode = rootNode.get("common");
+            JsonNode messagesNode = rootNode.get("message");
 
-            // 유저 상태 검증 로직
+            stateService.findNotificationTargets(commonNode.get("channelId").asText());
 
-            log.info("dto ===> " + chatMessageToKafka.toString());
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex); // 추후에 GlobalException 처리
         }
