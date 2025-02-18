@@ -5,7 +5,7 @@ import { useToast } from '@workspace/ui/hooks/Toast/use-toast';
 export const useChatAutoScroll = (messages: WebSocketResponsePayload[]) => {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [prevMessageCount, setPrevMessageCount] = useState(0);
+  const prevMessageCountRef = useRef(0);
   const [isUserScrollingUp, setIsUserScrollingUp] = useState(false);
   const [newMessageCount, setNewMessageCount] = useState(0);
   const { toast, dismiss } = useToast();
@@ -27,14 +27,14 @@ export const useChatAutoScroll = (messages: WebSocketResponsePayload[]) => {
 
     container.addEventListener('scroll', handleScroll);
 
-    if (messages.length > prevMessageCount) {
+    if (messages.length > prevMessageCountRef.current) {
       if (!isUserScrollingUp) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           bottomRef.current?.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest',
           });
-        }, 0);
+        });
       } else {
         setNewMessageCount((prev) => prev + 1);
         toast({
@@ -42,18 +42,11 @@ export const useChatAutoScroll = (messages: WebSocketResponsePayload[]) => {
           description: `${newMessageCount + 1}개의 새 메시지가 도착했습니다.`,
         });
       }
-      setPrevMessageCount(messages.length);
+      prevMessageCountRef.current = messages.length;
     }
 
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [
-    messages,
-    isUserScrollingUp,
-    newMessageCount,
-    toast,
-    dismiss,
-    prevMessageCount,
-  ]);
+  }, [messages, isUserScrollingUp, newMessageCount, toast, dismiss]);
 
   return { bottomRef, containerRef };
 };
