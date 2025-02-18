@@ -30,6 +30,9 @@ public enum ErrorCode {
     IMAGE_UPLOAD_FAILED("F50003", "파일 업로드에 실패했습니다."),
     IMAGE_DOWNLOAD_FAILED("F50004", "파일 다운로드 중 오류가 발생했습니다."),
     FILE_PROCESSING_FAILED("F50005", "파일 처리 중 오류가 발생했습니다."),
+    CHUNK_PROCESSING_FAILED("F50008", "청크 처리 중 오류가 발생했습니다."),
+    CHUNK_MERGING_FAILED("F50007", "청크 병합 중 오류가 발생했습니다."),
+    MIMETYPE_DETECTION_FAILED("F50009", "mimetype 감지에 실패했습니다."),
     UNEXPECTED_ERROR("F50006", "예상치 못한 오류가 발생했습니다.");
 
     private final String code;

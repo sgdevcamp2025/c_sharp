@@ -1,10 +1,14 @@
 package com.jootalkpia.file_server.controller;
 
 import com.jootalkpia.file_server.dto.ChangeProfileResponseDto;
+import com.jootalkpia.file_server.dto.MultipartChunk;
+import com.jootalkpia.file_server.dto.UploadChunkRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileResponseDto;
+import com.jootalkpia.file_server.dto.UploadFilesResponseDto;
 import com.jootalkpia.file_server.service.FileService;
 import com.jootalkpia.file_server.utils.ValidationUtils;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -17,13 +21,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
 @Slf4j
 public class FileController {
@@ -36,8 +41,47 @@ public class FileController {
         return ResponseEntity.ok("Test successful");
     }
 
-    @PostMapping("/files")
-    public ResponseEntity<UploadFileResponseDto> uploadFiles(@ModelAttribute UploadFileRequestDto uploadFileRequest) {
+//    @PostMapping("/init-upload")
+//    public ResponseEntity<?> initFileUpload(@RequestBody UploadChunkRequestDto request) {
+//        log.info("Received init-upload request: {}", request);
+//
+//        ValidationUtils.validateWorkSpaceId(request.getWorkspaceId());
+//        ValidationUtils.validateChannelId(request.getChannelId());
+//
+//        return ResponseEntity.ok();
+//    }
+
+    @PostMapping("/chunk")
+    public ResponseEntity<?> uploadFileChunk(
+            @RequestParam("workspaceId") Long workspaceId,
+            @RequestParam("channelId") Long channelId,
+            @RequestParam("tempFileIdentifier") String tempFileIdentifier,
+            @RequestParam("totalChunks") Long totalChunks,
+            @RequestParam("chunkSize") Long chunkSize,
+            @RequestParam("chunkInfo.chunkIndex") Long chunkIndex,
+            @RequestPart("chunkInfo.chunk") MultipartFile chunk) {
+
+        log.info("청크 업로드 요청: chunkIndex={}, totalChunks={}", chunkIndex, totalChunks);
+
+        ValidationUtils.validateWorkSpaceId(workspaceId);
+        ValidationUtils.validateChannelId(channelId);
+        ValidationUtils.validateFile(chunk);
+        ValidationUtils.validateFileId(tempFileIdentifier);
+        ValidationUtils.validateTotalChunksAndChunkIndex(totalChunks, chunkIndex);
+
+        // DTO로 변환
+        MultipartChunk multipartChunk = new MultipartChunk(chunkIndex, chunk);
+        UploadChunkRequestDto request = new UploadChunkRequestDto(
+                workspaceId, channelId, tempFileIdentifier, totalChunks, chunkSize, multipartChunk
+        );
+
+        Object response = fileService.uploadFileChunk(request);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping
+    public ResponseEntity<UploadFilesResponseDto> uploadFiles(@ModelAttribute UploadFileRequestDto uploadFileRequest) {
         log.info("got uploadFileRequest: {}", uploadFileRequest);
         ValidationUtils.validateLengthOfFilesAndThumbnails(uploadFileRequest.getFiles().length, uploadFileRequest.getThumbnails().length);
         ValidationUtils.validateWorkSpaceId(uploadFileRequest.getWorkspaceId());
@@ -46,11 +90,11 @@ public class FileController {
         ValidationUtils.validateFiles(uploadFileRequest.getThumbnails());
 
         log.info("got uploadFileRequest: {}", uploadFileRequest.getFiles().length);
-        UploadFileResponseDto response = fileService.uploadFiles(userId, uploadFileRequest);
+        UploadFilesResponseDto response = fileService.uploadFiles(userId, uploadFileRequest);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/files/{fileId}")
+    @GetMapping("/{fileId}")
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable Long fileId) {
         log.info("got downloadFile id: {}", fileId);
         ValidationUtils.validateFileId(fileId);
