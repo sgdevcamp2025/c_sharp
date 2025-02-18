@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 public class UserChannelRepository {
     private final JdbcTemplate jdbcTemplate;
 
-    public void updateLastAccessTime(String userId, String channelId, Long lastReadId) {
+    public void updateLastReadId(String userId, String channelId, Long lastReadId) {
         String sql = "UPDATE user_channel SET last_read_id = ? " +
                 "WHERE user_id = ? AND channel_id = ?";
 

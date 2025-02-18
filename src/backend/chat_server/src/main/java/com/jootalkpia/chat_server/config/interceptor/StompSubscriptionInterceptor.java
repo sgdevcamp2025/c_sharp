@@ -1,6 +1,8 @@
 package com.jootalkpia.chat_server.config.interceptor;
 
 import com.jootalkpia.chat_server.dto.RedisKeys;
+import com.jootalkpia.chat_server.repository.mongo.ChatMessageRepository;
+import com.jootalkpia.chat_server.repository.UserChannelRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,6 +29,9 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
     private final RedisTemplate<String, String> stringOperRedisTemplate;
     private final RedisTemplate<String, Object> objectOperRedisTemplate;
 
+    private final ChatMessageRepository chatMessageRepository;
+    private final UserChannelRepository userChannelRepository;
+
     @Override
     public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex) {
         if (!isValidMessage(sent, ex)) {
@@ -35,6 +40,22 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
         }
 
         handleStompCommand(StompHeaderAccessor.wrap(message));
+    }
+
+    public void handleChatUnsubscription(StompHeaderAccessor accessor) {
+        String sessionId = accessor.getSessionId();
+        String userId = getUserIdFromSessionId(sessionId);
+        String channelId = getChannelIdFromSessionId(sessionId);
+
+        if (userId != null && !userId.trim().isEmpty()) {
+            updateChannelFromSession(sessionId);
+            removeTabFromChannel(channelId, userId, sessionId);
+            userChannelRepository.updateLastReadId(
+                    userId,
+                    channelId,
+                    chatMessageRepository.findFirstByChannelIdOrderByThreadIdDesc(Long.valueOf(channelId)).getThreadId()
+            );
+        }
     }
 
     private boolean isValidMessage(boolean sent, Exception ex) {
@@ -125,17 +146,6 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
                 userId,
                 userTabs
         );
-    }
-
-    private void handleChatUnsubscription(StompHeaderAccessor accessor) {
-        String sessionId = accessor.getSessionId();
-        String userId = getUserIdFromSessionId(sessionId);
-        String channelId = getChannelIdFromSessionId(sessionId);
-
-        if (userId != null && !userId.trim().isEmpty()) {
-            updateChannelFromSession(sessionId);
-            removeTabFromChannel(channelId, userId, sessionId);
-        }
     }
 
     private String getUserIdFromSessionId(String sessionId) {
