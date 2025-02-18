@@ -1,16 +1,13 @@
 'use client';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useMessages, useWebSocketClient } from '@/src/features/chat/model';
-import type {
-  SendMessagePayload,
-  WebSocketResponsePayload,
-} from '@/src/features/chat/model';
 
-// import ThreadPanel from './thread-panel';
 import ChatContent from './chat-content';
 import ChatTextarea from './chat-textarea';
-import { formatToKoreanDate } from '../lib';
-import { useQueryClient } from '@tanstack/react-query';
+
+import { sendMessage } from '../lib';
+// import ThreadPanel from './thread-panel';
 
 const ChatSection = () => {
   const channelId = 1;
@@ -19,61 +16,24 @@ const ChatSection = () => {
     nickname: 'User',
     profileImage: 'https://via.placeholder.com/150',
   };
-  // const [isThreadOpen, setIsThreadOpen] = useState<boolean>(false);
-
   const { data: messages, addOptimisticMessage } = useMessages(
     `/subscribe/chat.${channelId}`,
   );
-
-  // console.log('📚 메시지 목록:', messages);
   const { publishMessage } = useWebSocketClient(channelId);
   const queryClient = useQueryClient();
+  // console.log('📚 메시지 목록:', messages);
+  // const [isThreadOpen, setIsThreadOpen] = useState<boolean>(false);
 
   const handleSendMessage = (content: string, attachmentList: number[]) => {
-    if (!content.trim() && attachmentList.length === 0) return;
-
-    const fakeThreadId = Math.floor(Math.random() * 1000000);
-    const fakeTimestamp = formatToKoreanDate(new Date());
-
-    const optimisticMessage: WebSocketResponsePayload = {
-      common: {
-        channelId,
-        threadId: fakeThreadId,
-        fakeThreadId,
-        threadDateTime: fakeTimestamp,
-        userId: currentUser.userId,
-        userNickname: currentUser.nickname,
-        userProfileImage: currentUser.profileImage,
-      },
-      message: [
-        {
-          type: 'TEXT',
-          text: content,
-        },
-      ],
-    };
-
-    addOptimisticMessage(optimisticMessage);
-
-    const payload: SendMessagePayload & { fakeThreadId: number } = {
-      userId: currentUser.userId,
+    sendMessage({
       content,
       attachmentList,
-      fakeThreadId,
-    };
-
-    publishMessage(payload);
-
-    queryClient.setQueryData(
-      ['messages', `/subscribe/chat.${channelId}`],
-      (prevMessages: WebSocketResponsePayload[] = []) => {
-        return prevMessages.map((msg) =>
-          msg.common.fakeThreadId === fakeThreadId
-            ? { ...msg, isOptimistic: false }
-            : msg,
-        );
-      },
-    );
+      channelId,
+      currentUser,
+      addOptimisticMessage,
+      publishMessage,
+      queryClient,
+    });
   };
 
   return (

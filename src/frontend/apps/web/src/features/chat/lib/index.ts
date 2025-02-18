@@ -6,3 +6,4 @@ export {
 export { formatChatTime } from './format-chat-time.util';
 export { processMessages } from './process-message.util';
 export { formatToKoreanDate } from './format-tokor-date';
+export { sendMessage } from './send-message.util';
