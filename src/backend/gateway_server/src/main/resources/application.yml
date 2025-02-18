@@ -26,10 +26,10 @@ spring:
           predicates:
             - Path=/api/v1/user/**
 
-#        - id: stock
-#          uri: http://localhost:${STOCK_PORT}
-#          predicates:
-#            - Path=/stock/**
+        - id: stock
+          uri: http://${EC2_PRIVATE_IP}:${STOCK_PORT}
+          predicates:
+            - Path=/api/v1/stock/**
 #
 #        - id: file
 #          uri: http://localhost:${FILE_PORT}
