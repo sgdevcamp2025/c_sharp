@@ -1,5 +1,6 @@
 import { ChatContainer } from '@/src/features/chat';
 import { StockDetailLayout } from '@/src/features/stock';
+import { RQProvider } from '@/src/shared';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -28,11 +29,15 @@ export default function StockDetailsPage({ params }) {
         >
           <ChevronLeft size={28} />
         </Link>
-        <StockDetailLayout />
+        <RQProvider>
+          <StockDetailLayout />
+        </RQProvider>
       </div>
 
       <div className="pl-2 basis-[55%] flex-shrink-0 min-w-0">
-        <ChatContainer stockSlug={stockSlug} />
+        <RQProvider>
+          <ChatContainer stockSlug={stockSlug} />
+        </RQProvider>
       </div>
     </div>
   );
