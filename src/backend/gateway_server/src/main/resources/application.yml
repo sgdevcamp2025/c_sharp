@@ -41,10 +41,10 @@ spring:
           predicates:
             - Path=/api/v1/history/**
 
-#        - id: workspace
-#          uri: http://${EC2_PRIVATE_IP}:${WORKSPACE_PORT}
-#          predicates:
-#            - Path=/api/v1/workspace/**
+        - id: workspace
+          uri: http://${EC2_PRIVATE_IP}:${WORKSPACE_PORT}
+          predicates:
+            - Path=/api/v1/workspace/**
 #
 #        - id: chat1
 #          uri: http://${EC2_PRIVATE_IP}:${CHAT_PORT1}
