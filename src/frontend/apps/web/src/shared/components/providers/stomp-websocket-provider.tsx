@@ -11,8 +11,6 @@ import {
 } from 'react';
 import * as StompJs from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { getBaseUrl } from '@/src/shared/services/lib';
-import type { ApiServerType } from '@/src/shared/services/models';
 
 type WebSocketContextProps = {
   client: StompJs.Client | null;
@@ -20,7 +18,6 @@ type WebSocketContextProps = {
 };
 
 type WebSocketProviderProps = {
-  serverType: ApiServerType;
   userId: number;
   children: ReactNode;
 };
@@ -28,13 +25,12 @@ type WebSocketProviderProps = {
 const StompWebSocketContext = createContext<WebSocketContextProps | null>(null);
 
 export const StompWebSocketProvider = ({
-  serverType,
   userId,
   children,
 }: WebSocketProviderProps) => {
   const client = useRef<StompJs.Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const BASE_URL = getBaseUrl(serverType);
+  const BASE_URL = `http://${process.env.NEXT_PUBLIC_BASE_URL}:${process.env.NEXT_PUBLIC_CHAT_SERVER1_PORT}`;
 
   const connect = useCallback(() => {
     if (client.current) {
