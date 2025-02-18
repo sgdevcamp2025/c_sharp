@@ -30,11 +30,11 @@ spring:
           uri: http://${EC2_PRIVATE_IP}:${STOCK_PORT}
           predicates:
             - Path=/api/v1/stock/**
-#
-#        - id: file
-#          uri: http://localhost:${FILE_PORT}
-#          predicates:
-#            - Path=/files/**
+
+        - id: file
+          uri: http://${EC2_PRIVATE_IP}:${FILE_PORT}
+          predicates:
+            - Path=/api/v1/files/**
 #
 #        - id: chat1
 #          uri: http://localhost:${CHAT_PORT1}
