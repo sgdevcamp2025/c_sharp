@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
+
+import { useQueryClient } from '@tanstack/react-query';
+
 import type {
   SendMessagePayload,
   WebSocketResponsePayload,
 } from '@/src/features/chat/model';
-import { useQueryClient } from '@tanstack/react-query';
-import { useStompWebSocket } from '@/src/shared/providers/stomp-websocket-provider';
+import { useStompWebSocket } from '@/src/shared/providers';
+import { QUERY_KEYS } from '@/src/shared/services';
 
 export const useWebSocketClient = (channelId: number) => {
   const queryClient = useQueryClient();
@@ -17,7 +20,7 @@ export const useWebSocketClient = (channelId: number) => {
     }
   }, [client]);
 
-  const subscribe = useCallback(() => {
+  const subscribe = () => {
     if (!client) {
       console.error('❌ WebSocket Client가 없습니다.');
       return;
@@ -39,7 +42,7 @@ export const useWebSocketClient = (channelId: number) => {
           console.log('📩 Received:', payload);
 
           queryClient.setQueryData(
-            ['messages', `/subscribe/chat.${channelId}`],
+            QUERY_KEYS.messages(channelId),
             (prev: WebSocketResponsePayload[] = []) => {
               return prev.map((msg) =>
                 msg.common.fakeThreadId === payload.common.threadId
@@ -61,7 +64,7 @@ export const useWebSocketClient = (channelId: number) => {
       console.log(`📴 Unsubscribing from /subscribe/chat.${channelId}`);
       subscription.unsubscribe();
     };
-  }, [client, channelId, queryClient]);
+  };
 
   const publishMessage = useCallback(
     (payload: SendMessagePayload & { fakeThreadId: number }) => {
