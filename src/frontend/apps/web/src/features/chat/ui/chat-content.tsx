@@ -3,6 +3,7 @@ import ContentAvatar from './content-avatar';
 
 import { useChatAutoScroll, type WebSocketResponsePayload } from '../model';
 import { processMessages } from '../lib';
+import { Toaster } from '@workspace/ui/components';
 
 export type ChatContentProps = {
   type?: 'default' | 'live';
@@ -65,6 +66,7 @@ const ChatContent = ({
         ))}
         <div ref={bottomRef} />
       </div>
+      <Toaster />
     </>
   );
 };
