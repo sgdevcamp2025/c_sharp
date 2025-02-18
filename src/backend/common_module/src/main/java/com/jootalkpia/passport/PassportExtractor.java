@@ -4,13 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jootalkpia.passport.component.Passport;
 import com.jootalkpia.passport.component.UserInfo;
-import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import lombok.RequiredArgsConstructor;
-
-//@Component 추후 gateway 진행하며 확인 필요
+@Component
 @RequiredArgsConstructor
 public class PassportExtractor {
 
@@ -19,33 +22,27 @@ public class PassportExtractor {
     private final ObjectMapper objectMapper;
     private final PassportValidator passportValidator;
 
-    public Passport getPassportFromRequestHeader(HttpServletRequest httpServletRequest) throws JsonProcessingException { //예외처리 수정 필요
-
-        return objectMapper.readValue(
-                new String(
-                        Base64.getDecoder().decode(httpServletRequest.getHeader(AUTHORIZATION_HEADER_NAME)),
-                        StandardCharsets.UTF_8
-                ),
-                Passport.class
-        );
-
+    public Mono<Passport> getPassportFromRequestHeader(ServerWebExchange exchange) {
+        return Mono.justOrEmpty(exchange.getRequest()
+                        .getHeaders()
+                        .getFirst(AUTHORIZATION_HEADER_NAME))
+                .map(header -> new String(Base64.getDecoder().decode(header), StandardCharsets.UTF_8))
+                .flatMap(passportStr -> {
+                    try {
+                        Passport passport = objectMapper.readValue(passportStr, Passport.class);
+                        return Mono.just(passport);
+                    } catch (JsonProcessingException e) {
+                        return Mono.error(new RuntimeException("Invalid Passport Format", e));
+                    }
+                });
     }
 
-    public UserInfo getUserInfoByPassport(Passport passport) throws JsonProcessingException { //예외처리 수정 필요
-
-        String passportString = new String(
-                Base64.getDecoder().decode(passport.toString())
-        );
-
-        passportValidator.validatePassport(passportString);
-
-        String userInfoString = objectMapper.readTree(passportString)
-                .get(USER_INFO)
-                .toString();
-        return objectMapper.readValue(
-                userInfoString,
-                UserInfo.class
-        );
-
+    public Mono<UserInfo> getUserInfoByPassport(Passport passport) {
+        return Mono.fromCallable(() -> {
+            String passportString = new String(Base64.getDecoder().decode(passport.toString()));
+            passportValidator.validatePassport(passportString);
+            String userInfoString = objectMapper.readTree(passportString).get(USER_INFO).toString();
+            return objectMapper.readValue(userInfoString, UserInfo.class);
+        });
     }
 }
