@@ -10,17 +10,17 @@ export type ChatContentProps = {
   messages?: WebSocketResponsePayload[];
 };
 
-export type ChatContentWithAvatarsProps = ChatContentProps & {
-  avatarUrls?: string[];
-  setIsThreadOpen: (value: boolean) => void;
-};
+// export type ChatContentWithAvatarsProps = ChatContentProps & {
+//   // avatarUrls?: string[];
+//   // setIsThreadOpen: (value: boolean) => void;
+// };
 
 const ChatContent = ({
   type = 'default',
   messages = [],
-  avatarUrls,
-  setIsThreadOpen,
-}: ChatContentWithAvatarsProps) => {
+  // avatarUrls,
+  // setIsThreadOpen,
+}: ChatContentProps) => {
   if (!messages || messages.length === 0) return null;
   console.log('🔗 ChatContent:', { messages });
 
@@ -53,9 +53,9 @@ const ChatContent = ({
             <div className="flex w-full items-start justify-between">
               <ContentText
                 type={type}
-                avatarUrls={avatarUrls}
+                // avatarUrls={avatarUrls}
                 message={messageData}
-                setIsThreadOpen={setIsThreadOpen}
+                // setIsThreadOpen={setIsThreadOpen}
                 hideUserInfo={messageData.isConsecutive}
               />
             </div>
