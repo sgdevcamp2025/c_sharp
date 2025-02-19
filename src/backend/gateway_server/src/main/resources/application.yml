@@ -24,12 +24,28 @@ spring:
               - OPTIONS
             allowedHeaders: "*"
             exposedHeaders: "*"
-
+            allowCredentials: true  # 인증 정보 포함 허용 (쿠키, 세션 등)
 
       default-filters:
         - JwtAuthenticationFilter
         - PassportAuthorizationFilter
         - PassportRelayFilter
+        - name: AddResponseHeader
+          args:
+            name: Access-Control-Allow-Origin
+            value: "https://jootalkpia.netlify.app, http://localhost:3000"
+        - name: AddResponseHeader
+          args:
+            name: Access-Control-Allow-Methods
+            value: "GET, POST, PUT, DELETE, OPTIONS"
+        - name: AddResponseHeader
+          args:
+            name: Access-Control-Allow-Headers
+            value: "*"
+        - name: AddResponseHeader
+          args:
+            name: Access-Control-Allow-Credentials
+            value: "true"
 
       routes:
         - id: auth
