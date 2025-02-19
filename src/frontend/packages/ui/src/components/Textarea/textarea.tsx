@@ -9,6 +9,8 @@ const Textarea = React.forwardRef<
   HTMLTextAreaElement,
   React.ComponentPropsWithRef<'textarea'>
 >(({ className, onKeyDown, ...props }, ref) => {
+  const isComposing = React.useRef(false);
+
   const autoResizeTextarea = () => {
     const textarea = document.querySelector('textarea');
     if (textarea) {
@@ -19,6 +21,8 @@ const Textarea = React.forwardRef<
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (isComposing.current) return;
+
     if (e.key === 'Enter') {
       if (!e.shiftKey) {
         e.preventDefault();
@@ -40,6 +44,7 @@ const Textarea = React.forwardRef<
       maxLength={2000}
       onKeyDown={handleKeyDown}
       onKeyUp={autoResizeTextarea}
+      onCompositionStart={() => (isComposing.current = true)}
       ref={ref}
       {...props}
     />

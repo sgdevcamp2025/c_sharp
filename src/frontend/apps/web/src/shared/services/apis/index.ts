@@ -5,3 +5,4 @@ export {
   patchRequest,
   deleteRequest,
 } from './fetch-method.api';
+export { QUERY_KEYS } from './querykey';

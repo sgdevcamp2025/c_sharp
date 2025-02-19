@@ -1,82 +1,90 @@
-import { useRef, useCallback } from 'react';
-import * as StompJs from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+import { useCallback, useEffect, useState } from 'react';
+
+import { useQueryClient } from '@tanstack/react-query';
+
 import type {
   SendMessagePayload,
   WebSocketResponsePayload,
 } from '@/src/features/chat/model';
-import { getBaseUrl } from '@/src/shared/services/lib';
-import { useQueryClient } from '@tanstack/react-query';
-import type { ApiServerType } from '@/src/shared/services/models';
+import { useStompWebSocket } from '@/src/shared/providers';
+import { QUERY_KEYS } from '@/src/shared/services';
 
-export const useWebSocketClient = (
-  serverType: ApiServerType,
-  channelId: number,
-  userId: number,
-) => {
+export const useWebSocketClient = (channelId: number) => {
   const queryClient = useQueryClient();
-  const client = useRef<StompJs.Client | null>(null);
-  const BASE_URL = getBaseUrl(serverType);
+  const { client } = useStompWebSocket();
+  const [isConnected, setIsConnected] = useState(false);
 
-  const connect = useCallback(() => {
-    if (client.current) {
-      client.current.deactivate();
+  useEffect(() => {
+    if (client && client.connected) {
+      setIsConnected(true);
+    }
+  }, [client]);
+
+  const subscribe = () => {
+    if (!client) {
+      console.error('❌ WebSocket Client가 없습니다.');
+      return;
     }
 
-    // console.log('Connecting with userId:', userId);
-    client.current = new StompJs.Client({
-      connectHeaders: {
-        'X-User-ID': userId.toString(),
-      },
-      webSocketFactory: () => new SockJS(`${BASE_URL}/ws-connect`),
-      reconnectDelay: 5000,
-      debug: (msg: string) => console.log('[DEBUG]', msg),
-      onConnect: () => {
-        // console.log('Broker connected with userId:', userId);
-        client.current?.subscribe(`/subscribe/chat.${channelId}`, (message) => {
-          try {
-            const payload: WebSocketResponsePayload = JSON.parse(message.body);
-            console.log('Parsed payload:', payload);
-
-            queryClient.setQueryData<WebSocketResponsePayload[]>(
-              ['messages', `/subscribe/chat.${channelId}`],
-              (prev = []) => [...prev, payload],
-            );
-          } catch (error) {
-            console.error('메시지 파싱 실패:', error);
-          }
-        });
-      },
-      onStompError: (frame) => {
-        console.error('Broker error:', frame.headers['message'], frame.body);
-      },
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-    });
-
-    client.current.activate();
-  }, [BASE_URL, channelId, queryClient, userId]);
-
-  const disconnect = useCallback(() => {
-    if (client.current) {
-      client.current.deactivate();
-      client.current = null;
+    if (!client.connected) {
+      console.warn(
+        '⏳ WebSocket이 아직 연결되지 않았습니다. 구독을 대기합니다.',
+      );
+      return;
     }
-  }, []);
+
+    console.log(`📡 Subscribing to /subscribe/chat.${channelId}`);
+    const subscription = client.subscribe(
+      `/subscribe/chat.${channelId}`,
+      (message) => {
+        try {
+          const payload = JSON.parse(message.body);
+          console.log('📩 Received:', payload);
+
+          queryClient.setQueryData(
+            QUERY_KEYS.messages(channelId),
+            (prev: WebSocketResponsePayload[] = []) => {
+              return prev.map((msg) =>
+                msg.common.fakeThreadId === payload.common.threadId
+                  ? {
+                      ...payload,
+                      common: { ...payload.common, fakeThreadId: undefined },
+                    }
+                  : msg,
+              );
+            },
+          );
+        } catch (error) {
+          console.error('❌ 메시지 파싱 실패:', error);
+        }
+      },
+    );
+
+    return () => {
+      console.log(`📴 Unsubscribing from /subscribe/chat.${channelId}`);
+      subscription.unsubscribe();
+    };
+  };
 
   const publishMessage = useCallback(
-    (payload: SendMessagePayload) => {
-      if (client.current && client.current.connected) {
-        client.current.publish({
-          destination: `/publish/chat.${channelId}`,
-          body: JSON.stringify(payload),
-        });
-      } else {
-        console.error('WebSocket 연결이 되어 있지 않습니다.');
+    (payload: SendMessagePayload & { fakeThreadId: number }) => {
+      if (!client || !client.connected) {
+        console.error('❌ WebSocket 연결이 되어 있지 않습니다.');
+        return;
       }
+
+      const enrichedPayload = {
+        ...payload,
+        fakeThreadId: payload.fakeThreadId,
+      };
+
+      client.publish({
+        destination: `/publish/chat.${channelId}`,
+        body: JSON.stringify(enrichedPayload),
+      });
     },
-    [channelId],
+    [client, channelId],
   );
 
-  return { connect, disconnect, publishMessage };
+  return { subscribe, publishMessage, isConnected };
 };

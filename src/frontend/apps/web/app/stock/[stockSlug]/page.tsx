@@ -3,8 +3,6 @@ import { StockDetailLayout } from '@/src/features/stock';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 
-// 주식데이터를 가지고 올수있는 방법이 필요합니다.
-
 export async function generateMetadata({ params }) {
   const { stockSlug } = params;
 

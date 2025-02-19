@@ -10,17 +10,17 @@ export type ChatContentProps = {
   messages?: WebSocketResponsePayload[];
 };
 
-export type ChatContentWithAvatarsProps = ChatContentProps & {
-  avatarUrls?: string[];
-  setIsThreadOpen: (value: boolean) => void;
-};
+// export type ChatContentWithAvatarsProps = ChatContentProps & {
+//   avatarUrls?: string[];
+//   setIsThreadOpen: (value: boolean) => void;
+// };
 
 const ChatContent = ({
   type = 'default',
   messages = [],
-  avatarUrls,
-  setIsThreadOpen,
-}: ChatContentWithAvatarsProps) => {
+  // avatarUrls,
+  // setIsThreadOpen,
+}: ChatContentProps) => {
   const { bottomRef, containerRef } = useChatAutoScroll(messages);
 
   if (!messages || messages.length === 0) return null;
@@ -56,9 +56,9 @@ const ChatContent = ({
             <div className="flex w-full items-start justify-between">
               <ContentText
                 type={type}
-                avatarUrls={avatarUrls}
+                // avatarUrls={avatarUrls}
                 message={messageData}
-                setIsThreadOpen={setIsThreadOpen}
+                // setIsThreadOpen={setIsThreadOpen}
                 hideUserInfo={messageData.isConsecutive}
               />
             </div>

@@ -1,6 +1,7 @@
 import AuthWrapper from '@/src/features/auth/ui/auth-wrapper';
 import { ProfilePopover } from '@/src/features/user';
-import { Header } from '@/src/shared';
+import { Header, StompWebSocketProvider, RQProvider } from '@/src/shared';
+
 import '@workspace/ui/globals.css';
 
 export default function RootLayout({
@@ -14,7 +15,11 @@ export default function RootLayout({
         <Header authContent={<ProfilePopover />} />
       </header>
       <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">
-        <AuthWrapper> {children}</AuthWrapper>
+        <AuthWrapper>
+          <StompWebSocketProvider userId={1}>
+            <RQProvider>{children}</RQProvider>
+          </StompWebSocketProvider>
+        </AuthWrapper>
       </div>
     </>
   );

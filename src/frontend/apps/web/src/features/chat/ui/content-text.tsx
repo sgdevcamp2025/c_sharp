@@ -1,27 +1,26 @@
 import Image from 'next/image';
-import { MessageSquareText } from 'lucide-react';
 
 import { Badge } from '@workspace/ui/components';
 
-import AvatarList from './avatarlist';
-import type { ChatContentWithAvatarsProps } from './chat-content';
-
 import type { WebSocketResponsePayload } from '../model';
 import { formatChatTime } from '../lib';
+// import { MessageSquareText } from 'lucide-react';
+// import AvatarList from './avatarlist';
+// import type { ChatContentWithAvatarsProps } from './chat-content';
 
 export type ContentTextProps = {
   type?: 'default' | 'live';
-  avatarUrls?: string[];
+  // avatarUrls?: string[];
   message: WebSocketResponsePayload;
-  setIsThreadOpen: (value: boolean) => void;
+  // setIsThreadOpen: (value: boolean) => void;
   hideUserInfo?: boolean;
 };
 
 const ContentText = ({
   type,
-  avatarUrls,
+  // avatarUrls,
   message,
-  setIsThreadOpen,
+  // setIsThreadOpen,
   hideUserInfo = false,
 }: ContentTextProps) => {
   console.log('123', message);
@@ -95,13 +94,13 @@ const ContentText = ({
         />
       </div> */}
       </div>
-      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+      {/* <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
         <MessageSquareText
           size="15"
           className="cursor-pointer hover:text-gray-600"
           onClick={() => setIsThreadOpen(true)}
         />
-      </div>
+      </div> */}
     </div>
   );
 };
