@@ -13,7 +13,6 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -45,13 +44,12 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
         handleStompCommand(StompHeaderAccessor.wrap(message));
     }
 
-    @Transactional
     public void handleChatUnsubscription(StompHeaderAccessor accessor) {
         String sessionId = accessor.getSessionId();
         String userId = getUserIdFromSessionId(sessionId);
         String channelId = getChannelIdFromSessionId(sessionId);
 
-        if (userId != null && !userId.trim().isEmpty()) {
+        if (userId != null && !userId.trim().isEmpty() && !channelId.equals(DEFAULT_CHANNEL)) {
             updateChannelFromSession(sessionId);
             removeTabFromChannel(channelId, userId, sessionId);
             userChannelRepository.updateLastReadId(
