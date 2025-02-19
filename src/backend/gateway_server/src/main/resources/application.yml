@@ -24,7 +24,6 @@ spring:
               - OPTIONS
             allowedHeaders: "*"
             exposedHeaders: "*"
-            allowCredentials: true
 
 
       default-filters:
