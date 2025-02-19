@@ -47,11 +47,12 @@ spring:
             - Path=/api/v1/workspace/**
 
       globalcors:
+        add-to-simple-url-handler-mapping: true  # CORS 설정 활성화
         cors-configurations:
           '[/**]': # 모든 요청에 대해 CORS 적용, TODO: 이후 변경
             allowedOrigins:
               - "http://localhost:3000"
-              - "jootalkpia.netlify.app/"
+              - "https://jootalkpia.netlify.app"  # '/' 제거
             allowedMethods:
               - GET
               - POST
