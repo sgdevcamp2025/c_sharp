@@ -8,12 +8,15 @@ spring:
       acks: all # 멱등성 프로듀서를 위해 all로 설정, 0 또는 1이면 enable.idempotence=true 불가
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 topic:
-  chat: jootalkpia.chat.prd.notification
+  chat: jootalkpia.chat.prd.message
 group:
   status: user-status-handle-consumer-group
-
 
 server:
   port: ${STATE_PORT}

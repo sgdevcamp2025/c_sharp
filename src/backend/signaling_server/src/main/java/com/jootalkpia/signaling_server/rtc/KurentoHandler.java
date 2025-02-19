@@ -11,12 +11,16 @@ import com.jootalkpia.signaling_server.repository.HuddleParticipantsRepository;
 import com.jootalkpia.signaling_server.service.HuddleService;
 import com.jootalkpia.signaling_server.service.KurentoService;
 import com.jootalkpia.signaling_server.util.ValidationUtils;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.IceCandidate;
 import org.kurento.client.WebRtcEndpoint;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -31,10 +35,11 @@ public class KurentoHandler extends TextWebSocketHandler {
 
     private final Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).create();
     private final HuddleService huddleService;
-    private final HuddleParticipantsRepository huddleParticipantsRepository;
     private final KurentoService kurentoService;
-    private final ChannelHuddleRepository channelHuddleRepository;
     private final ValidationUtils validationUtils;
+    private final RedisTemplate<String, Long> redisTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
+
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
@@ -66,6 +71,8 @@ public class KurentoHandler extends TextWebSocketHandler {
             Long channelId = getLongValueFromJson(json, "channelId");
             Long userId = getLongValueFromJson(json, "userId");
 
+            // TODO: ValidationUtils.validateUserId(),  ValidationUtils.validateChannelId()
+
             // 허들 메타데이터 저장
             Huddle newHuddle = huddleService.createHuddle(channelId, userId);
 
@@ -77,7 +84,7 @@ public class KurentoHandler extends TextWebSocketHandler {
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "roomCreated", "huddleId", newHuddle.huddleId()))));
 
-            // 일정 시간 내 참가 없으면 삭제
+//             일정 시간 내 참가 없으면 삭제
 //            scheduleHuddleDeletion(newHuddle.huddleId());
 
             // 자동으로 허들 입장 처리
@@ -92,16 +99,16 @@ public class KurentoHandler extends TextWebSocketHandler {
         }
     }
 
-
     private void scheduleHuddleDeletion(String huddleId) {
 
     }
 
-    // 허들 입장
+    // 허들 입장 (새로운 참가자가 들어올 때 기존 참가자들에게 알림)
     private void handleJoinRoom(WebSocketSession session, Map<String, Object> json) throws IOException {
         Long userId = getLongValueFromJson(json, "userId");
-//        String huddleId = (String) json.get("huddleId");
         Long channelId = getLongValueFromJson(json, "channelId");
+
+        // TODO: ValidationUtils.validateUserId(),  ValidationUtils.validateChannelId()
 
         try {
             String huddleId = validationUtils.isHuddleInChannel(channelId);
@@ -114,21 +121,82 @@ public class KurentoHandler extends TextWebSocketHandler {
             validationUtils.isPipelineInChannel(huddleId);
 
             // WebRTC 엔드포인트 생성 및 저장
-            kurentoService.addParticipantToRoom(huddleId, userId);
+            WebRtcEndpoint newUserEndpoint = kurentoService.addParticipantToRoom(huddleId, userId);
 
             // 유저:허들 저장
             huddleService.addUserHuddle(userId, huddleId);
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "joinedRoom", "huddleId", huddleId))));
+
+            // 새로운 참가자가 들어왔음을 기존 참가자들에게 알림
+            notifyExistingParticipants(huddleId, userId, newUserEndpoint);
+
+            // 새로운 참가자가 기존 참가자들의 스트림을 구독하도록 SDP Offer 전송 요청
+            subscribeToExistingParticipants(huddleId, userId);
+
         } catch (Exception e) {
             log.error("Error joining room", e);
 
-            // checking...
+            // 오류 발생 시 롤백 처리
             huddleService.recoverIfErrorJoining(userId, channelId);
 
             session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "error", "message", "Failed to join room"))));
         }
     }
+
+    // 새로운 참가자가 입장하면 기존 참가자들에게 구독하라고 SDP Offer 전송 요청
+    private void notifyExistingParticipants(String huddleId, Long newUserId, WebRtcEndpoint newUserEndpoint) {
+        Set<Long> participantIds = redisTemplate.opsForSet().members("huddle:" + huddleId + ":participants");
+
+        for (Long participantId : participantIds) {
+            if (!participantId.equals(newUserId)) {
+                try {
+                    WebRtcEndpoint existingEndpoint = kurentoService.getParticipantEndpoint(huddleId, participantId);
+                    if (existingEndpoint != null) {
+                        // 새로운 참가자가 기존 참가자에게 SDP Offer 요청
+                        String sdpOffer = newUserEndpoint.generateOffer();
+
+                        messagingTemplate.convertAndSend("/topic/huddle/" + huddleId + "/subscribe", gson.toJson(Map.of(
+                                "id", "subscribe",
+                                "huddleId", huddleId,
+                                "newUserId", newUserId,
+                                "targetUserId", participantId,  // 구독 대상 추가
+                                "sdpOffer", sdpOffer
+                        )));
+                    }
+                } catch (Exception e) {
+                    log.error("Error notifying existing participant {} about new participant {}", participantId, newUserId, e);
+                }
+            }
+        }
+    }
+
+    // 새로운 참가자가 기존 참가자들을 구독하도록 SDP Offer 전송 요청
+    private void subscribeToExistingParticipants(String huddleId, Long newUserId) {
+        Set<Long> participantIds = redisTemplate.opsForSet().members("huddle:" + huddleId + ":participants");
+
+        for (Long participantId : participantIds) {
+            if (!participantId.equals(newUserId)) {
+                try {
+                    WebRtcEndpoint newUserEndpoint = kurentoService.getParticipantEndpoint(huddleId, newUserId);
+                    if (newUserEndpoint != null) {
+                        String sdpOffer = newUserEndpoint.generateOffer();
+
+                        messagingTemplate.convertAndSend("/topic/huddle/" + huddleId + "/subscribe", gson.toJson(Map.of(
+                                "id", "subscribe",
+                                "huddleId", huddleId,
+                                "newUserId", newUserId,
+                                "targetUserId", participantId,
+                                "sdpOffer", sdpOffer
+                        )));
+                    }
+                } catch (Exception e) {
+                    log.error("Error notifying new participant {} about existing participant {}", newUserId, participantId, e);
+                }
+            }
+        }
+    }
+
 
     // 허들 나감
     private void handleLeaveRoom(WebSocketSession session, Map<String, Object> json) throws IOException {
@@ -159,18 +227,28 @@ public class KurentoHandler extends TextWebSocketHandler {
 
             // 허들에 참여 중이 아닌 경우 Offer 처리 안함
             if (webRtcEndpoint == null) {
-                log.warn("허들에 참여 중이지 않은 유저입니다: userId={}", userId);
+                log.warn("엔드포인트가 널!! 허들에 참여 중이지 않은 유저입니다: userId={}", userId);
                 return;
             }
 
             webRtcEndpoint.addIceCandidateFoundListener(event -> {
                 IceCandidate candidate = event.getCandidate();
-                sendIceCandidate(session, candidate);
+                sendIceCandidate(huddleId, userId, userId, candidate);
             });
 
+            // offer 에 대한 answer 생성
             String sdpAnswer = webRtcEndpoint.processOffer(sdpOffer);
+
+            // 쿠렌토가 후보를 찾는 과정
             webRtcEndpoint.gatherCandidates();
-            session.sendMessage(new TextMessage(gson.toJson(Map.of("id", "answer", "sdpAnswer", sdpAnswer))));
+
+            session.sendMessage(new TextMessage(gson.toJson(Map.of(
+                    "id", "answer",
+                    "huddleId", huddleId,
+                    "userId", userId,
+                    "sdpAnswer", sdpAnswer
+            ))));
+
         } catch (Exception e) {
             log.error("Error handling offer", e);
         }
@@ -181,19 +259,16 @@ public class KurentoHandler extends TextWebSocketHandler {
         try {
             Long userId = getLongValueFromJson(json, "userId");
             String huddleId = (String) json.get("huddleId");
+            Long targetUserId = getLongValueFromJson(json, "targetUserId");
 
-            // `candidate` 필드가 `LinkedTreeMap` 형태로 들어올 가능성 있음
             Object candidateObj = json.get("candidate");
-
             String candidate;
             String sdpMid = "";
             int sdpMLineIndex = 0;
 
             if (candidateObj instanceof String) {
-                // String 타입이면 그대로 사용
                 candidate = (String) candidateObj;
             } else if (candidateObj instanceof Map) {
-                // Map 형태면 필드별로 추출
                 Map<String, Object> candidateMap = (Map<String, Object>) candidateObj;
                 candidate = (String) candidateMap.get("candidate");
                 sdpMid = (String) candidateMap.getOrDefault("sdpMid", "");
@@ -203,15 +278,16 @@ public class KurentoHandler extends TextWebSocketHandler {
                 return;
             }
 
-            // WebRTC Endpoint 가져오기
-            WebRtcEndpoint webRtcEndpoint = kurentoService.getParticipantEndpoint(huddleId, userId);
-            if (webRtcEndpoint == null) {
-                log.warn("허들에 참여 중이지 않은 유저입니다: userId={}", userId);
+            WebRtcEndpoint targetEndpoint = kurentoService.getParticipantEndpoint(huddleId, targetUserId);
+            if (targetEndpoint == null) {
+                log.warn("Target user {} is not in huddle {}", targetUserId, huddleId);
                 return;
             }
 
-            // ICE Candidate 적용
-            webRtcEndpoint.addIceCandidate(new IceCandidate(candidate, sdpMid, sdpMLineIndex));
+            targetEndpoint.addIceCandidate(new IceCandidate(candidate, sdpMid, sdpMLineIndex));
+
+            // 상대방에게 ICE Candidate 전송
+            sendIceCandidate(huddleId, targetUserId, userId, new IceCandidate(candidate, sdpMid, sdpMLineIndex));
 
         } catch (Exception e) {
             log.error("Error handling ICE candidate", e);
@@ -220,32 +296,21 @@ public class KurentoHandler extends TextWebSocketHandler {
 
     // ICE Candidate 전송 공통 메서드
     private final Object webSocketLock = new Object(); // 동기화용 Lock 객체
+    private void sendIceCandidate(String huddleId, Long targetUserId, Long senderId, IceCandidate candidate) {
+        Map<String, Object> candidateJson = Map.of(
+                "id", "iceCandidate",
+                "huddleId", huddleId,
+                "userId", targetUserId,
+                "senderId", senderId,
+                "candidate", Map.of(
+                        "candidate", candidate.getCandidate(),
+                        "sdpMid", candidate.getSdpMid(),
+                        "sdpMLineIndex", candidate.getSdpMLineIndex()
+                )
+        );
 
-    private void sendIceCandidate(WebSocketSession session, IceCandidate candidate) {
-        synchronized (webSocketLock) { // 동기화 블록 사용
-            try {
-                if (session == null || !session.isOpen()) {
-                    log.warn("WebSocket session is null or closed. Cannot send ICE candidate.");
-                    return;
-                }
-
-                Map<String, Object> candidateJson = Map.of(
-                        "id", "iceCandidate",
-                        "candidate", Map.of(
-                                "candidate", candidate.getCandidate(),
-                                "sdpMid", candidate.getSdpMid(),
-                                "sdpMLineIndex", candidate.getSdpMLineIndex()
-                        )
-                );
-
-                session.sendMessage(new TextMessage(gson.toJson(candidateJson))); // 동기화된 WebSocket 메시지 전송
-                log.info("Sent ICE candidate: {}", candidateJson);
-
-            } catch (IllegalStateException e) {
-                log.error("Cannot send ICE candidate. WebSocket is in an invalid state: {}", e.getMessage());
-            } catch (IOException e) {
-                log.error("Failed to send ICE candidate", e);
-            }
-        }
+        messagingTemplate.convertAndSend("/topic/huddle/" + huddleId + "/iceCandidate", gson.toJson(candidateJson));
+        log.info("📡 Sent ICE candidate to user {} in huddle {}: {}", targetUserId, huddleId, candidateJson);
     }
+
 }

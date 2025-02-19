@@ -31,7 +31,7 @@ public class ValidationUtils {
                 throw new CustomException(ErrorCode.HUDDLE_NOT_FOUND.getCode(), ErrorCode.HUDDLE_NOT_FOUND.getMsg());
             }
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.UNEXPECTED_ERROR.getCode(), "허들 참여 검증 중 오류 발생");
+            throw new CustomException(ErrorCode.UNEXPECTED_ERROR.getCode(), "유저가 허들 참여 가능한지 검증 중 오류 발생");
         }
     }
 
@@ -92,16 +92,14 @@ public class ValidationUtils {
     public void removeParticipantIfExists(String huddleId, Long userId) {
         try {
             Set<Long> participants = huddleParticipantsRepository.getParticipants(huddleId);
-
             if (participants == null || !participants.contains(userId)) {
-                throw new CustomException(ErrorCode.USER_NOT_FOUND.getCode(), "해당 허들에 유저가 존재하지 않습니다.");
+                log.warn("허들에 존재하지 않는 참가자 제거 시도: huddleId={}, userId={}", huddleId, userId);
+                return;
             }
-
-            // 참가자 삭제
             huddleParticipantsRepository.removeParticipant(huddleId, userId);
             log.info("허들 참가자 삭제 완료: huddleId={}, userId={}", huddleId, userId);
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.UNEXPECTED_ERROR.getCode(), "허들 참가자 삭제 중 오류 발생");
+            log.error("허들 참가자 삭제 중 오류 발생 (무시됨): huddleId={}, userId={}", huddleId, userId, e);
         }
     }
 
@@ -109,16 +107,14 @@ public class ValidationUtils {
     public void removeUserEndpointIfExists(String huddleId, Long userId) {
         try {
             String endpointId = huddleParticipantsRepository.getUserEndpoint(huddleId, userId);
-
             if (endpointId == null) {
-                throw new CustomException(ErrorCode.ENDPOINT_NOT_FOUND.getCode(), "해당 유저의 WebRTC 엔드포인트가 존재하지 않습니다.");
+                log.warn("해당 유저의 WebRTC 엔드포인트가 존재하지 않음: huddleId={}, userId={}", huddleId, userId);
+                return;
             }
-
-            // 엔드포인트 삭제
             huddleParticipantsRepository.removeUserEndpoint(huddleId, userId);
             log.info("WebRTC 엔드포인트 삭제 완료: huddleId={}, userId={}, endpointId={}", huddleId, userId, endpointId);
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.UNEXPECTED_ERROR.getCode(), "WebRTC 엔드포인트 삭제 중 오류 발생");
+            log.error("WebRTC 엔드포인트 삭제 중 오류 발생 (무시됨): huddleId={}, userId={}", huddleId, userId, e);
         }
     }
 
@@ -126,16 +122,14 @@ public class ValidationUtils {
     public void removeUserHuddleIfExists(Long userId) {
         try {
             String huddleId = userHuddleRepository.getUserHuddle(userId);
-
             if (huddleId == null) {
-                throw new CustomException(ErrorCode.HUDDLE_NOT_FOUND.getCode(), "해당 유저가 속한 허들이 존재하지 않습니다.");
+                log.warn("해당 유저가 속한 허들이 존재하지 않음: userId={}", userId);
+                return;
             }
-
-            // 유저-허들 매핑 삭제
             userHuddleRepository.removeUserHuddle(userId);
             log.info("유저의 허들 삭제 완료: userId={}, huddleId={}", userId, huddleId);
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.UNEXPECTED_ERROR.getCode(), "유저 허들 삭제 중 오류 발생");
+            log.error("유저 허들 삭제 중 오류 발생 (무시됨): userId={}", userId, e);
         }
     }
 

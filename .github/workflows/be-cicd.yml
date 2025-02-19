@@ -19,6 +19,7 @@ jobs:
     strategy:
       matrix:
         service:
+          - gateway_server
           - stock_server
           - auth_server
           - workspace_server

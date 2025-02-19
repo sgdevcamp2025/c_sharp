@@ -47,6 +47,28 @@ public class ValidationUtils {
         }
     }
 
+    public static void validateFileId(String fileId) {
+        if (fileId == null || fileId.isEmpty() ) {
+            log.info("Validation file id is null");
+            throw new CustomException(ErrorCode.INVALID_PARAMETER.getCode(), ErrorCode.INVALID_PARAMETER.getMsg());
+        }
+    }
+
+    public static void validateTotalChunksAndChunkIndex(Long totalChunks, Long chunkIndex) {
+        if (totalChunks == null || totalChunks <= 0) {
+            log.info("Validation chunk index is null");
+            throw new CustomException(ErrorCode.INVALID_PARAMETER.getCode(), ErrorCode.INVALID_PARAMETER.getMsg());
+        }
+        if (chunkIndex == null || chunkIndex <= 0) {
+            log.info("Validation chunk index is null");
+            throw new CustomException(ErrorCode.INVALID_PARAMETER.getCode(), ErrorCode.INVALID_PARAMETER.getMsg());
+        }
+        if (chunkIndex > totalChunks) {
+            log.error("chunkIndex({})가 1~{} 범위를 벗어남", chunkIndex, totalChunks);
+            throw new CustomException(ErrorCode.INVALID_PARAMETER.getCode(), ErrorCode.INVALID_PARAMETER.getMsg());
+        }
+    }
+
     public static void validateLengthOfFilesAndThumbnails(int fileLength, int thumbnailLength) {
         if (fileLength < thumbnailLength) {
             log.info("Validation length of files and thumbnails");
