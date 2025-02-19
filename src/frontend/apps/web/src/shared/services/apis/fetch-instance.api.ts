@@ -1,3 +1,5 @@
+'use server';
+
 import { ERROR_MESSAGES } from '@/src/shared/services/models';
 import type {
   HttpMethod,
@@ -8,6 +10,7 @@ import type {
   ApiServerType,
 } from '@/src/shared/services/models';
 import { getBaseUrl } from '@/src/shared/services/lib/utils';
+import { cookies } from 'next/headers';
 
 export async function fetchInstance<TResponse, TBody = JsonValue>(
   serverType: ApiServerType,
@@ -16,9 +19,7 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
   options: FetchOptions<TBody> = {},
 ): Promise<TResponse> {
   try {
-    // 🟢 브라우저 환경에서만 localStorage 접근
-    const token =
-      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = cookies().get('token')?.value;
 
     // 🟢 options 객체에서 필요한 값들을 구조 분해 할당
     const {
