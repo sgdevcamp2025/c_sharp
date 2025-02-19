@@ -36,6 +36,14 @@ public class StompConnectInterceptor implements ChannelInterceptor {
         handleStompCommand(StompHeaderAccessor.wrap(message));
     }
 
+    public void handleDisconnection(StompHeaderAccessor accessor) {
+        if (!StompCommand.DISCONNECT.equals(accessor.getCommand())) {
+            return;
+        }
+
+        handleUserDisconnection(accessor);
+    }
+
     private boolean hasException(Exception ex) {
         return ex != null;
     }
@@ -51,14 +59,6 @@ public class StompConnectInterceptor implements ChannelInterceptor {
         }
 
         handleUserConnection(accessor);
-    }
-
-    private void handleDisconnection(StompHeaderAccessor accessor) {
-        if (!StompCommand.DISCONNECT.equals(accessor.getCommand())) {
-            return;
-        }
-
-        handleUserDisconnection(accessor);
     }
 
     private void handleUserConnection(StompHeaderAccessor accessor) {
