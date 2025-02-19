@@ -10,6 +10,23 @@ spring:
 
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns:
+              - "*"  # 모든 출처 허용
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            exposedHeaders: "*"
+            allowCredentials: true
+
+
+
       default-filters:
         - JwtAuthenticationFilter
         - PassportAuthorizationFilter
