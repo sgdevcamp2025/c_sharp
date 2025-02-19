@@ -13,8 +13,9 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOriginPatterns:
-              - "*"  # 모든 출처 허용
+            allowedOrigins:
+              - "https://jootalkpia.netlify.app"  # 프로덕션 도메인
+              - "http://localhost:3000"  # 특정 포트 지정
             allowedMethods:
               - GET
               - POST

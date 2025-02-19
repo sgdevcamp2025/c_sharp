@@ -1,4 +1,4 @@
-package com.jootalkpia.gateway_server.filter;
+package com.jootalkpia.gateway_server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +16,7 @@ public class GatewayCorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration corsConfig = new CorsConfiguration();
 
-        // 모든 Origin 허용
-        corsConfig.setAllowedOriginPatterns(List.of("*"));
+        corsConfig.setAllowedOrigins(List.of("https://jootalkpia.netlify.app", "http://localhost:3000"));
         corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setExposedHeaders(List.of("*"));
