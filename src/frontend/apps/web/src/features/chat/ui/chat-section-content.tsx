@@ -47,14 +47,14 @@ const ChatSectionContent = () => {
 
   return (
     <>
-      <div className="flex flex-col w-full h-full">
-        <div className="flex flex-1 flex-col w-full h-full overflow-y-auto">
+      <div className="flex flex-col w-full h-full relative">
+        <div className="flex flex-1 flex-col w-full min-h-0 overflow-y-auto pb-[64px]">
           <ChatContent
             setIsThreadOpen={setIsThreadOpen}
             messages={messages}
           />
         </div>
-        <div className="p-4">
+        <div className="pr-4 pl-4 pb-4 flex-shrink-0 sticky bottom-0 bg-white shadow-md">
           <ChatTextarea onSend={handleSendMessage} />
         </div>
       </div>

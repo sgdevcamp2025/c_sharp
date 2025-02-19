@@ -1,9 +1,9 @@
 import ContentText from './content-text';
 import ContentAvatar from './content-avatar';
 
-import { MessageSquareText } from 'lucide-react';
-import type { WebSocketResponsePayload } from '../model';
+import { useChatAutoScroll, type WebSocketResponsePayload } from '../model';
 import { processMessages } from '../lib';
+import { Toaster } from '@workspace/ui/components';
 
 export type ChatContentProps = {
   type?: 'default' | 'live';
@@ -21,6 +21,8 @@ const ChatContent = ({
   avatarUrls,
   setIsThreadOpen,
 }: ChatContentWithAvatarsProps) => {
+  const { bottomRef, containerRef } = useChatAutoScroll(messages);
+
   if (!messages || messages.length === 0) return null;
   console.log('🔗 ChatContent:', { messages });
 
@@ -32,6 +34,7 @@ const ChatContent = ({
   return (
     <>
       <div
+        ref={containerRef}
         className={`flex flex-col w-full pb-2 overflow-auto h-auto ${backgroundColor}`}
       >
         {processedMessages.map((messageData, index) => (
@@ -61,7 +64,9 @@ const ChatContent = ({
             </div>
           </div>
         ))}
+        <div ref={bottomRef} />
       </div>
+      <Toaster />
     </>
   );
 };
