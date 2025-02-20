@@ -1,14 +1,12 @@
 'use client';
 
-import { useLoginRedirect } from '@/src/features/auth';
-import { Loader2 } from 'lucide-react';
+import { RedirectContent } from '@/src/features/auth/ui';
+import { Suspense } from 'react';
 
 export default function RedirectPage() {
-  useLoginRedirect();
-
   return (
-    <div className="w-screen h-screen flex items-center justify-center">
-      <Loader2 className="h-10 w-10 animate-spin text-primary" />
-    </div>
+    <Suspense>
+      <RedirectContent />
+    </Suspense>
   );
 }
