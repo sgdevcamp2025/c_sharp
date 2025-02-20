@@ -19,4 +19,6 @@ export const requestLogin = async (authorizationCode: string) => {
   cookies().set('userId', user.userId, cookieOptions);
   cookies().set('accessToken', token.accessToken, cookieOptions);
   cookies().set('refreshToken', token.refreshToken, cookieOptions);
+
+  return user;
 };

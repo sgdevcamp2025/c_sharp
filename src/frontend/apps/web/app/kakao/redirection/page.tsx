@@ -19,7 +19,11 @@ export default function RedirectPage() {
 
     const fetchLogin = async () => {
       try {
-        await requestLogin(code);
+        const user = await requestLogin(code);
+        if (!user) {
+          throw new Error('사용자 정보가 없습니다.');
+        }
+        localStorage.setItem('user', JSON.stringify(user));
         router.replace('/stock');
       } catch (err) {
         console.error('로그인 실패:', err);
