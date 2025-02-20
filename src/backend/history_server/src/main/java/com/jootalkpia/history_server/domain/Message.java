@@ -1,12 +1,10 @@
 package com.jootalkpia.history_server.domain;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Message {
     @Field("type")
     private String type;

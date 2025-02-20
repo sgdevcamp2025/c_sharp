@@ -3,7 +3,7 @@ package com.jootalkpia.history_server.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jootalkpia.history_server.domain.Message;
 
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record MessageDto(
         String type,
         String text,
