@@ -1,1 +1,4 @@
 rootProject.name = 'file_server'
+
+include(":common_module")
+findProject(":common_module")?.projectDir = file("../common_module")
