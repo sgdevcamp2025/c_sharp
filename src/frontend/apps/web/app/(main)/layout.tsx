@@ -1,4 +1,3 @@
-import AuthWrapper from '@/src/features/auth/ui/auth-wrapper';
 import '@workspace/ui/globals.css';
 
 export default function RootLayout({
@@ -12,9 +11,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <div className="flex flex-col overflow-hidden bg-muted">
-          <AuthWrapper>{children}</AuthWrapper>
-        </div>
+        <div className="flex flex-col overflow-hidden bg-muted">{children}</div>
       </body>
     </html>
   );
