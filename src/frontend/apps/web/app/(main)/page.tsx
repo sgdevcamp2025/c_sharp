@@ -34,8 +34,10 @@ export default function Page() {
           height={110}
         />
         <div className="flex flex-col">
+          <p className="text-gray-500 text-md text-right mr-2">
+            주식 실시간 커뮤니티
+          </p>
           <h1 className="text-5xl font-bold text-orange-500">주톡피아</h1>
-          <p className="text-gray-500 text-md">주식 실시간 커뮤니티</p>
         </div>
       </div>
       <LoginButton />
