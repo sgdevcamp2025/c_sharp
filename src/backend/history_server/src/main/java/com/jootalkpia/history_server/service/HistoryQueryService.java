@@ -2,6 +2,7 @@ package com.jootalkpia.history_server.service;
 
 
 import com.jootalkpia.history_server.domain.ChatMessage;
+import com.jootalkpia.history_server.dto.ChatMessageDto;
 import com.jootalkpia.history_server.dto.ChatMessagePageResponse;
 import com.jootalkpia.history_server.repository.ChatMessageRepository;
 import com.jootalkpia.history_server.repository.UserChannelRepository;
@@ -31,6 +32,10 @@ public class HistoryQueryService {
             chatMessageList = chatMessageRepository.findByChannelIdAndThreadIdGreaterThanOrderByThreadIdAsc(channelId, cursorId, PageRequest.of(0, size + 1));
         }
 
+        List<ChatMessageDto> responseMessages = chatMessageList.stream()
+                .map(ChatMessageDto::from)
+                .toList();
+
         hasNext = chatMessageList.size() > size;
         if (hasNext) {
             chatMessageList = chatMessageList.subList(0, size);
@@ -40,6 +45,6 @@ public class HistoryQueryService {
             lastThreadId = chatMessageList.get(chatMessageList.size() - 1).getThreadId();
         }
 
-        return new ChatMessagePageResponse(hasNext, lastThreadId, chatMessageList);
+        return new ChatMessagePageResponse(hasNext, lastThreadId, responseMessages);
     }
 }
