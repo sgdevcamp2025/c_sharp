@@ -1,7 +1,7 @@
 package com.jootalkpia.history_server.service;
 
 import com.jootalkpia.history_server.domain.ChatMessage;
-import com.jootalkpia.history_server.dto.ChatMessageDto;
+import com.jootalkpia.history_server.dto.ThreadDto;
 import com.jootalkpia.history_server.dto.ChatMessagePageResponse;
 import com.jootalkpia.history_server.repository.ChatMessageRepository;
 import com.jootalkpia.history_server.repository.UserChannelRepository;
@@ -25,7 +25,7 @@ public class HistoryQueryService {
             return new ChatMessagePageResponse(false, null, Collections.emptyList());
         }
 
-        List<ChatMessageDto> responseMessages = convertToDtoList(chatMessageList);
+        List<ThreadDto> responseMessages = convertToDtoList(chatMessageList);
         boolean hasNext = determineHasNext(responseMessages, size);
 
         // size + 1로 조회했으므로, 초과한 1개 데이터 제거
@@ -61,23 +61,23 @@ public class HistoryQueryService {
     /**
      * ChatMessage 리스트를 ChatMessageDto 리스트로 변환하는 메서드
      */
-    private List<ChatMessageDto> convertToDtoList(List<ChatMessage> chatMessageList) {
+    private List<ThreadDto> convertToDtoList(List<ChatMessage> chatMessageList) {
         return chatMessageList.stream()
-                .map(ChatMessageDto::from)
+                .map(ThreadDto::from)
                 .toList();
     }
 
     /**
      * hasNext(다음 페이지 여부)를 판별하는 메서드
      */
-    private boolean determineHasNext(List<ChatMessageDto> responseMessages, int size) {
+    private boolean determineHasNext(List<ThreadDto> responseMessages, int size) {
         return responseMessages.size() > size;
     }
 
     /**
      * 마지막 threadId를 반환하는 메서드
      */
-    private Long getLastThreadId(List<ChatMessageDto> responseMessages) {
+    private Long getLastThreadId(List<ThreadDto> responseMessages) {
         if (responseMessages.isEmpty()) {
             return null;
         }

@@ -26,7 +26,7 @@ public record MessageDto(
                 .videoUrl(this.videoUrl)
                 .build();
     }
-    public static MessageDto mongoToDto(Message message) {
+    public static MessageDto documentToDto(Message message) {
         return new MessageDto(
                 message.getType(),
                 message.getText(),

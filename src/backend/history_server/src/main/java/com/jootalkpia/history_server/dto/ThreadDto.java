@@ -4,7 +4,7 @@ import com.jootalkpia.history_server.domain.ChatMessage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record ChatMessageDto(
+public record ThreadDto(
         Long channelId,
         Long threadId,
         String threadDateTime,
@@ -13,8 +13,8 @@ public record ChatMessageDto(
         String userProfileImage,
         List<MessageDto> messages
 ) {
-    public static ChatMessageDto from(ChatMessage chatMessage) {
-        return new ChatMessageDto(
+    public static ThreadDto from(ChatMessage chatMessage) {
+        return new ThreadDto(
                 chatMessage.getChannelId(),
                 chatMessage.getThreadId(),
                 chatMessage.getThreadDateTime(),
@@ -22,7 +22,7 @@ public record ChatMessageDto(
                 chatMessage.getUserNickname(),
                 chatMessage.getUserProfileImage(),
                 chatMessage.getMessages().stream()
-                        .map(MessageDto::mongoToDto)  // Message 변환
+                        .map(MessageDto::documentToDto)  // Message 변환
                         .collect(Collectors.toList())
         );
     }

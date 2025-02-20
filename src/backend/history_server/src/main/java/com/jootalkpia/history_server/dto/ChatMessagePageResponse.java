@@ -4,7 +4,7 @@ import java.util.List;
 
 public record ChatMessagePageResponse(
         boolean hasNext,
-        Long lastMessageId,
-        List<ChatMessageDto> messages
+        Long lastCursorId,
+        List<ThreadDto> threads
 ) {}
 
