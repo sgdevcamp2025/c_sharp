@@ -13,13 +13,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class HistoryQueryService {
 
-    private static final int DEFAULT_PAGE_SIZE = 30;
     private final ChatMessageRepository chatMessageRepository;
 
     public ChatMessagePageResponse getChatMessagesForward(Long channelId, Long cursorThreadId, int size, Long userId) {
-        if (size <= 0) {
-            size = DEFAULT_PAGE_SIZE;
-        }
 
         List<ChatMessage> chatMessages;
         boolean hasNext;

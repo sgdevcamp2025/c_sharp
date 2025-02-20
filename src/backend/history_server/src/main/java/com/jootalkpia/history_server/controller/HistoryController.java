@@ -14,13 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class HistoryController {
 
+    private static final String DEFAULT_PAGE_SIZE = "30";
     private final HistoryQueryService historyQueryService;
 
     @GetMapping("/api/v1/history/{channelId}")
     public ChatMessagePageResponse getChatMessagesForward(
             @PathVariable Long channelId,
             @RequestParam(required = false) Long cursorId,    //처음 요청시엔 서버 내에서 안읽은 메세지 값으로 설정하기 위해
-            @RequestParam(defaultValue = "30") int size,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
             @CurrentUser UserInfo userInfo) {
         return historyQueryService.getChatMessagesForward(channelId, cursorId, size, userInfo.userId());
     }
