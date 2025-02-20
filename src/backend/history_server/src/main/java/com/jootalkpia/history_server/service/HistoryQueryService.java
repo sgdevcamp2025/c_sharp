@@ -1,6 +1,5 @@
 package com.jootalkpia.history_server.service;
 
-
 import com.jootalkpia.history_server.domain.ChatMessage;
 import com.jootalkpia.history_server.dto.ChatMessageDto;
 import com.jootalkpia.history_server.dto.ChatMessagePageResponse;
@@ -20,40 +19,68 @@ public class HistoryQueryService {
     private final UserChannelRepository userChannelRepository;
 
     public ChatMessagePageResponse getChatMessagesForward(Long channelId, Long cursorId, int size, Long userId) {
+        List<ChatMessage> chatMessageList = fetchMessagesForward(channelId, cursorId, size, userId);
 
-        List<ChatMessage> chatMessageList;
-        boolean hasNext;
-        Long lastThreadId = null;
-        if (cursorId == null) {
-            // 첫 요청이면 DB에서 마지막 읽은 threadId 조회
-            final Long lastReadId = userChannelRepository.findLastReadIdByUserIdAndChannelId(userId, channelId);
-
-            // lastReadId가 null이면(첫 입장일 경우) 빈 응답 반환
-            if (lastReadId == null) {
-                return new ChatMessagePageResponse(false, null, Collections.emptyList());
-            }
-
-            // threadId가 존재하면 메시지 조회
-            chatMessageList = chatMessageRepository.findByChannelIdAndThreadIdGreaterThanOrderByThreadIdAsc(channelId, lastReadId, PageRequest.of(0, size + 1));
-        }
-        else {
-            // thread_id 이후의 메시지 조회
-            chatMessageList = chatMessageRepository.findByChannelIdAndThreadIdGreaterThanOrderByThreadIdAsc(channelId, cursorId, PageRequest.of(0, size + 1));
+        if (chatMessageList.isEmpty()) {
+            return new ChatMessagePageResponse(false, null, Collections.emptyList());
         }
 
-        List<ChatMessageDto> responseMessages = chatMessageList.stream()
-                .map(ChatMessageDto::from)
-                .toList();
+        List<ChatMessageDto> responseMessages = convertToDtoList(chatMessageList);
+        boolean hasNext = responseMessages.size() > size;
 
-        hasNext = responseMessages.size() > size;
+        // size + 1로 조회했으므로, 초과한 1개 데이터 제거
         if (hasNext) {
             responseMessages = responseMessages.subList(0, size);
         }
 
-        if (!responseMessages.isEmpty()) {
-            lastThreadId = responseMessages.get(responseMessages.size() - 1).threadId();
-        }
+        Long lastThreadId = getLastThreadId(responseMessages);
 
         return new ChatMessagePageResponse(hasNext, lastThreadId, responseMessages);
+    }
+
+
+    /**
+     * DB에서 채팅 메시지를 조회하는 메서드
+     */
+    private List<ChatMessage> fetchMessagesForward(Long channelId, Long cursorId, int size, Long userId) {
+        if (cursorId == null) {
+            Long lastReadId = userChannelRepository.findLastReadIdByUserIdAndChannelId(userId, channelId);
+
+            if (lastReadId == null) {
+                return Collections.emptyList();  // 첫 입장 시 빈 응답
+            }
+
+            return chatMessageRepository.findByChannelIdAndThreadIdGreaterThanOrderByThreadIdAsc(
+                    channelId, lastReadId, PageRequest.of(0, size + 1));
+        }
+
+        return chatMessageRepository.findByChannelIdAndThreadIdGreaterThanOrderByThreadIdAsc(
+                channelId, cursorId, PageRequest.of(0, size + 1));
+    }
+
+    /**
+     * ChatMessage 리스트를 ChatMessageDto 리스트로 변환하는 메서드
+     */
+    private List<ChatMessageDto> convertToDtoList(List<ChatMessage> chatMessageList) {
+        return chatMessageList.stream()
+                .map(ChatMessageDto::from)
+                .toList();
+    }
+
+    /**
+     * hasNext(다음 페이지 여부)를 판별하는 메서드
+     */
+    private boolean determineHasNext(List<ChatMessageDto> responseMessages, int size) {
+        return responseMessages.size() > size;
+    }
+
+    /**
+     * 마지막 threadId를 반환하는 메서드
+     */
+    private Long getLastThreadId(List<ChatMessageDto> responseMessages) {
+        if (responseMessages.isEmpty()) {
+            return null;
+        }
+        return responseMessages.get(responseMessages.size() - 1).threadId();
     }
 }
