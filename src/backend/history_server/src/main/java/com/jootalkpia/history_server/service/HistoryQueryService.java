@@ -84,7 +84,16 @@ public class HistoryQueryService {
     private List<ChatMessage> fetchMessagesBackward(Long channelId, Long cursorId, int size, Long userId) {
         Long lastReadId = cursorId;
 
+        // 첫 요청 시 처리
+        if (cursorId == null) {
+            lastReadId = userChannelRepository.findLastReadIdByUserIdAndChannelId(userId, channelId);
 
+
+            // 채널 내 메시지가 없는 경우 빈 리스트 반환
+            if (lastReadId == null) {
+                return Collections.emptyList();
+            }
+        }
 
         // lastReadId 이하의 메시지를 최신순 (DESC)으로 조회
         return chatMessageRepository.findByChannelIdAndThreadIdLessThanEqualOrderByThreadIdDesc(
