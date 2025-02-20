@@ -22,6 +22,9 @@ repositories {
 }
 
 dependencies {
+	//common-module
+	implementation project(":common_module")
+
 	//spring boot
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
