@@ -108,7 +108,7 @@ public class FileService {
             TEMP_FILE_STORAGE.remove(tempFileIdentifier);
             chunkList.forEach(File::delete);
 
-            return new UploadFileResponseDto(fileId, fileType);
+            return new UploadFileResponseDto("200", "complete", fileId, fileType);
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_PROCESSING_FAILED.getCode(), ErrorCode.FILE_PROCESSING_FAILED.getMsg());
         }
@@ -149,19 +149,25 @@ public class FileService {
 
     @Transactional
     public void uploadThumbnail(Long fileId, MultipartFile thumbnail) {
+        log.info("upload thumbnail file id: {}", fileId);
         Files fileEntity = fileRepository.findById(fileId)
                 .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND.getCode(), ErrorCode.FILE_NOT_FOUND.getMsg()));
 
         if (!"VIDEO".equals(fileEntity.getFileType())) {
             throw new CustomException(ErrorCode.UNSUPPORTED_FILE_TYPE.getCode(), ErrorCode.UNSUPPORTED_FILE_TYPE.getMsg());
         }
+        log.info("upload thumbnail file id: {}", fileId);
 
         try {
-            File tempFile = File.createTempFile("thumbnail_", ".jpg"); // 확장자는 실제 타입에 맞게 변경
+            String suffix = fileTypeDetector.detectFileTypeFromMultipartFile(thumbnail);
+            log.info("upload thumbnail file id: {}", fileId);
+            File tempFile = File.createTempFile("thumbnail_", suffix);
             thumbnail.transferTo(tempFile);
 
-            String folder = "thumbnails/" + fileEntity.getFileId();
-            s3Service.uploadFileMultipart(tempFile, folder, fileId);
+            String folder = "thumbnails/";
+            String urlThumbnail = s3Service.uploadFileMultipart(tempFile, folder, fileId);
+
+            fileEntity.setUrlThumbnail(urlThumbnail);
 
             tempFile.delete();
         } catch (IOException e) {

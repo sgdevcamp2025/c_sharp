@@ -57,14 +57,13 @@ public class FileController {
 
 
     @PostMapping("/thumbnail")
-    public ResponseEntity<Void> uploadThumbnail(@RequestParam Long fileId, @RequestPart MultipartFile thumbnail) {
+    public ResponseEntity<Map<String, Object>> uploadThumbnail(@RequestParam Long fileId, @RequestPart MultipartFile thumbnail) {
         log.info("got uploadThumbnail id: {}", fileId);
         ValidationUtils.validateFile(thumbnail);
         ValidationUtils.validateFileId(fileId);
         fileService.uploadThumbnail(fileId, thumbnail);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Map.of("code", 200, "status", "complete"));
     }
-
 
 
     @PostMapping("/chunk")
