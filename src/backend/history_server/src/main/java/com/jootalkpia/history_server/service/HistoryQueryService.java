@@ -88,6 +88,12 @@ public class HistoryQueryService {
         if (cursorId == null) {
             lastReadId = userChannelRepository.findLastReadIdByUserIdAndChannelId(userId, channelId);
 
+            // lastReadId가 null이면 (첫 입장 시) 가장 최신 메세지로 설정
+            if (lastReadId == null) {
+                lastReadId = chatMessageRepository.findTopByChannelIdOrderByThreadIdDesc(channelId)
+                        .map(ChatMessage::getThreadId) // 가장 최신 메시지의 threadId 반환
+                        .orElse(null); // 채널에 메시지가 없으면 null 반환
+            }
 
             // 채널 내 메시지가 없는 경우 빈 리스트 반환
             if (lastReadId == null) {
