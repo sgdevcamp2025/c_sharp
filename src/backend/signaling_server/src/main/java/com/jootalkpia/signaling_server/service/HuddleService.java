@@ -8,7 +8,7 @@ import com.jootalkpia.signaling_server.repository.HuddleParticipantsRepository;
 import com.jootalkpia.signaling_server.repository.ChannelHuddleRepository;
 import com.jootalkpia.signaling_server.repository.HuddlePipelineRepository;
 import com.jootalkpia.signaling_server.repository.UserHuddleRepository;
-import com.jootalkpia.signaling_server.util.ValidationUtils;
+import com.jootalkpia.signaling_server.rtc.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
