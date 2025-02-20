@@ -5,8 +5,10 @@ import com.jootalkpia.file_server.dto.MultipartChunk;
 import com.jootalkpia.file_server.dto.UploadChunkRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileResponseDto;
+import com.jootalkpia.file_server.dto.UploadFilesRequestDto;
 import com.jootalkpia.file_server.dto.UploadFilesResponseDto;
 import com.jootalkpia.file_server.service.FileService;
+import com.jootalkpia.file_server.service.FileTypeDetector;
 import com.jootalkpia.file_server.utils.ValidationUtils;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +35,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 @Slf4j
 public class FileController {
     private final FileService fileService;
-    private final Long userId = 1L;//JootalkpiaAuthenticationContext.getUserInfo().userId();
+    private final FileTypeDetector fileTypeDetector;
 
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
@@ -42,10 +43,10 @@ public class FileController {
         return ResponseEntity.ok("Test successful");
     }
 
-    @PostMapping("/init-upload/{tempFileIdentifier}")
-    public ResponseEntity<Void> initFileUpload(@PathVariable String tempFileIdentifier) {
+    @GetMapping("/init-upload/{tempFileIdentifier}")
+    public ResponseEntity<Map<String, Object>> initFileUpload(@PathVariable String tempFileIdentifier) {
         log.info("init-upload 요청 받음: {}", tempFileIdentifier);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Map.of("code", 200, "status", "complete"));
     }
 
 //    @DeleteMapping("/fileId")
@@ -54,7 +55,6 @@ public class FileController {
 //        fileService.deleteFile(fileId);
 //        return ResponseEntity.ok().build();
 //    }
-
 
     @PostMapping("/thumbnail")
     public ResponseEntity<Map<String, Object>> uploadThumbnail(@RequestParam Long fileId, @RequestPart MultipartFile thumbnail) {
@@ -94,15 +94,28 @@ public class FileController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/small")
+    public ResponseEntity<UploadFileResponseDto> uploadFile(@ModelAttribute UploadFileRequestDto uploadFileRequest) {
+        log.info("got uploadFileRequest: {}", uploadFileRequest.getWorkspaceId());
+        ValidationUtils.validateWorkSpaceId(uploadFileRequest.getWorkspaceId());
+        ValidationUtils.validateChannelId(uploadFileRequest.getChannelId());
+        ValidationUtils.validateFile(uploadFileRequest.getFile());
+
+        UploadFileResponseDto response = fileService.uploadFile(uploadFileRequest);
+        return ResponseEntity.ok(response);
+    }
+
 
     @PostMapping
-    public ResponseEntity<UploadFilesResponseDto> uploadFiles(@ModelAttribute UploadFileRequestDto uploadFileRequest) {
+    public ResponseEntity<UploadFilesResponseDto> uploadFiles(@ModelAttribute UploadFilesRequestDto uploadFileRequest) {
         log.info("got uploadFileRequest: {}", uploadFileRequest);
         ValidationUtils.validateLengthOfFilesAndThumbnails(uploadFileRequest.getFiles().length, uploadFileRequest.getThumbnails().length);
         ValidationUtils.validateWorkSpaceId(uploadFileRequest.getWorkspaceId());
         ValidationUtils.validateChannelId(uploadFileRequest.getChannelId());
         ValidationUtils.validateFiles(uploadFileRequest.getFiles());
         ValidationUtils.validateFiles(uploadFileRequest.getThumbnails());
+
+        Long userId = 1L;
 
         log.info("got uploadFileRequest: {}", uploadFileRequest.getFiles().length);
         UploadFilesResponseDto response = fileService.uploadFiles(userId, uploadFileRequest);
@@ -119,7 +132,7 @@ public class FileController {
         // response 생성
         long contentLength = s3InputStream.response().contentLength();
 
-        // Content-Type 가져오기 기본값: application/octet-stream
+        // Content-Type 가져오기 기      본값: application/octet-stream
         String contentType = s3InputStream.response().contentType() != null
                 ? s3InputStream.response().contentType()
                 : MediaType.APPLICATION_OCTET_STREAM_VALUE;

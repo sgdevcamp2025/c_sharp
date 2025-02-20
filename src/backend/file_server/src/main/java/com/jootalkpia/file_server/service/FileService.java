@@ -1,12 +1,11 @@
 package com.jootalkpia.file_server.service;
 
 import com.jootalkpia.file_server.dto.ChangeProfileResponseDto;
-import com.jootalkpia.file_server.dto.MultipartChunk;
 import com.jootalkpia.file_server.dto.UploadChunkRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileRequestDto;
+import com.jootalkpia.file_server.dto.UploadFilesRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileResponseDto;
 import com.jootalkpia.file_server.dto.UploadFilesResponseDto;
-import com.jootalkpia.file_server.dto.UploadThumbnailRequestDto;
 import com.jootalkpia.file_server.entity.Files;
 import com.jootalkpia.file_server.entity.User;
 import com.jootalkpia.file_server.exception.common.CustomException;
@@ -20,13 +19,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -175,9 +171,26 @@ public class FileService {
         }
     }
 
+    @Transactional
+    public UploadFileResponseDto uploadFile(UploadFileRequestDto uploadFileRequestDto) {
+        try {
+            String fileType = fileTypeDetector.detectFileTypeFromMultipartFile(uploadFileRequestDto.getFile());
+
+            Long fileId = null;
+            Files filesEntity = new Files();
+            fileRepository.save(filesEntity);
+            fileId = filesEntity.getFileId();
+
+            uploadEachFile(fileType, fileId, uploadFileRequestDto.getFile());
+            return new UploadFileResponseDto("200", "complete", fileId, fileType);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED.getCode(), ErrorCode.IMAGE_UPLOAD_FAILED.getMsg());
+        }
+    }
+
 
     @Transactional
-    public UploadFilesResponseDto uploadFiles(Long userId, UploadFileRequestDto uploadFileRequestDto) {
+    public UploadFilesResponseDto uploadFiles(Long userId, UploadFilesRequestDto uploadFileRequestDto) {
         MultipartFile[] files = uploadFileRequestDto.getFiles();
         MultipartFile[] thumbnails = uploadFileRequestDto.getThumbnails();
 
