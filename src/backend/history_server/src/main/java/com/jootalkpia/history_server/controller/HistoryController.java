@@ -25,7 +25,6 @@ public class HistoryController {
             @RequestParam(required = false) Long cursorId,
             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
             @CurrentUser UserInfo userInfo) {
-        System.out.println(cursorId);
         return historyQueryService.
                 getChatMessagesForward(channelId, cursorId, size, userInfo.userId());
     }

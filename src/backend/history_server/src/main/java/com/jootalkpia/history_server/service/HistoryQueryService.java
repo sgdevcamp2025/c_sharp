@@ -45,13 +45,13 @@ public class HistoryQueryService {
                 .map(ChatMessageDto::from)
                 .toList();
 
-        hasNext = chatMessageList.size() > size;
+        hasNext = responseMessages.size() > size;
         if (hasNext) {
-            chatMessageList = chatMessageList.subList(0, size);
+            responseMessages = responseMessages.subList(0, size);
         }
 
-        if (!chatMessageList.isEmpty()) {
-            lastThreadId = chatMessageList.get(chatMessageList.size() - 1).getThreadId();
+        if (!responseMessages.isEmpty()) {
+            lastThreadId = responseMessages.get(responseMessages.size() - 1).threadId();
         }
 
         return new ChatMessagePageResponse(hasNext, lastThreadId, responseMessages);
