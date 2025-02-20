@@ -1,6 +1,11 @@
 package com.jootalkpia.state_server.service;
 
-import com.jootalkpia.state_server.entity.RedisKeys;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.jootalkpia.state_server.dto.ChannelInfo;
+import com.jootalkpia.state_server.dto.CommonData;
+import com.jootalkpia.state_server.dto.PushMessageToKafka;
+import com.jootalkpia.state_server.entity.common.RedisKeys;
+import com.jootalkpia.state_server.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,6 +21,15 @@ import java.util.Set;
 public class StateService {
     private final RedisTemplate<String, String> stringOperRedisTemplate;
     private final RedisTemplate<String, Object> objectOperRedisTemplate;
+
+    private final ChannelRepository channelRepository;
+
+    public PushMessageToKafka createPushMessage(JsonNode commonNode,JsonNode messagesNode, String sessionId) {
+        CommonData commonData = CommonData.from(commonNode);
+        ChannelInfo channelInfo = channelRepository.findChannelFromId(Long.valueOf(commonData.channelId()));
+
+        return PushMessageToKafka.from(sessionId, commonData, messagesNode, channelInfo);
+    }
 
     public Set<String> findNotificationTargets(String channelId) {
         Set<String> subscriber = findSubscribers(channelId);
