@@ -19,7 +19,7 @@ const LoginButton = () => {
       className="p-0 border-none bg-transparent w-auto h-auto"
     >
       <Image
-        src="/images/kakao_login_large_narrow.png"
+        src="/images/kakao-login-large-narrow.png"
         alt="카카오 로그인"
         width={200}
         height={50}
