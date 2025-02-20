@@ -1,5 +1,6 @@
 'use client';
 
+import { requestLogin } from '@/src/features/auth/api/requestLogin.api';
 import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
@@ -18,7 +19,7 @@ export default function RedirectPage() {
 
     const fetchLogin = async () => {
       try {
-        //fetch로직
+        await requestLogin(code);
         router.replace('/stock');
       } catch (err) {
         console.error('로그인 실패:', err);
