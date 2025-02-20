@@ -8,6 +8,8 @@ import com.jootalkpia.file_server.dto.UploadFileResponseDto;
 import com.jootalkpia.file_server.dto.UploadFilesResponseDto;
 import com.jootalkpia.file_server.service.FileService;
 import com.jootalkpia.file_server.utils.ValidationUtils;
+import com.jootalkpia.passport.anotation.CurrentUser;
+import com.jootalkpia.passport.component.UserInfo;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -120,14 +122,14 @@ public class FileController {
                 .body(new InputStreamResource(s3InputStream));
     }
 
-    @PostMapping("/{userId}/profile-image")
+    @PostMapping("/profile-image")
     public ResponseEntity<ChangeProfileResponseDto> changeProfile(
-            @PathVariable Long userId,
-            @RequestParam("newImage") MultipartFile newImage) {
+            @RequestParam("newImage") MultipartFile newImage,
+            @CurrentUser UserInfo userInfo) {
         log.info("got new profile Image: {}", newImage);
         ValidationUtils.validateFile(newImage);
 
-        ChangeProfileResponseDto response = fileService.changeProfile(userId, newImage);
+        ChangeProfileResponseDto response = fileService.changeProfile(userInfo.userId(), newImage);
         return ResponseEntity.ok(response);
     }
 }
