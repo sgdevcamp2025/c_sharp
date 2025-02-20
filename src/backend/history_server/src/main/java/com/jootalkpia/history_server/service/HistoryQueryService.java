@@ -15,29 +15,28 @@ public class HistoryQueryService {
 
     private final ChatMessageRepository chatMessageRepository;
 
-    public ChatMessagePageResponse getChatMessagesForward(Long channelId, Long cursorThreadId, int size, Long userId) {
+    public ChatMessagePageResponse getChatMessagesForward(Long channelId, Long cursorId, int size, Long userId) {
 
-        List<ChatMessage> chatMessages;
+        List<ChatMessage> chatMessageList;
         boolean hasNext;
         Long lastThreadId = null;
 
-        if (cursorThreadId == null) {
-            // 첫 요청: thread_id 기준 정렬하여 가져오기
-            chatMessages = chatMessageRepository.findByChannelIdOrderByThreadIdAsc(channelId, PageRequest.of(0, size + 1));
+        if (cursorId == null) { //첫요청 이면 db의 저장된 thread id가 cursorId
+            chatMessageList = chatMessageRepository.findByChannelIdOrderByThreadIdAsc(channelId, PageRequest.of(0, size + 1));
         } else {
             // thread_id 이후의 메시지 조회
-            chatMessages = chatMessageRepository.findByChannelIdAndThreadIdGreaterThanOrderByThreadIdAsc(channelId, cursorThreadId, PageRequest.of(0, size + 1));
+            chatMessageList = chatMessageRepository.findByChannelIdAndThreadIdGreaterThanOrderByThreadIdAsc(channelId, cursorId, PageRequest.of(0, size + 1));
         }
 
-        hasNext = chatMessages.size() > size;
+        hasNext = chatMessageList.size() > size;
         if (hasNext) {
-            chatMessages = chatMessages.subList(0, size);
+            chatMessageList = chatMessageList.subList(0, size);
         }
 
-        if (!chatMessages.isEmpty()) {
-            lastThreadId = chatMessages.get(chatMessages.size() - 1).getThreadId();
+        if (!chatMessageList.isEmpty()) {
+            lastThreadId = chatMessageList.get(chatMessageList.size() - 1).getThreadId();
         }
 
-        return new ChatMessagePageResponse(hasNext, lastThreadId, chatMessages);
+        return new ChatMessagePageResponse(hasNext, lastThreadId, chatMessageList);
     }
 }
