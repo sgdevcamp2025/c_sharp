@@ -1,6 +1,6 @@
 'use client';
 
-import { requestLogin } from '@/src/features/auth/api/requestLogin.api';
+import { requestLogin } from '@/src/features/auth';
 import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
