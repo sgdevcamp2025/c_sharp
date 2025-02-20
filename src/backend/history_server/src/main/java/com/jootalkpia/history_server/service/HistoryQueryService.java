@@ -26,7 +26,7 @@ public class HistoryQueryService {
         }
 
         List<ChatMessageDto> responseMessages = convertToDtoList(chatMessageList);
-        boolean hasNext = responseMessages.size() > size;
+        boolean hasNext = determineHasNext(responseMessages, size);
 
         // size + 1로 조회했으므로, 초과한 1개 데이터 제거
         if (hasNext) {
