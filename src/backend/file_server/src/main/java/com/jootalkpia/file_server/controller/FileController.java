@@ -74,7 +74,7 @@ public class FileController {
             @RequestParam("channelId") Long channelId,
             @RequestParam("tempFileIdentifier") String tempFileIdentifier,
             @RequestParam("totalChunks") Long totalChunks,
-            @RequestParam("chunkSize") Long chunkSize,
+            @RequestParam("totalSize") Long totalSize,
             @RequestParam("chunkInfo.chunkIndex") Long chunkIndex,
             @RequestPart("chunkInfo.chunk") MultipartFile chunk) {
 
@@ -89,7 +89,7 @@ public class FileController {
         // DTO로 변환
         MultipartChunk multipartChunk = new MultipartChunk(chunkIndex, chunk);
         UploadChunkRequestDto request = new UploadChunkRequestDto(
-                workspaceId, channelId, tempFileIdentifier, totalChunks, chunkSize, multipartChunk
+                workspaceId, channelId, tempFileIdentifier, totalChunks, totalSize, multipartChunk
         );
 
         Object response = fileService.uploadFileChunk(request);
