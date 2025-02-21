@@ -1,10 +1,7 @@
 package com.jootalkpia.chat_server.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jootalkpia.chat_server.dto.ChatMessageToKafka;
-import com.jootalkpia.chat_server.dto.MinutePriceResponse;
-import com.jootalkpia.chat_server.dto.PushMessageToKafka;
+import com.jootalkpia.chat_server.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -72,9 +69,15 @@ public class KafkaConsumer {
         try {
             PushMessageToKafka pushMessageToKafka = objectMapper.readValue(kafkaMessage, PushMessageToKafka.class);
             String cleanSessionId = pushMessageToKafka.sessionId().replace("\"", "");
+            String workspaceId = pushMessageToKafka.workspaceId();
 
-            messagingTemplate.convertAndSend("/subscribe/notification." + cleanSessionId, pushMessageToKafka);
+            PushMessage pushMessage = PushMessage.from(pushMessageToKafka);
+            ReadCountMessage readCountMessage = ReadCountMessage.from(pushMessageToKafka);
 
+            messagingTemplate.convertAndSend("/subscribe/notification." + cleanSessionId, pushMessage);
+            messagingTemplate.convertAndSend("/subscribe/notification." + cleanSessionId + "/workspace." + workspaceId, readCountMessage);
+
+            log.info("/subscribe/notification." + cleanSessionId + "/workspace." + workspaceId);
             log.info("dto ===> " + pushMessageToKafka);
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex); // 추후에 GlobalException 처리
