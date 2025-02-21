@@ -1,6 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import * as StompJs from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 const STOMP_SERVER_URL = 'http//13.125.13.209:8090/ws';
 const RTC_CONFIGURATION = {
@@ -26,7 +28,8 @@ export default function page() {
   const [isInCall, setIsInCall] = useState(false);
 
   //stomp연결
-  const [stompClient, setStompClient] = useState(null);
+  const stompClient = useRef<StompJs.Client | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   //참여자 목록
   const participants = useRef<{ [key: string]: any }>({});
@@ -36,6 +39,40 @@ export default function page() {
 
   //내 미디어 스트림
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  //웹소켓(sockjs+stomp) 연결
+  useEffect(() => {
+    if (stompClient.current) {
+      stompClient.current.deactivate();
+    }
+
+    stompClient.current = new StompJs.Client({
+      webSocketFactory: () => new SockJS(STOMP_SERVER_URL),
+      debug: (msg: string) => console.log('[DEBUG]', msg),
+      onConnect: () => {
+        console.log('✅ WebSocket Connected');
+        setIsConnected(true);
+      },
+      onStompError: (frame) => {
+        console.error(
+          '❌ WebSocket error:',
+          frame.headers['message'],
+          frame.body,
+        );
+      },
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+    });
+
+    stompClient.current.activate();
+
+    return () => {
+      if (stompClient.current) {
+        stompClient.current.deactivate();
+        stompClient.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div>
