@@ -98,6 +98,7 @@ public class FileService {
             filesEntity.setUrl(s3Url);
             filesEntity.setFileType(fileType);
             filesEntity.setFileSize(mergedFile.length());
+            filesEntity.setMimeType(fileTypeDetector.detectMimeType(mergedFile));
             fileRepository.save(filesEntity);
 
             // 임시 데이터 정리
