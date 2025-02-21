@@ -15,7 +15,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
     private final StompConnectInterceptor stompConnectInterceptor;
     private final StompSubscriptionInterceptor stompSubscriptionInterceptor;
     private final StompValidationInterceptor stompValidationInterceptor;

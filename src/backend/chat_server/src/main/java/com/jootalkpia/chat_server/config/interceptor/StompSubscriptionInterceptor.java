@@ -27,6 +27,7 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
     private static final long SESSION_EXPIRY_HOURS = 4;
     private static final String DEFAULT_CHANNEL = "none";
     private static final Long DEFAULT_ID = 1L;
+    private static final String SUBSCRIBE_CHAT_PREFIX = "/subscribe/chat.";
 
     private final RedisTemplate<String, String> stringOperRedisTemplate;
     private final RedisTemplate<String, Object> objectOperRedisTemplate;
@@ -79,7 +80,9 @@ public class StompSubscriptionInterceptor implements ChannelInterceptor {
             return;
         }
 
-        handleChatSubscription(accessor);
+        if (accessor.getDestination().startsWith(SUBSCRIBE_CHAT_PREFIX)) {
+            handleChatSubscription(accessor);
+        }
     }
 
     private void handleUnsubscription(StompHeaderAccessor accessor) {

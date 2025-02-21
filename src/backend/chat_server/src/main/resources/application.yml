@@ -37,10 +37,12 @@ logging:
 topic:
   minute: jootalkpia.stock.prd.minute
   chat: jootalkpia.chat.prd.message
+  push: jootalkpia.push.prd.message
 
 group:
   minute: minute-price-save-consumer-group
   chat: chat-message-handle-consumer-group-${SERVER_PORT}
+  push: push-message-handle-consumer-group-${SERVER_PORT}
 
 server:
  port: ${SERVER_PORT}
