@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Avatar,
   AvatarFallback,
@@ -8,8 +10,10 @@ import {
 } from '@workspace/ui/components';
 import { CircleUserRound } from 'lucide-react';
 import ProfilePopoverContent from './profile-popover-content';
+import { useUserStore } from '@/src/entities';
 
 const ProfilePopover = () => {
+  const { profileImage } = useUserStore((state) => state.user);
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -17,7 +21,7 @@ const ProfilePopover = () => {
           variant="default"
           className="cursor-pointer"
         >
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage src={profileImage} />
           <AvatarFallback>
             <CircleUserRound size={40} />
           </AvatarFallback>
