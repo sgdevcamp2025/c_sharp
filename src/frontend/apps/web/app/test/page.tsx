@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as StompJs from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-const STOMP_SERVER_URL = 'http//13.125.13.209:8090/ws';
+const STOMP_SERVER_URL = 'http://13.125.13.209:8090/ws';
 const RTC_CONFIGURATION = {
   iceServers: [
     { urls: 'stun:13.125.13.209:3478' },
@@ -45,9 +45,9 @@ export default function page() {
     if (stompClient.current) {
       stompClient.current.deactivate();
     }
-
+    console.log('STOMP_SERVER_URL:', STOMP_SERVER_URL);
     stompClient.current = new StompJs.Client({
-      webSocketFactory: () => new SockJS(STOMP_SERVER_URL),
+      webSocketFactory: () => new SockJS(`${STOMP_SERVER_URL}`),
       debug: (msg: string) => console.log('[DEBUG]', msg),
       onConnect: () => {
         console.log('✅ WebSocket Connected');
@@ -60,8 +60,7 @@ export default function page() {
           frame.body,
         );
       },
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
+      reconnectDelay: 0,
     });
 
     stompClient.current.activate();
@@ -75,16 +74,20 @@ export default function page() {
   }, []);
 
   return (
-    <div>
-      <h2>Kurento WebRTC Group Call (SockJS + STOMP + STUN/TURN)</h2>
-      <div>
+    <div className="flex flex-col items-center justify-center gap-4">
+      <h2 className="font-bold">
+        Kurento WebRTC Group Call (SockJS + STOMP + STUN/TURN)
+      </h2>
+      <div className="flex gap-3">
         <input
+          className="border p-2"
           type="text"
           placeholder="유저아이디"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
         />
         <input
+          className="border p-2"
           type="text"
           placeholder="채널"
           value={channelId}
@@ -92,32 +95,50 @@ export default function page() {
         />
         {/* 방에 참가가 되면, 나오는 버튼 */}
         {!isInCall ? (
-          <button onClick={joinRoom}>Join Room</button>
+          <button
+            className="bg-primary text-white p-2"
+            onClick={joinRoom}
+          >
+            Join Room
+          </button>
         ) : (
-          <button onClick={leaveRoom}>Leave Room</button>
+          <button
+            className="bg-primary text-white p-2"
+            onClick={leaveRoom}
+          >
+            Leave Room
+          </button>
         )}
       </div>
-      {/* 내 화면 */}
-      <div>
-        <video
-          ref={localVideoRef}
-          autoPlay
-          muted
-        />
-      </div>
-      {/* 다른 참가자들 화면 */}
-      <div id="remoteVideos">
-        {Object.keys(videoRefs.current).map((peerId) => (
+      {/* 카메라 영역 */}
+      <div className="flex gap-2">
+        {/* 내 화면 */}
+        <div className="border-2 p-2 border-red-400 w-44 h-44 mb-2">
+          <label>내 화면</label>
           <video
-            key={peerId}
-            ref={(ref) => {
-              if (ref) {
-                videoRefs.current[peerId] = ref;
-              }
-            }}
+            ref={localVideoRef}
             autoPlay
+            muted
           />
-        ))}
+        </div>
+        {/* 다른 참가자들 화면 */}
+        <div
+          id="remoteVideos"
+          className="border-2 p-2 border-blue-400 w-44 h-44 mb-2"
+        >
+          <label>남 화면</label>
+          {Object.keys(videoRefs.current).map((peerId) => (
+            <video
+              key={peerId}
+              ref={(ref) => {
+                if (ref) {
+                  videoRefs.current[peerId] = ref;
+                }
+              }}
+              autoPlay
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
