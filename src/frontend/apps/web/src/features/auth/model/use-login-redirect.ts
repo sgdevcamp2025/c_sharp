@@ -4,11 +4,13 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { requestLogin } from '../api/requestLogin.api';
+import { useUserStore } from '@/src/entities';
 
 export const useLoginRedirect = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
+  const setUser = useUserStore((state) => state.setUser);
 
   useEffect(() => {
     if (!code) {
@@ -24,6 +26,7 @@ export const useLoginRedirect = () => {
           throw new Error('사용자 정보가 없습니다.');
         }
         localStorage.setItem('user', JSON.stringify(user));
+        setUser(user);
         router.push('/stock');
       } catch (err) {
         console.error('로그인 실패:', err);
