@@ -21,7 +21,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/subscribe");
         config.setApplicationDestinationPrefixes("/publish"); // STOMP 메시지 발행 prefix
     }
 
