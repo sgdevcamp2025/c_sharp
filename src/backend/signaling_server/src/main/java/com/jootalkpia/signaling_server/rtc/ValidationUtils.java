@@ -1,4 +1,4 @@
-package com.jootalkpia.signaling_server.util;
+package com.jootalkpia.signaling_server.rtc;
 
 import com.jootalkpia.signaling_server.exception.common.CustomException;
 import com.jootalkpia.signaling_server.exception.common.ErrorCode;
