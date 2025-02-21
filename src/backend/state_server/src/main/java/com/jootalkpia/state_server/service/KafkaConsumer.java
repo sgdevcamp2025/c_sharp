@@ -17,6 +17,7 @@ public class KafkaConsumer {
     private static final String COMMON = "common";
     private static final String MESSAGE = "message";
     private static final String CHANNEL_ID = "channelId";
+    private static final String USER_ID = "userId";
 
     @KafkaListener(
             topics = "${topic.chat}",
@@ -33,8 +34,9 @@ public class KafkaConsumer {
             JsonNode messagesNode = rootNode.get(MESSAGE);
 
             String channelId = commonNode.get(CHANNEL_ID).asText();
+            String userId = commonNode.get(USER_ID).asText();
 
-            for (String sessionId : stateService.findNotificationTargets(channelId)) {
+            for (String sessionId : stateService.findNotificationTargets(channelId, userId)) {
                 kafkaProducer.sendPushMessage(stateService.createPushMessage(commonNode, messagesNode, sessionId));
             }
 
