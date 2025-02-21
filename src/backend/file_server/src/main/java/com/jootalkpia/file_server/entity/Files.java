@@ -11,16 +11,13 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Files {
+public class Files extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fileId;
-
     private String url;
     private String urlThumbnail;
     private String fileType;
     private Long fileSize;
     private String mimeType;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

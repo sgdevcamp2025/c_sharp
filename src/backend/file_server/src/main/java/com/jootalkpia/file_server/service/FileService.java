@@ -98,6 +98,7 @@ public class FileService {
             filesEntity.setUrl(s3Url);
             filesEntity.setFileType(fileType);
             filesEntity.setFileSize(mergedFile.length());
+            filesEntity.setMimeType(fileTypeDetector.detectMimeType(mergedFile));
             fileRepository.save(filesEntity);
 
             // 임시 데이터 정리
@@ -181,7 +182,14 @@ public class FileService {
             fileRepository.save(filesEntity);
             fileId = filesEntity.getFileId();
 
-            uploadEachFile(fileType, fileId, uploadFileRequestDto.getFile());
+            String s3Url = uploadEachFile(fileType, fileId, uploadFileRequestDto.getFile());
+
+            filesEntity.setUrl(s3Url);
+            filesEntity.setFileType(fileType);
+            filesEntity.setFileSize(uploadFileRequestDto.getFile().getSize());
+            filesEntity.setMimeType(uploadFileRequestDto.getFile().getContentType());
+
+            fileRepository.save(filesEntity);
             return new UploadFileResponseDto("200", "complete", fileId, fileType);
         } catch (Exception e) {
             throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED.getCode(), ErrorCode.IMAGE_UPLOAD_FAILED.getMsg());
