@@ -13,7 +13,7 @@ import ProfilePopoverContent from './profile-popover-content';
 import { useUserStore } from '@/src/entities';
 
 const ProfilePopover = () => {
-  const { profileImage } = useUserStore((state) => state.user);
+  const profileImage = useUserStore((state) => state.user?.profileImage ?? '');
   return (
     <Popover>
       <PopoverTrigger asChild>

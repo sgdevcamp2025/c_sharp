@@ -11,10 +11,9 @@ import {
 
 const ProfilePicture = () => {
   const isPictureEditMode = false;
-  const { profileImage } = useUserStore((state) => state.user);
-
+  const profileImage = useUserStore((state) => state.user?.profileImage ?? '');
   return (
-    <div className="w-full flex flex-col items-end">
+    <div className="w-full flex flex-col items-end gap-1">
       {isPictureEditMode ? (
         <Input
           id="picture"

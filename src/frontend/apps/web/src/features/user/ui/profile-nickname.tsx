@@ -6,7 +6,7 @@ import { Pencil } from 'lucide-react';
 
 const ProfileNickname = () => {
   const isNameEditMode = false;
-  const { nickname } = useUserStore((state) => state.user);
+  const nickname = useUserStore((state) => state.user?.nickname ?? '');
 
   return (
     <div className="flex w-full  items-center space-x-2">
