@@ -26,6 +26,7 @@ spring:
       com.jootalkpia.workspace_server.service: DEBUG    # workspace 서비스 패키지 로그
       org.springframework.data.redis: DEBUG        # Redis 작업 로그
   kafka:
+    bootstrap-servers: ${KAFKA_SERVER}
     producer:
       acks: all # 멱등성 프로듀서를 위해 all로 설정, 0 또는 1이면 enable.idempotence=true 불가
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
