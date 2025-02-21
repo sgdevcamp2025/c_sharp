@@ -41,6 +41,9 @@ importers:
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      kurento-utils:
+        specifier: ^7.1.0
+        version: 7.1.0
       lightweight-charts:
         specifier: ^5.0.1
         version: 5.0.1
@@ -2539,6 +2542,9 @@ packages:
   fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
 
+  freeice@2.2.2:
+    resolution: {integrity: sha512-XNoIxDHufqPIBSLpp4IrFPnoc+hv/0RwdOGhIoggIDC2ZKf5r6OoixbeoFJSmZOAq2aYiEUArhuQ8zVVrM5C4w==}
+
   fs-exists-sync@0.1.0:
     resolution: {integrity: sha512-cR/vflFyPZtrN6b38ZyWxpWdhlXrzZEBawlpBQMq7033xVY7/kg0GDMBK5jg8lDYQckdJ5x/YC88lM3C7VMsLg==}
     engines: {node: '>=0.10.0'}
@@ -2667,6 +2673,9 @@ packages:
     resolution: {integrity: sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==}
     engines: {node: '>=0.4.7'}
     hasBin: true
+
+  hark@1.2.3:
+    resolution: {integrity: sha512-u68vz9SCa38ESiFJSDjqK8XbXqWzyot7Cj6Y2b6jk2NJ+II3MY2dIrLMg/kjtIAun4Y1DHF/20hfx4rq1G5GMg==}
 
   has-bigints@1.0.2:
     resolution: {integrity: sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==}
@@ -3046,6 +3055,12 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
+  kurento-browser-extensions@0.0.2:
+    resolution: {integrity: sha512-E1EkdrFj954UeTdfnNUWwrwolC6aeyCen/ws+5tAvPTIZSUyqXVvcp3Cwg7jQxiZioR4VFdZ1PXuv8A9q2GgVw==}
+
+  kurento-utils@7.1.0:
+    resolution: {integrity: sha512-wNgONWM3FPj9uNP9PyndYLnoo1YuYkDaeF6mmMRdeImAd2s/zhHKUT3+leVUoEbBY+QgyluJbQwFgAC6oBu0Cw==}
+
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
@@ -3197,6 +3212,9 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
 
+  merge@1.2.1:
+    resolution: {integrity: sha512-VjFo4P5Whtj4vsLzsYBu5ayHhoHJ0UqNm7ibvShmbmoz7tGi0vXaoJbGdB+GmDMLUdg8DpQXEIeVDAe8MaABvQ==}
+
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
@@ -3296,6 +3314,9 @@ packages:
 
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
+
+  normalice@1.0.1:
+    resolution: {integrity: sha512-wF2/tv9q/K8S+RqCgll5yC6z/zcXNr+rEHfGIw8A6D58vjfJo+kp749MI6cAHv72LE7nwv92Qi6tZhIeMOOJpg==}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -3811,6 +3832,13 @@ packages:
   scheduler@0.25.0:
     resolution: {integrity: sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==}
 
+  sdp-transform@1.5.3:
+    resolution: {integrity: sha512-WDWxxUgTR0QD8rAEnJpDoJMOigJU35oeXzleMdfbVhzrcOpwOwU6j2SDCNc2yOYAcvSDXYODtNU0DM1sOmkpHQ==}
+    hasBin: true
+
+  sdp-translator@0.1.24:
+    resolution: {integrity: sha512-BZAamdLOtBw+DXwF/0vbimZl7oMtjVuyO6As4jO5HIBp2pLHfsRDSm4SXK5tFEMEs8Ugjq2V8Ny6SkMtOmdWig==}
+
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
@@ -4211,6 +4239,10 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  ua-parser-js@0.7.40:
+    resolution: {integrity: sha512-us1E3K+3jJppDBa3Tl0L3MOJiGhe1C6P0+nIvQAFYbxlMAx0h81eOwLmU57xgqToduDDPx3y5QsdjPfDu+FgOQ==}
+    hasBin: true
+
   uc.micro@2.1.0:
     resolution: {integrity: sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A==}
 
@@ -4286,6 +4318,11 @@ packages:
 
   util@0.12.5:
     resolution: {integrity: sha512-kZf/K6hEIrWHI6XqOFUiiMa+79wE/D8Q+NCNAWclkyg3b4d2k7s0QGepNjiABc+aR3N1PAyHL7p6UcLY6LmrnA==}
+
+  uuid@3.4.0:
+    resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
+    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
@@ -4386,6 +4423,9 @@ packages:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
     engines: {node: '>= 8'}
     hasBin: true
+
+  wildemitter@1.2.1:
+    resolution: {integrity: sha512-UMmSUoIQSir+XbBpTxOTS53uJ8s/lVhADCkEbhfRjUGFDPme/XGOb0sBWLx5sTz7Wx/2+TlAw1eK9O5lw5PiEw==}
 
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
@@ -7073,6 +7113,10 @@ snapshots:
 
   fraction.js@4.3.7: {}
 
+  freeice@2.2.2:
+    dependencies:
+      normalice: 1.0.1
+
   fs-exists-sync@0.1.0: {}
 
   fs-extra@10.1.0:
@@ -7240,6 +7284,10 @@ snapshots:
       wordwrap: 1.0.0
     optionalDependencies:
       uglify-js: 3.19.3
+
+  hark@1.2.3:
+    dependencies:
+      wildemitter: 1.2.1
 
   has-bigints@1.0.2: {}
 
@@ -7639,6 +7687,21 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
+  kurento-browser-extensions@0.0.2:
+    optional: true
+
+  kurento-utils@7.1.0:
+    dependencies:
+      freeice: 2.2.2
+      hark: 1.2.3
+      inherits: 2.0.4
+      merge: 1.2.1
+      sdp-translator: 0.1.24
+      ua-parser-js: 0.7.40
+      uuid: 3.4.0
+    optionalDependencies:
+      kurento-browser-extensions: 0.0.2
+
   levn@0.4.1:
     dependencies:
       prelude-ls: 1.2.1
@@ -7772,6 +7835,8 @@ snapshots:
 
   merge2@1.4.1: {}
 
+  merge@1.2.1: {}
+
   micromatch@4.0.8:
     dependencies:
       braces: 3.0.3
@@ -7875,6 +7940,8 @@ snapshots:
       resolve: 1.22.10
 
   node-releases@2.0.19: {}
+
+  normalice@1.0.1: {}
 
   normalize-path@3.0.0: {}
 
@@ -8451,6 +8518,12 @@ snapshots:
 
   scheduler@0.25.0: {}
 
+  sdp-transform@1.5.3: {}
+
+  sdp-translator@0.1.24:
+    dependencies:
+      sdp-transform: 1.5.3
+
   semver@6.3.1: {}
 
   semver@7.6.2: {}
@@ -8916,6 +8989,8 @@ snapshots:
 
   typescript@5.7.3: {}
 
+  ua-parser-js@0.7.40: {}
+
   uc.micro@2.1.0: {}
 
   uglify-js@3.19.3:
@@ -8996,6 +9071,8 @@ snapshots:
       is-generator-function: 1.1.0
       is-typed-array: 1.1.15
       which-typed-array: 1.1.18
+
+  uuid@3.4.0: {}
 
   uuid@9.0.1: {}
 
@@ -9094,6 +9171,8 @@ snapshots:
   which@2.0.2:
     dependencies:
       isexe: 2.0.0
+
+  wildemitter@1.2.1: {}
 
   word-wrap@1.2.5: {}
 
