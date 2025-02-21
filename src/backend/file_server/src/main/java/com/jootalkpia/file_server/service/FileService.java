@@ -174,14 +174,22 @@ public class FileService {
     @Transactional
     public UploadFileResponseDto uploadFile(UploadFileRequestDto uploadFileRequestDto) {
         try {
-            String fileType = fileTypeDetector.detectFileTypeFromMultipartFile(uploadFileRequestDto.getFile());
+            String mimeType = fileTypeDetector.detectFileTypeFromMultipartFile(uploadFileRequestDto.getFile());
 
             Long fileId = null;
             Files filesEntity = new Files();
             fileRepository.save(filesEntity);
             fileId = filesEntity.getFileId();
 
-            uploadEachFile(fileType, fileId, uploadFileRequestDto.getFile());
+            String s3Url = uploadEachFile(mimeType, fileId, uploadFileRequestDto.getFile());
+            String fileType = defineFolderToUpload(mimeType);
+
+            filesEntity.setUrl(s3Url);
+            filesEntity.setFileType(fileType);
+            filesEntity.setFileSize(uploadFileRequestDto.getFile().getSize());
+            filesEntity.setMimeType(mimeType);
+
+            fileRepository.save(filesEntity);
             return new UploadFileResponseDto("200", "complete", fileId, fileType);
         } catch (Exception e) {
             throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED.getCode(), ErrorCode.IMAGE_UPLOAD_FAILED.getMsg());

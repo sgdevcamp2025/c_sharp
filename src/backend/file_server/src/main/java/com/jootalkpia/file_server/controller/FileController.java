@@ -75,8 +75,8 @@ public class FileController {
             @RequestParam("tempFileIdentifier") String tempFileIdentifier,
             @RequestParam("totalChunks") Long totalChunks,
             @RequestParam("totalSize") Long totalSize,
-            @RequestParam("chunkInfo.chunkIndex") Long chunkIndex,
-            @RequestPart("chunkInfo.chunk") MultipartFile chunk) {
+            @RequestParam("chunkIndex") Long chunkIndex,
+            @RequestPart("chunk") MultipartFile chunk) {
 
         log.info("청크 업로드 요청: chunkIndex={}, totalChunks={}", chunkIndex, totalChunks);
 
