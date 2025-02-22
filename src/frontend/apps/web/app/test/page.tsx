@@ -18,11 +18,15 @@ const RTC_CONFIGURATION = {
   bundlePolicy: 'max-bundle',
   iceCandidatePoolSize: 0,
 };
+const STOMP_PATH = {
+  PUB_URL: '/app/signal',
+  SUB_URL: '/topic/huddle',
+};
 
 export default function page() {
   //유저id 입력, 채널 id입력을 위한 변수
-  const [userId, setUserId] = useState('');
-  const [channelId, setChannelId] = useState('');
+  const [userId, setUserId] = useState<number>(null);
+  const [channelId, setChannelId] = useState<number>(null);
 
   //방참가 여부
   const [isInCall, setIsInCall] = useState(false);
@@ -69,9 +73,28 @@ export default function page() {
       if (stompClient.current) {
         stompClient.current.deactivate();
         stompClient.current = null;
+        setIsConnected(false);
       }
     };
   }, []);
+
+  //방참가 pub(방 생성)-완료되면 참가자 리스트 sub
+  const joinRoom = () => {
+    if (!userId || !channelId) {
+      alert('userId와 channelId를 입력해주세요');
+      return;
+    }
+    if (!isConnected) {
+      console.log('WEBSOCKET 연결 끊김');
+      return;
+    }
+
+    console.log('방 참가 요청 시작 !');
+    stompClient.current?.publish({
+      destination: `${STOMP_PATH.PUB_URL}`,
+      body: JSON.stringify({ id: 'join', channelId, userId }),
+    });
+  };
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
@@ -81,17 +104,17 @@ export default function page() {
       <div className="flex gap-3">
         <input
           className="border p-2"
-          type="text"
+          type="number"
           placeholder="유저아이디"
           value={userId}
-          onChange={(e) => setUserId(e.target.value)}
+          onChange={(e) => setUserId(Number(e.target.value))}
         />
         <input
           className="border p-2"
-          type="text"
+          type="number"
           placeholder="채널"
           value={channelId}
-          onChange={(e) => setChannelId(e.target.value)}
+          onChange={(e) => setChannelId(Number(e.target.value))}
         />
         {/* 방에 참가가 되면, 나오는 버튼 */}
         {!isInCall ? (
@@ -143,9 +166,6 @@ export default function page() {
     </div>
   );
 }
-
-//방참가 (방 생성)
-const joinRoom = () => {};
 
 //방 나가기
 const leaveRoom = (e) => {};
