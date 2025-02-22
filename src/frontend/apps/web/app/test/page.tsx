@@ -51,6 +51,9 @@ export default function page() {
     }
     console.log('STOMP_SERVER_URL:', STOMP_SERVER_URL);
     stompClient.current = new StompJs.Client({
+      connectHeaders: {
+        sessionId: userId.toString(),
+      },
       webSocketFactory: () => new SockJS(`${STOMP_SERVER_URL}`),
       debug: (msg: string) => console.log('[DEBUG]', msg),
       onConnect: () => {
