@@ -24,7 +24,7 @@ const ChatContent = ({
   const { bottomRef, containerRef } = useChatAutoScroll(messages);
 
   if (!messages || messages.length === 0) return null;
-  console.log('🔗 ChatContent:', { messages });
+  // console.log('🔗 ChatContent:', { messages });
 
   const backgroundColor = type === 'live' ? 'bg-live' : 'bg-white';
   const hoverColor = type === 'default' ? 'hover:bg-chatboxHover' : '';
@@ -53,7 +53,7 @@ const ChatContent = ({
               />
             )}
 
-            <div className="flex w-full items-start justify-between">
+            <div className="flex w-full items-start justify-between pb-3">
               <ContentText
                 type={type}
                 // avatarUrls={avatarUrls}
