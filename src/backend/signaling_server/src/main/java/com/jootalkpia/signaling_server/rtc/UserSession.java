@@ -1,5 +1,6 @@
 package com.jootalkpia.signaling_server.rtc;
 
+import com.google.gson.JsonArray;
 import java.io.Closeable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -174,6 +175,28 @@ public class UserSession implements Closeable {
         messagingTemplate.convertAndSend(destination, message.toString());
         log.info("📡 Sent STOMP message to {}: {}", destination, message);
     }
+
+    public void sendParticipantMessage(Long userId, JsonArray participantsArray) {
+        String destination = "/topic/huddle/" + channelId;
+
+//        // 연결되지 않은 참가자 목록 생성
+//        JsonArray unConnectedParticipants = new JsonArray();
+//        for (int i = 0; i < participantsArray.size(); i++) {
+//            Long participantId = participantsArray.get(i).getAsLong();
+//            if (!incomingMedia.containsKey(participantId)) {
+//                unConnectedParticipants.add(participantId);
+//            }
+//        }
+
+        final JsonObject existingParticipantsMsg = new JsonObject();
+        existingParticipantsMsg.addProperty("id", "existingParticipants");
+        existingParticipantsMsg.add("data", participantsArray);
+
+        log.debug("PARTICIPANT {}: sending a list of {} participants", userId, participantsArray.size());
+
+        messagingTemplate.convertAndSend(destination, existingParticipantsMsg.toString());
+    }
+
 
     public void addCandidate(IceCandidate candidate, Long userId) {
         if (this.userId.compareTo(userId) == 0) {

@@ -107,12 +107,7 @@ public class Huddle implements Closeable {
             }
         }
 
-        final JsonObject existingParticipantsMsg = new JsonObject();
-        existingParticipantsMsg.addProperty("id", "existingParticipants");
-        existingParticipantsMsg.add("data", participantsArray);
-        log.debug("PARTICIPANT {}: sending a list of {} participants", user.getUserId(),
-                participantsArray.size());
-        user.sendMessage(existingParticipantsMsg);
+        user.sendParticipantMessage(user.getUserId(), participantsArray);
     }
 
     public Collection<UserSession> getParticipants() {
