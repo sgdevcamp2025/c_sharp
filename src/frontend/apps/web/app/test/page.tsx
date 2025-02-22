@@ -25,8 +25,9 @@ const STOMP_PATH = {
 
 export default function page() {
   //유저id 입력, 채널 id입력을 위한 변수
-  const [userId, setUserId] = useState<number>(null);
-  const [channelId, setChannelId] = useState<number>(null);
+  const [userId, setUserId] = useState<number | ''>('');
+  const [channelId, setChannelId] = useState<number | ''>('');
+  const [isSetupConfirmed, setIsSetupConfirmed] = useState(false);
 
   //방참가 여부
   const [isInCall, setIsInCall] = useState(false);
@@ -49,6 +50,8 @@ export default function page() {
     if (stompClient.current) {
       stompClient.current.deactivate();
     }
+    if (!isSetupConfirmed) return;
+
     console.log('STOMP_SERVER_URL:', STOMP_SERVER_URL);
     stompClient.current = new StompJs.Client({
       connectHeaders: {
@@ -59,6 +62,11 @@ export default function page() {
       onConnect: () => {
         console.log('✅ WebSocket Connected');
         setIsConnected(true);
+        console.log('start sub');
+        stompClient.current?.subscribe(
+          `${STOMP_PATH.SUB_URL}/${channelId}`,
+          handleSignal,
+        );
       },
       onStompError: (frame) => {
         console.error(
@@ -79,7 +87,19 @@ export default function page() {
         setIsConnected(false);
       }
     };
-  }, []);
+  }, [isSetupConfirmed]);
+
+  //구독 리스트
+  const handleSignal = (msg: StompJs.Message) => {
+    const data = JSON.parse(msg.body);
+    console.log('서버에서 온 메시지 : ', data);
+
+    switch (data.id) {
+      case 'existingParticipants':
+        console.log('방입장 성공');
+        break;
+    }
+  };
 
   //방참가 pub(방 생성)-완료되면 참가자 리스트 sub
   const joinRoom = () => {
@@ -93,9 +113,13 @@ export default function page() {
     }
 
     console.log('방 참가 요청 시작 !');
+
+    const message = JSON.stringify({ id: 'joinHuddle', channelId, userId });
+    console.log('보내는 메시지:', message);
+
     stompClient.current?.publish({
       destination: `${STOMP_PATH.PUB_URL}`,
-      body: JSON.stringify({ id: 'join', channelId, userId }),
+      body: message,
     });
   };
 
@@ -110,17 +134,28 @@ export default function page() {
           type="number"
           placeholder="유저아이디"
           value={userId}
-          onChange={(e) => setUserId(Number(e.target.value))}
+          onChange={(e) =>
+            setUserId(e.target.value ? Number(e.target.value) : '')
+          }
         />
         <input
           className="border p-2"
           type="number"
           placeholder="채널"
           value={channelId}
-          onChange={(e) => setChannelId(Number(e.target.value))}
+          onChange={(e) =>
+            setChannelId(e.target.value ? Number(e.target.value) : '')
+          }
         />
         {/* 방에 참가가 되면, 나오는 버튼 */}
-        {!isInCall ? (
+        {!isSetupConfirmed ? (
+          <button
+            className="bg-primary text-white p-2"
+            onClick={() => setIsSetupConfirmed(true)}
+          >
+            정보 입력 완료
+          </button>
+        ) : !isInCall ? (
           <button
             className="bg-primary text-white p-2"
             onClick={joinRoom}
