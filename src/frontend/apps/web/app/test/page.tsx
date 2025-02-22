@@ -58,7 +58,7 @@ export default function page() {
         sessionId: userId.toString(),
       },
       webSocketFactory: () => new SockJS(`${STOMP_SERVER_URL}`),
-      debug: (msg: string) => console.log('[DEBUG]', msg),
+      // debug: (msg: string) => console.log('[DEBUG]', msg),
       onConnect: () => {
         console.log('✅ WebSocket Connected');
         setIsConnected(true);
@@ -89,14 +89,17 @@ export default function page() {
     };
   }, [isSetupConfirmed]);
 
-  //구독 리스트
+  //구독 리스트 (기존참가자 목록, 새로운 참가자 정보)
   const handleSignal = (msg: StompJs.Message) => {
     const data = JSON.parse(msg.body);
     console.log('서버에서 온 메시지 : ', data);
 
     switch (data.id) {
       case 'existingParticipants':
-        console.log('방입장 성공');
+        handleExistingParticipants(data);
+        break;
+      case 'newParticipantArrived':
+        handleNewParticipant(data);
         break;
     }
   };
@@ -121,6 +124,28 @@ export default function page() {
       destination: `${STOMP_PATH.PUB_URL}`,
       body: message,
     });
+  };
+
+  //방참가 완료 & 기존 참가자 목록ID 저장
+  const handleExistingParticipants = (data: any) => {
+    const list = data.data;
+    console.log('방입장 성공');
+    setIsInCall(true);
+
+    list.forEach((participantId: number) => {
+      participants.current[participantId] = { id: participantId };
+    });
+    console.log('기존참가자 등록 완료!');
+    console.log('참가자 목록-existing:', participants.current);
+  };
+
+  //새로운 참가자 알림
+  const handleNewParticipant = (data: any) => {
+    const newPeerId = data.name;
+    console.log(`새로운 참가자 입장 : ${newPeerId}`);
+    participants.current[newPeerId] = { id: newPeerId };
+    console.log('참가자 등록 완료!');
+    console.log('참가자 목록-new:', participants.current);
   };
 
   return (
