@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.IceCandidate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -18,18 +19,15 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class CallHandler {
 
+    @Qualifier("customUserRegistry")
     private final UserRegistry registry;
     private final HuddleManager huddleManager;
-    private final UserRegistry userRegistry;
 
     @MessageMapping("/signal")
     public void handleSignalMessage(StompHeaderAccessor headerAccessor, @Payload String message) {
         final JsonObject jsonMessage = JsonParser.parseString(message).getAsJsonObject();
 
         String sessionId = headerAccessor.getSessionId();
-//        Long userId = jsonMessage.get("userId").getAsLong();
-
-        // 세션 ID로 UserSession 가져오기
         UserSession userSession = registry.getBySessionId(sessionId);
 
         if (userSession != null) {
@@ -37,7 +35,6 @@ public class CallHandler {
         } else {
             log.debug("Incoming message from new user: {}", jsonMessage);
         }
-
 
         switch (jsonMessage.get("id").getAsString()) {
             case "joinHuddle":

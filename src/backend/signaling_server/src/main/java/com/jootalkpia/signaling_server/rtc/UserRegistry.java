@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
-@Component
+@Component("customUserRegistry")
 public class UserRegistry {
 
     private final ConcurrentHashMap<Long, UserSession> usersById = new ConcurrentHashMap<>();

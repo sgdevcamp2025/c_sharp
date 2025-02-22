@@ -16,24 +16,23 @@ public class HuddleManager {
 
     private final KurentoClient kurento;
     private final SimpMessagingTemplate messagingTemplate;
-    private final ConcurrentMap<Long, Huddle> channelIds = new ConcurrentHashMap<>();
-
+    private final ConcurrentMap<Long, Huddle> huddles = new ConcurrentHashMap<>();
 
     public Huddle getHuddle(Long channelId) {
         log.debug("Searching for channelId {}", channelId);
-        Huddle huddle = channelIds.get(channelId);
+        Huddle huddle = huddles.get(channelId);
 
         if (huddle == null) {
             log.debug("channelId {} not existent. Will create now!", channelId);
             huddle = new Huddle(channelId, kurento.createMediaPipeline(), messagingTemplate);
-            channelIds.put(channelId, huddle);
+            huddles.put(channelId, huddle);
         }
         log.debug("channelId {} found!", channelId);
         return huddle;
     }
 
     public void removeHuddle(Huddle huddle) {
-        this.channelIds.remove(huddle.getChannelId());
+        this.huddles.remove(huddle.getChannelId());
         huddle.close();
         log.info("channelId {} removed and closed", huddle.getChannelId());
     }

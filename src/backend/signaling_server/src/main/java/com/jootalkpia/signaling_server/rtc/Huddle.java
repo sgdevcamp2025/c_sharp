@@ -86,21 +86,18 @@ public class Huddle implements Closeable {
         final JsonObject participantLeftJson = new JsonObject();
         participantLeftJson.addProperty("id", "participantLeft");
         participantLeftJson.addProperty("name", userId);
+
         for (final UserSession participant : participants.values()) {
-            try {
-                participant.cancelVideoFrom(userId);
-                participant.sendMessage(participantLeftJson);
-            } catch (final IOException e) {
-                unnotifiedParticipants.add(participant.getUserId());
-            }
+            participant.cancelVideoFrom(userId);
+            participant.sendMessage(participantLeftJson);
         }
 
         if (!unnotifiedParticipants.isEmpty()) {
             log.debug("ROOM {}: The users {} could not be notified that {} left the room", this.channelId,
                     unnotifiedParticipants, userId);
         }
-
     }
+
 
     public void sendParticipantNames(UserSession user) {
 
