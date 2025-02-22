@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { CircleX, Loader2 } from 'lucide-react';
 
-import { ImagePreivew } from './file-preview-image';
+import { ImagePreview } from './file-preview-image';
 import { VideoPreview } from './file-preview-video';
 import FileModal from './file-modal';
 
@@ -27,7 +27,7 @@ export const FilePreviewItem = ({
     <div className="relative group flex-shrink-0">
       <div className="w-20 h-20 rounded-lg relative overflow-hidden border border-black">
         {fileData.thumbnailUrl === undefined ? (
-          <ImagePreivew
+          <ImagePreview
             preview={fileData.previewUrl}
             onClick={() => setIsModalOpen(true)}
           />
