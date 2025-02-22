@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
 import {
+  validateFileType,
   validateTotalFileSize,
   processFile,
   createChunks,
   generateTempFileIdentifier,
-  validateFileType,
 } from '../lib';
 import { uploadChunksQueue, uploadSmallFiles, uploadThumbnail } from '../api';
 
@@ -17,11 +17,11 @@ export type FilePreview = {
   isLoading: boolean;
 };
 
-export const useFileManagements = (
+export function useFileManagements(
   workspaceId: number,
   channelId: number,
   userId: number,
-) => {
+) {
   const [filePreviews, setFilePreviews] = useState<FilePreview[]>([]);
   const [isFinalLoading, setIsFinalLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -54,8 +54,6 @@ export const useFileManagements = (
 
       // ────────── [3] 미리보기 데이터 생성 ──────────
       const timestamp = Date.now();
-      // console.log('timestamp', timestamp);
-
       const newPreviews: FilePreview[] = files.map((file, index) => {
         const id = `${userId}-${timestamp}-${index}`;
         return {
@@ -85,16 +83,18 @@ export const useFileManagements = (
       }
 
       // ────────── [5] 업로드 로직 ──────────
-      for (const [i, file] of files.entries()) {
-        // 10MB 이하 - 소형 파일 업로드
-        if (file.size <= 10 * 1024 * 1024) {
-          try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        try {
+          // (A) 10MB 이하 소형 파일
+          if (file.size <= 10 * 1024 * 1024) {
             const smallUploadRes = await uploadSmallFiles({
               channelId,
               workspaceId,
               file,
             });
             if (smallUploadRes.code === '200' && smallUploadRes.fileId) {
+              // 비디오인 경우 썸네일 업로드
               if (file.type.startsWith('video/')) {
                 const processed = await processFile(file);
                 if (processed?.thumbnailFile) {
@@ -106,48 +106,52 @@ export const useFileManagements = (
               }
               setUploadedFileIds((prev) => [...prev, smallUploadRes.fileId]);
             }
-          } catch (err) {
-            console.error(`Error uploading small file ${file.name}`, err);
-          }
-        } else {
-          const chunks = await createChunks(file);
-          const totalSize = file.size;
+          } else {
+            // (B) 10MB 초과 -> 청크 업로드
+            const chunks = await createChunks(file);
+            const totalSize = file.size;
+            const tempFileIdentifier = generateTempFileIdentifier(
+              userId,
+              timestamp,
+              i + 1,
+            );
+            const uploadResponses = await uploadChunksQueue(
+              chunks,
+              channelId,
+              workspaceId,
+              tempFileIdentifier,
+              totalSize,
+            );
 
-          const tempFileIdentifier = generateTempFileIdentifier(
-            userId,
-            timestamp,
-            i + 1,
-          );
-          const uploadResponses = await uploadChunksQueue(
-            chunks,
-            channelId,
-            workspaceId,
-            tempFileIdentifier,
-            totalSize,
-          );
-
-          uploadResponses.forEach(async (res) => {
-            if (res.code === '200' && res.fileId && res.fileType) {
-              const finalFileId = res.fileId;
-              const processed = await processFile(file);
-              if (processed?.thumbnailFile) {
-                await uploadThumbnail({
-                  fileId: finalFileId,
-                  thumbnail: processed.thumbnailFile,
-                });
+            // 청크 업로드 응답에서 fileId를 찾고, 비디오 썸네일 업로드
+            for (const res of uploadResponses) {
+              if (res.code === '200' && res.fileId && res.fileType) {
+                const finalFileId = res.fileId;
+                if (file.type.startsWith('video/')) {
+                  const processed = await processFile(file);
+                  if (processed?.thumbnailFile) {
+                    await uploadThumbnail({
+                      fileId: finalFileId,
+                      thumbnail: processed.thumbnailFile,
+                    });
+                  }
+                }
+                setUploadedFileIds((prev) => [...prev, finalFileId]);
               }
-              setUploadedFileIds((prev) => [...prev, finalFileId]);
             }
-          });
+          }
+        } finally {
+          setFilePreviews((prev) =>
+            prev.map((fp) =>
+              fp.file.name === file.name ? { ...fp, isLoading: false } : fp,
+            ),
+          );
         }
       }
     } catch (err) {
       console.error('Error during file processing/upload:', err);
       setError(err as Error);
     } finally {
-      setFilePreviews((prev) =>
-        prev.map((fp) => ({ ...fp, isLoading: false })),
-      );
       setIsFinalLoading(false);
     }
   };
@@ -171,4 +175,4 @@ export const useFileManagements = (
     uploadedFileIds,
     setUploadedFileIds,
   };
-};
+}
