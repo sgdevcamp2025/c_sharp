@@ -1,7 +1,6 @@
 package com.jootalkpia.signaling_server.rtc;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -16,8 +15,6 @@ import org.kurento.client.MediaPipeline;
 import org.kurento.client.WebRtcEndpoint;
 import org.kurento.jsonrpc.JsonUtils;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
 import com.google.gson.JsonObject;
 
@@ -66,7 +63,7 @@ public class UserSession implements Closeable {
         final String ipSdpAnswer = this.getEndpointForUser(sender).processOffer(sdpOffer);
         final JsonObject scParams = new JsonObject();
         scParams.addProperty("id", "receiveVideoAnswer");
-        scParams.addProperty("name", sender.getUserId());
+        scParams.addProperty("senderId", sender.getUserId());
         scParams.addProperty("sdpAnswer", ipSdpAnswer);
 
         log.trace("USER {}: SdpAnswer for {} is {}", this.userId, sender.getUserId(), ipSdpAnswer);
@@ -94,7 +91,7 @@ public class UserSession implements Closeable {
                 public void onEvent(IceCandidateFoundEvent event) {
                     JsonObject response = new JsonObject();
                     response.addProperty("id", "iceCandidate");
-                    response.addProperty("name", sender.getUserId());
+                    response.addProperty("senderId", sender.getUserId());
                     response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
                     sendMessage(response);
                 }

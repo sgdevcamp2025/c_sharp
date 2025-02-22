@@ -1,7 +1,6 @@
 package com.jootalkpia.signaling_server.rtc;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.Continuation;
 import org.kurento.client.MediaPipeline;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.socket.WebSocketSession;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -121,8 +119,8 @@ public class Huddle implements Closeable {
         return participants.values();
     }
 
-    public UserSession getParticipant(String name) {
-        return participants.get(name);
+    public UserSession getParticipant(Long userId) {
+        return participants.get(userId);
     }
 
     @Override
