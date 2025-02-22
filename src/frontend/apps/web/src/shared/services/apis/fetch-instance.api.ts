@@ -61,8 +61,15 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
 
     // body 데이터가 있고, GET 요청이 아닐 때만 body 필드 추가
     if (body && method !== 'GET') {
-      finalOptions.body =
-        body instanceof FormData ? body : JSON.stringify(body);
+      if (
+        body instanceof FormData ||
+        body instanceof Blob ||
+        body instanceof File
+      ) {
+        finalOptions.body = body;
+      } else {
+        finalOptions.body = JSON.stringify(body);
+      }
     }
 
     // API 호출
