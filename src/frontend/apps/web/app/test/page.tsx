@@ -106,7 +106,7 @@ export default function page() {
 
   //방참가 pub(방 생성)-완료되면 참가자 리스트 sub
   const joinRoom = () => {
-    if (!userId || !channelId) {
+    if (!!!userId || !!!channelId) {
       alert('userId와 channelId를 입력해주세요');
       return;
     }
@@ -142,6 +142,8 @@ export default function page() {
   //새로운 참가자 알림
   const handleNewParticipant = (data: any) => {
     const newPeerId = data.name;
+    if (newPeerId === userId) return; //내 id무시
+
     console.log(`새로운 참가자 입장 : ${newPeerId}`);
     participants.current[newPeerId] = { id: newPeerId };
     console.log('참가자 등록 완료!');
@@ -154,19 +156,22 @@ export default function page() {
         Kurento WebRTC Group Call (SockJS + STOMP + STUN/TURN)
       </h2>
       <div className="flex gap-3">
+        <label>유저아이디</label>
         <input
+          id="userId"
           className="border p-2"
           type="number"
-          placeholder="유저아이디"
+          placeholder="userId"
           value={userId}
           onChange={(e) =>
             setUserId(e.target.value ? Number(e.target.value) : '')
           }
         />
+        <label>채널아이디</label>
         <input
           className="border p-2"
           type="number"
-          placeholder="채널"
+          placeholder="channelId"
           value={channelId}
           onChange={(e) =>
             setChannelId(e.target.value ? Number(e.target.value) : '')
@@ -175,24 +180,30 @@ export default function page() {
         {/* 방에 참가가 되면, 나오는 버튼 */}
         {!isSetupConfirmed ? (
           <button
-            className="bg-primary text-white p-2"
-            onClick={() => setIsSetupConfirmed(true)}
+            className="bg-red-500 text-white p-2"
+            onClick={() => {
+              if (!!!userId || !!!channelId) {
+                alert('userId와 channelId를 입력해주세요');
+                return;
+              }
+              setIsSetupConfirmed(true);
+            }}
           >
-            정보 입력 완료
+            1. 정보 입력 완료
           </button>
         ) : !isInCall ? (
           <button
-            className="bg-primary text-white p-2"
+            className="bg-orange-500 text-white p-2"
             onClick={joinRoom}
           >
-            Join Room
+            2. 방 입장
           </button>
         ) : (
           <button
-            className="bg-primary text-white p-2"
+            className="bg-yellow-500 text-white p-2"
             onClick={leaveRoom}
           >
-            Leave Room
+            3. 방 퇴장
           </button>
         )}
       </div>
