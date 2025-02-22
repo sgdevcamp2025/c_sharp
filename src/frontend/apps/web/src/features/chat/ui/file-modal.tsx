@@ -1,6 +1,6 @@
 import { Button } from '@workspace/ui/components';
 import { Modal } from '@workspace/ui/components/Modal/modal';
-import { FileData } from '../model';
+import { FilePreview } from '../model';
 import { formatFileSize } from '../lib';
 import Image from 'next/image';
 
@@ -9,7 +9,7 @@ type FileModalProps = {
   setIsOpen: (isOpen: boolean) => void;
   size?: 'default' | 'lg';
   className?: string;
-  fileData: FileData;
+  fileData: FilePreview;
 };
 
 const FileModal = ({
@@ -29,29 +29,29 @@ const FileModal = ({
       <div className="p-6">
         {/* 헤더 */}
         <div className="flex justify-between items-center mb-6">
-          {/* <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <span className="p-2 bg-gray-100 rounded-lg">
-              {fileData.type === 'image' ? '🖼️' : '🎥'}
+              {fileData.thumbnailUrl === undefined ? '🖼️' : '🎥'}
             </span>
             <div>
               <h2 className="text-lg font-bold text-gray-800">
-                {fileData.name}
+                {fileData.file.name}
               </h2>
               <p className="text-sm text-gray-500">
-                {fileData.type === 'image' ? 'Image' : 'Video'} •{' '}
+                {fileData.thumbnailUrl === undefined ? 'Image' : 'Video'} •{' '}
                 {formatFileSize(fileData.file.size)}
               </p>
             </div>
-          </div> */}
+          </div>
         </div>
 
         {/* 컨텐츠 영역 */}
         <div className="rounded-xl overflow-hidden bg-gray-50">
-          {/* {fileData.type === 'image' ? (
+          {fileData.thumbnailUrl === undefined ? (
             <div className="relative w-full h-[40vh]">
               <Image
-                src={fileData.preview}
-                alt={fileData.name}
+                src={fileData.previewUrl}
+                alt={fileData.previewUrl}
                 fill
                 className="object-contain"
                 sizes="(max-width: 768px) 100vw, 80vw"
@@ -60,7 +60,7 @@ const FileModal = ({
           ) : (
             <div className="relative w-full h-[40vh] bg-black">
               <video
-                src={fileData.preview}
+                src={fileData.previewUrl}
                 className="w-full h-full"
                 controls
                 autoPlay
@@ -70,7 +70,7 @@ const FileModal = ({
                 Your browser does not support the video tag.
               </video>
             </div>
-          )} */}
+          )}
         </div>
 
         {/* 푸터 */}
