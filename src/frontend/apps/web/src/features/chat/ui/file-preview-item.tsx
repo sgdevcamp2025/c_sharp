@@ -1,30 +1,34 @@
 'use client';
 import { useState } from 'react';
-import { CircleX } from 'lucide-react';
+import { CircleX, Loader2 } from 'lucide-react';
 
 import { ImagePreivew } from './file-preview-image';
 import { VideoPreview } from './file-preview-video';
 import FileModal from './file-modal';
 
-import type { FileData } from '../model';
+import type { FilePreview } from '../model';
 
 type FilePreviewItemProps = {
-  fileData: FileData;
-  onRemove: (id: string) => void;
+  id: number;
+  fileData: FilePreview;
+  onRemove: (id: number) => void;
 };
 
 export const FilePreviewItem = ({
+  id,
   fileData,
   onRemove,
 }: FilePreviewItemProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  console.log(fileData);
+
   return (
     <div className="relative group flex-shrink-0">
-      {/* <div className="w-20 h-20 rounded-lg relative overflow-hidden border border-black">
-        {fileData.type === 'image' ? (
+      <div className="w-20 h-20 rounded-lg relative overflow-hidden border border-black">
+        {fileData.thumbnailUrl === undefined ? (
           <ImagePreivew
-            preview={fileData.preview}
+            preview={fileData.previewUrl}
             onClick={() => setIsModalOpen(true)}
           />
         ) : (
@@ -33,23 +37,33 @@ export const FilePreviewItem = ({
             onClick={() => setIsModalOpen(true)}
           />
         )}
-        <CircleX
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove(fileData.id);
-          }}
-          color="#EA4335"
-          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-        />
-      </div> */}
-      {/* {isModalOpen && (
+        {fileData.isLoading ? (
+          <div className="absolute top-1 right-1">
+            <Loader2
+              size={24}
+              className="animate-spin"
+              color="#3B82F6"
+            />
+          </div>
+        ) : (
+          <CircleX
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(Number(id));
+            }}
+            color="#EA4335"
+            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+          />
+        )}
+      </div>
+      {isModalOpen && (
         <FileModal
           isOpen={isModalOpen}
           setIsOpen={setIsModalOpen}
           size="default"
           fileData={fileData}
         />
-      )} */}
+      )}
     </div>
   );
 };
