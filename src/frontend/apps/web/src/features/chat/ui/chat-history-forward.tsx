@@ -1,68 +1,74 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
+
 import { useForwardInfiniteHistory } from '@/src/features/chat/model';
-import { CHAT_HISTORY_DUMMY_DATA } from './chat-history-dummy';
-import type { ChatHistoryProps } from './chat-history-reverse';
+import { processChatHistory } from '../lib/process-chat-history.util';
+import ChatHistoryItem from './chat-history-item';
+
+export type ChatHistoryProps = {
+  containerRef: React.RefObject<HTMLDivElement>;
+};
 
 const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
-  const channelId = 1; // 상황에 맞게 채널 ID를 설정하세요.
-
+  const channelId = 1;
+  const initialCursor = undefined;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useForwardInfiniteHistory(channelId);
+    useForwardInfiniteHistory(channelId, initialCursor);
 
-  // 모든 페이지의 메시지를 합칩니다.
   const messages = data?.pages.flatMap((page) => page.threads) ?? [];
+  const processedThreads = processChatHistory(messages);
 
-  // 스크롤이 바닥에 가까워지면 다음 페이지를 요청합니다.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container && data && data.pages.length === 1) {
+      container.scrollTop = 0;
+    }
+  }, [data, containerRef]);
+
+  // 스크롤 이벤트: 사용자가 스크롤 하단에 도달하면 fetchNextPage 호출 후 스크롤 보정
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleScroll = () => {
-      // 스크롤이 바닥에 도달하거나 가까워졌을 때 (10px 여유)
       if (
         container.scrollTop + container.clientHeight >=
           container.scrollHeight - 10 &&
         hasNextPage &&
         !isFetchingNextPage
       ) {
-        fetchNextPage();
+        // fetch 전 현재 컨테이너 전체 높이를 기록합니다.
+        const prevScrollHeight = container.scrollHeight;
+        fetchNextPage().then(() => {
+          const newScrollHeight = container.scrollHeight;
+          // 새로운 메시지들이 추가되어 전체 높이가 늘어난 만큼 scrollTop을 보정합니다.
+          container.scrollTop += newScrollHeight - prevScrollHeight;
+        });
       }
     };
 
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [containerRef, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <div
-      ref={containerRef}
-      style={{ height: '200px', overflowY: 'auto', border: '1px solid #ccc' }}
-    >
-      {messages.map((thread) => (
-        <div
-          key={thread.threadId}
-          style={{ padding: '10px', borderBottom: '1px solid #eee' }}
-        >
-          <div style={{ fontSize: '12px', color: '#888' }}>
-            {thread.threadDateTime} - {thread.userNickname}
-          </div>
-          {thread.messages.map((msg, idx) => (
-            <p
-              key={idx}
-              style={{ margin: '5px 0' }}
-            >
-              {msg.text}
-            </p>
-          ))}
-        </div>
-      ))}
-
+    <>
       {hasNextPage && isFetchingNextPage && (
-        <div style={{ textAlign: 'center', padding: '10px' }}>
-          Loading more messages...
+        <div className="flex w-full p-[10px] justify-center">
+          <Loader2
+            className="animate-spin"
+            color="#F87315"
+          />
         </div>
       )}
-    </div>
+
+      {processedThreads.map((thread) => (
+        <ChatHistoryItem
+          key={thread.threadId}
+          thread={thread}
+        />
+      ))}
+    </>
   );
 };
 

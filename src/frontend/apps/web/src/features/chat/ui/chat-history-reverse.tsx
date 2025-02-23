@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
-import Image from 'next/image';
+
 import { Loader2 } from 'lucide-react';
 
 import { useReverseInfiniteHistory } from '@/src/features/chat/model';
 
-import ContentAvatar from './content-avatar';
-
-import { formatChatTime, processChatHistory } from '../lib';
+import { processChatHistory } from '../lib';
+import ChatHistoryItem from './chat-history-item';
 
 export type ChatHistoryProps = {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -14,8 +13,9 @@ export type ChatHistoryProps = {
 
 const ChatReverseHistory = ({ containerRef }: ChatHistoryProps) => {
   const channelId = 1;
+  const initialCursor = undefined;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useReverseInfiniteHistory(channelId);
+    useReverseInfiniteHistory(channelId, initialCursor);
 
   const messages = data?.pages.flatMap((page) => page.threads) ?? [];
 
@@ -59,66 +59,10 @@ const ChatReverseHistory = ({ containerRef }: ChatHistoryProps) => {
       )}
 
       {processedThreads.map((thread) => (
-        <div
+        <ChatHistoryItem
           key={thread.threadId}
-          className="group relative flex w-full pl-5 pt-5 pr-6 gap-4 bg-white hover:bg-chatboxHover transition-all duration-300"
-        >
-          {thread.hideAvatar ? null : (
-            <ContentAvatar
-              type="default"
-              userProfileImage={thread.userProfileImage}
-            />
-          )}
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              {!thread.isConsecutive && (
-                <>
-                  <div className="text-base font-bold">
-                    {thread.userNickname}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {formatChatTime(thread.threadDateTime, false)}
-                  </div>
-                </>
-              )}
-            </div>
-            {thread.messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className="text-base flex gap-4 items-center"
-              >
-                {thread.isConsecutive && (
-                  <div className="flex flex-col items-end w-10 h-full text-sm text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-                    {formatChatTime(thread.threadDateTime, true)}
-                  </div>
-                )}
-                {msg.type === 'TEXT' && (
-                  <div className="whitespace-pre-line break-words">
-                    {msg.text.replace(/\\n/g, '\n')}
-                  </div>
-                )}
-                {msg.type === 'IMAGE' && (
-                  <Image
-                    src={msg.imageUrl}
-                    alt="Image"
-                    className="w-32 h-32"
-                  />
-                )}
-                {msg.type === 'VIDEO' && (
-                  <video
-                    controls
-                    className="w-48 h-48"
-                  >
-                    <source
-                      src={msg.videoUrl}
-                      type="video/mp4"
-                    />
-                  </video>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+          thread={thread}
+        />
       ))}
     </>
   );
