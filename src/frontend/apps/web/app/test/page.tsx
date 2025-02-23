@@ -158,12 +158,12 @@ export default function page() {
 
     //내 정보도 리스트에 저장
     participants.current[userId] = { rtcPeer: localRtcPeer };
+    console.log('내 정보 로컬에 등록완료');
 
     //기존 참가자들 offer
-    list.forEach((participantId: number) => {
-      participants.current[participantId] = { id: participantId };
-    });
-    console.log('기존참가자 등록 완료!');
+    list.forEach((participantId: number) =>
+      handleNewParticipant(participantId),
+    );
     console.log('참가자 목록-existing:', participants.current);
   };
 
@@ -184,7 +184,6 @@ export default function page() {
 
         const message = JSON.stringify({
           id: 'onIceCandidate',
-          userId,
           candidate,
           sender: mode === 'sendonly' ? userId : participantId,
         });
@@ -219,14 +218,38 @@ export default function page() {
   };
 
   //새로운 참가자 알림
-  const handleNewParticipant = (data: any) => {
-    const newPeerId = data.name;
+  const handleNewParticipant = (participantId) => {
+    const newPeerId = participantId;
     if (newPeerId === userId) return; //내 id무시
 
     console.log(`새로운 참가자 입장 : ${newPeerId}`);
-    participants.current[newPeerId] = { id: newPeerId };
-    console.log('참가자 등록 완료!');
-    console.log('참가자 목록-new:', participants.current);
+
+    const remoteRtcPeer = createWebRtcPeer(
+      'recvonly',
+      null,
+      (offerSdp: any) => {
+        if (!offerSdp) {
+          console.log(`${participantId}:SDP가 null임!!!!!`);
+          return;
+        }
+        const message = JSON.stringify({
+          id: 'receiveVideoFrom',
+          sdpOffer: offerSdp,
+          sender: newPeerId,
+        });
+        console.log('보내는 메시지:', message);
+
+        stompClient.current?.publish({
+          destination: `${STOMP_PATH.PUB_URL}`,
+          body: message,
+        });
+      },
+      participantId,
+    );
+
+    //내 정보도 리스트에 저장
+    participants.current[participantId] = { rtcPeer: remoteRtcPeer };
+    console.log(`${participantId}정보 로컬에 등록완료`);
   };
 
   return (
