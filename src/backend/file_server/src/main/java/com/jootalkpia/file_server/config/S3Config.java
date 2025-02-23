@@ -8,6 +8,8 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
 
 import java.net.URI;
 
@@ -35,6 +37,21 @@ public class S3Config {
                         AwsBasicCredentials.create(accessKey, secretKey)
                 ))
                 .httpClientBuilder(NettyNioAsyncHttpClient.builder()) // 비동기 HTTP 클라이언트
+                .build();
+    }
+
+    @Bean
+    public S3Client s3Client() {
+        return S3Client.builder()
+                .region(Region.of(region))
+                .endpointOverride(URI.create("https://s3." + region + ".amazonaws.com")) // S3 엔드포인트
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKey, secretKey)
+                ))
+                .serviceConfiguration(S3Configuration.builder()
+                        .checksumValidationEnabled(false) // Checksum 검증 비활성화 (선택)
+                        .build()
+                )
                 .build();
     }
 }

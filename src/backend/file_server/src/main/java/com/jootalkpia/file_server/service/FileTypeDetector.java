@@ -5,6 +5,8 @@ import com.jootalkpia.file_server.exception.common.ErrorCode;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
@@ -73,5 +75,17 @@ public class FileTypeDetector {
             throw new RuntimeException(e);
         }
     }
+
+    public String detectFileTypeFromS3(String s3Key, String bucketName) {
+        try {
+            URL url = new URL("https://" + bucketName + ".s3.amazonaws.com/" + s3Key);
+            URLConnection connection = url.openConnection();
+            return connection.getContentType();
+        } catch (IOException e) {
+            log.error("파일 타입 감지 실패: {}", s3Key, e);
+            return "application/octet-stream";
+        }
+    }
+
 
 }

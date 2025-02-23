@@ -13,7 +13,6 @@ public class UploadChunkRequestDto {
     private Long channelId;
     private String tempFileIdentifier;
     private Long totalChunks;
-    private String fileType;
-//    private Long chunkSize;
+    private String mimeType;
     private MultipartChunk chunkInfo;
 }
