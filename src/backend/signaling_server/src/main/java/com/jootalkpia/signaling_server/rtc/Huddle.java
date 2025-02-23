@@ -59,7 +59,7 @@ public class Huddle implements Closeable {
     private Collection<Long> joinRoom(UserSession newParticipant) {
         final JsonObject newParticipantMsg = new JsonObject();
         newParticipantMsg.addProperty("id", "newParticipantArrived");
-        newParticipantMsg.addProperty("name", newParticipant.getUserId());
+        newParticipantMsg.addProperty("name", String.valueOf(newParticipant.getUserId()));
 
         final List<Long> participantsList = new ArrayList<>(participants.values().size());
         log.debug("ROOM {}: notifying other participants of new participant {}", channelId,
@@ -67,7 +67,7 @@ public class Huddle implements Closeable {
 
         for (final UserSession participant : participants.values()) {
 
-            participant.sendMessage(newParticipantMsg);
+            participant.sendPrivateMessage(participant.getUserId(), newParticipantMsg);
 
             participantsList.add(participant.getUserId());
         }
@@ -107,7 +107,13 @@ public class Huddle implements Closeable {
             }
         }
 
-        user.sendParticipantMessage(user.getUserId(), participantsArray);
+        final JsonObject existingParticipantsMsg = new JsonObject();
+        existingParticipantsMsg.addProperty("id", "existingParticipants");
+        existingParticipantsMsg.add("data", participantsArray);
+
+        log.debug("PARTICIPANT {}: sending a list of {} participants", user.getUserId(), participantsArray.size());
+
+        user.sendPrivateMessage(user.getUserId(), existingParticipantsMsg);
     }
 
     public Collection<UserSession> getParticipants() {
