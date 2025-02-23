@@ -21,7 +21,7 @@ public class ChatController {
         chatService.processChatMessage(request, channelId);
     }
 
-    @GetMapping("/api/chat-port")
+    @GetMapping("/ws-connect/api/chat-port")
     public ResponseEntity<String> getWebSocketPort(HttpServletRequest request) {
         int port = request.getServerPort(); // 현재 서버의 포트 가져오기
         return ResponseEntity.ok(String.valueOf(port));
