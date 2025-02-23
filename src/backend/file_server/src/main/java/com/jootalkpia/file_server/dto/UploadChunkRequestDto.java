@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadChunkRequestDto {
     private Long workspaceId;
     private Long channelId;
-    private String tempFileIdentifier;
+    private Long fileId;
     private Long totalChunks;
     private String mimeType;
     private MultipartChunk chunkInfo;

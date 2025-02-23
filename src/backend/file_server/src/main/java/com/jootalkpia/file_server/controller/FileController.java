@@ -52,13 +52,12 @@ public class FileController {
         log.info("init-upload 요청 받음: {}", tempFileIdentifier);
 
         // 초기화 처리
-        fileService.initiateMultipartUpload(tempFileIdentifier, mimeType);
+        Long fileId = fileService.initiateMultipartUpload(tempFileIdentifier, mimeType);
 
         // 초기화 완료 응답
         Map<String, Object> response = new HashMap<>();
-        response.put("code", 200);
+        response.put("fileId", fileId);
         response.put("status", "initialized");
-        response.put("message", "업로드 준비 완료");
         return ResponseEntity.ok(response);
     }
 
@@ -83,7 +82,7 @@ public class FileController {
     public ResponseEntity<?> uploadFileChunk(
             @RequestParam("workspaceId") Long workspaceId,
             @RequestParam("channelId") Long channelId,
-            @RequestParam("tempFileIdentifier") String tempFileIdentifier,
+            @RequestParam("fileId") Long fileId,
             @RequestParam("totalChunks") Long totalChunks,
             @RequestParam("chunkIndex") Long chunkIndex,
             @RequestParam("mimeType") String mimeType,
@@ -94,13 +93,13 @@ public class FileController {
         ValidationUtils.validateWorkSpaceId(workspaceId);
         ValidationUtils.validateChannelId(channelId);
         ValidationUtils.validateFile(chunk);
-        ValidationUtils.validateFileId(tempFileIdentifier);
+//        ValidationUtils.validateFileId(fileId);
         ValidationUtils.validateTotalChunksAndChunkIndex(totalChunks, chunkIndex);
 
         // DTO로 변환
         MultipartChunk multipartChunk = new MultipartChunk(chunkIndex, chunk);
         UploadChunkRequestDto request = new UploadChunkRequestDto(
-                workspaceId, channelId, tempFileIdentifier, totalChunks, mimeType, multipartChunk
+                workspaceId, channelId, fileId, totalChunks, mimeType, multipartChunk
         );
 
         Object response = fileService.uploadChunk(request);

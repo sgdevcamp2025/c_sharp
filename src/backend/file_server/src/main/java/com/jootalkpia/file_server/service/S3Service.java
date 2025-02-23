@@ -6,6 +6,7 @@ import com.jootalkpia.file_server.exception.common.ErrorCode;
 import com.jootalkpia.file_server.repository.FileRepository;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,17 +42,17 @@ public class S3Service {
     @Value("${spring.cloud.aws.region.static}")
     private String region;
 
-    public String makeKey(String tempFileIdentifier, String mimeType) {
+    public String makeKey(Long fileId, String mimeType) {
         String filePath;
         if (mimeType.startsWith("video/")) {
             filePath = "videos/";
         } else filePath = "images/";
-        return filePath + tempFileIdentifier;
+        return filePath + fileId;
     }
 
-    public String initiateMultipartUpload(String tempFileIdentifier, String mimeType) {
+    public String initiateMultipartUpload(Long fileId, String mimeType) {
 
-        String s3Key = makeKey(tempFileIdentifier, mimeType);
+        String s3Key = makeKey(fileId, mimeType);
 
         log.info("initialized with s3key : {}", s3Key);
 
@@ -63,15 +64,15 @@ public class S3Service {
         try {
             CompletableFuture<CreateMultipartUploadResponse> createResponse = s3AsyncClient.createMultipartUpload(createRequest);
             String uploadId = createResponse.join().uploadId();
-            log.info("S3 멀티파트 업로드 초기화: {}, uploadId: {}", tempFileIdentifier, uploadId);
+            log.info("S3 멀티파트 업로드 초기화: {}, uploadId: {}", fileId, uploadId);
             return uploadId;
         } catch (Exception e) {
-            log.error("S3 멀티파트 업로드 초기화 실패: {}", tempFileIdentifier, e);
+            log.error("S3 멀티파트 업로드 초기화 실패: {}", fileId, e);
             throw new CustomException(ErrorCode.FILE_PROCESSING_FAILED.getCode(), "S3 멀티파트 업로드 초기화 실패");
         }
     }
 
-    public CompletableFuture<CompletedPart> asyncUploadPartToS3(String tempFileIdentifier, String uploadId, int partNumber, byte[] chunkData, String s3Key) {
+    public CompletableFuture<CompletedPart> asyncUploadPartToS3(Long fileId, String uploadId, int partNumber, byte[] chunkData, String s3Key) {
         UploadPartRequest uploadPartRequest = UploadPartRequest.builder()
                 .bucket(bucketName)
                 .key(s3Key)
@@ -93,8 +94,8 @@ public class S3Service {
                 });
     }
 
-    public void completeMultipartUpload(String tempFileIdentifier, String uploadId, List<CompletedPart> completedParts, String mimeType) {
-        String s3Key = makeKey(tempFileIdentifier, mimeType);
+    public void completeMultipartUpload(Long fileId, String uploadId, List<CompletedPart> completedParts, String mimeType) {
+        String s3Key = makeKey(fileId, mimeType);
 
         completedParts.sort(Comparator.comparingInt(CompletedPart::partNumber));
 
@@ -128,14 +129,10 @@ public class S3Service {
                             .thenAccept(copyObjectResponse -> {
                                 log.info("S3 Content-Type 설정 완료: {}, 타입: {}", s3Key, mimeType);
 
-                                // FilesEntity 저장
-                                FilesEntity filesEntity = new FilesEntity();
-                                filesEntity.setMimeType(mimeType);
-                                String fileType = "IMAGE";
-                                if (mimeType.startsWith("video/")) {
-                                    fileType = "VIDEO";
-                                }
-                                filesEntity.setFileType(fileType);
+                                // FilesEntity 가져오기 및 URL 업데이트
+                                FilesEntity filesEntity = fileRepository.findById(fileId)
+                                        .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND.getCode(), "해당 ID의 파일을 찾을 수 없습니다."));
+
                                 filesEntity.setUrl(completeMultipartUploadResponse.location());
                                 fileRepository.save(filesEntity);
                             }).exceptionally(ex -> {

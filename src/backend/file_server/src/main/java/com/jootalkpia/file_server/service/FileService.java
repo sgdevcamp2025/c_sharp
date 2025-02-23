@@ -41,41 +41,48 @@ public class FileService {
     private final UserRepository userRepository;
 
     // tempIdentifier: uploadId
-    private static final ConcurrentHashMap<String, String> UPLOAD_ID_STORAGE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, String> UPLOAD_ID_STORAGE = new ConcurrentHashMap<>();
 
     // uploadId: etag
     private static final ConcurrentHashMap<String, List<CompletedPart>> PART_TAG_STORAGE = new ConcurrentHashMap<>();
 
-    public void initiateMultipartUpload(String tempFileIdentifier, String mimeType) {
-        String uploadId = s3Service.initiateMultipartUpload(tempFileIdentifier, mimeType);
+    public Long initiateMultipartUpload(String tempFileIdentifier, String mimeType) {
+        FilesEntity filesEntity = new FilesEntity();
+        filesEntity.setMimeType(mimeType);
+        filesEntity.setFileType(mimeType.startsWith("video/") ? "VIDEO" : "IMAGE");
+        FilesEntity savedEntity = fileRepository.save(filesEntity);
+        Long fileId = savedEntity.getFileId();
+
+        String uploadId = s3Service.initiateMultipartUpload(fileId, mimeType);
         synchronized (UPLOAD_ID_STORAGE) {
-            UPLOAD_ID_STORAGE.put(tempFileIdentifier, uploadId);
+            UPLOAD_ID_STORAGE.put(fileId, uploadId);
             log.info("Upload ID 저장 - TempFileIdentifier: {}, Upload ID: {}", tempFileIdentifier, uploadId);
         }
+        return savedEntity.getFileId();
     }
 
     public Object uploadChunk(UploadChunkRequestDto request) {
         MultipartFile chunkFile = request.getChunkInfo().getChunk();
-        String tempFileIdentifier = request.getTempFileIdentifier();
+        Long fileId = request.getFileId();
         int totalChunks = request.getTotalChunks().intValue();
         int chunkIndex = request.getChunkInfo().getChunkIndex().intValue();
         String mimeType = request.getMimeType();
-        log.info(tempFileIdentifier);
+        log.info("{}", fileId);
 
         log.info("uploadFileChunk request: {}", chunkIndex);
         log.info("UPLOAD_ID_STORAGE 상태 - Size: {}, Keys: {}", UPLOAD_ID_STORAGE.size(), UPLOAD_ID_STORAGE.keySet());
 
-        String uploadId = UPLOAD_ID_STORAGE.get(tempFileIdentifier);
+        String uploadId = UPLOAD_ID_STORAGE.get(fileId);
         if (uploadId == null) {
-            log.error("uploadId 없음 - tempFileIdentifier: {}", tempFileIdentifier);
+            log.error("uploadId 없음 - tempFileIdentifier: {}", fileId);
             throw new CustomException(ErrorCode.CHUNK_INITIALIZE_FAILED.getCode(), ErrorCode.CHUNK_INITIALIZE_FAILED.getMsg());
         }
 
         log.info("청크 업로드 중 - Upload ID: {}, Chunk Index: {}", uploadId, chunkIndex);
 
-        String s3Key = s3Service.makeKey(tempFileIdentifier, mimeType);
+        String s3Key = s3Service.makeKey(fileId, mimeType);
         try {
-            CompletableFuture<CompletedPart> future = s3Service.asyncUploadPartToS3(tempFileIdentifier, uploadId, chunkIndex, chunkFile.getBytes(), s3Key);
+            CompletableFuture<CompletedPart> future = s3Service.asyncUploadPartToS3(fileId, uploadId, chunkIndex, chunkFile.getBytes(), s3Key);
 
             future.thenAccept(completedPart -> {
                 synchronized (PART_TAG_STORAGE) {
@@ -85,13 +92,13 @@ public class FileService {
                 // 마지막 청크 여부 확인
                 if (isLastChunk(totalChunks, uploadId)) {
                     synchronized (PART_TAG_STORAGE) {
-                        s3Service.completeMultipartUpload(tempFileIdentifier, uploadId, PART_TAG_STORAGE.get(uploadId),
+                        s3Service.completeMultipartUpload(fileId, uploadId, PART_TAG_STORAGE.get(uploadId),
                                 mimeType);
                         log.info("모든 청크 업로드 완료 및 병합 완료: {}", uploadId);
 
                         // 상태 초기화
                         synchronized (UPLOAD_ID_STORAGE) {
-                            UPLOAD_ID_STORAGE.remove(tempFileIdentifier);
+                            UPLOAD_ID_STORAGE.remove(fileId);
                         }
                         synchronized (PART_TAG_STORAGE) {
                             PART_TAG_STORAGE.remove(uploadId);
