@@ -68,7 +68,7 @@ public class UserSession implements Closeable {
         scParams.addProperty("sdpAnswer", ipSdpAnswer);
 
         log.trace("USER {}: SdpAnswer for {} is {}", this.userId, sender.getUserId(), ipSdpAnswer);
-        this.sendMessage(scParams);
+        this.sendPrivateMessage(userId, scParams);
         log.debug("gather candidates");
         this.getEndpointForUser(sender).gatherCandidates();
     }
@@ -176,17 +176,16 @@ public class UserSession implements Closeable {
         log.info("📡 Sent STOMP message to {}: {}", destination, message);
     }
 
+    // 개별 사용자에게 응답 전송 (경로에 userId를 붙임)
+    public void sendPrivateMessage(Long userId, JsonObject message) {
+        String destination = "/queue/private/" + userId;
+        messagingTemplate.convertAndSend(destination, message.toString());
+        log.info("📡 Sent private STOMP message to {}: {}", destination, message);
+    }
+
+
     public void sendParticipantMessage(Long userId, JsonArray participantsArray) {
         String destination = "/topic/huddle/" + channelId;
-
-//        // 연결되지 않은 참가자 목록 생성
-//        JsonArray unConnectedParticipants = new JsonArray();
-//        for (int i = 0; i < participantsArray.size(); i++) {
-//            Long participantId = participantsArray.get(i).getAsLong();
-//            if (!incomingMedia.containsKey(participantId)) {
-//                unConnectedParticipants.add(participantId);
-//            }
-//        }
 
         final JsonObject existingParticipantsMsg = new JsonObject();
         existingParticipantsMsg.addProperty("id", "existingParticipants");
