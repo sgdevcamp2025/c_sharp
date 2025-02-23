@@ -106,6 +106,7 @@ export default function page() {
         handleVideoResponse(data);
         break;
       case 'iceCandidate':
+        handleIceResponse(data);
         break;
     }
   };
@@ -264,6 +265,16 @@ export default function page() {
 
     if (participants.current[sender]) {
       participants.current[sender].rtcPeer.processAnswer(sdpAnswer);
+    }
+  };
+
+  //ice answer 처리
+  const handleIceResponse = (data: any) => {
+    const { sender, candidate } = data;
+    console.log(`${sender}의 ice answer 받음`);
+
+    if (participants.current[sender]) {
+      participants.current[sender].rtcPeer.addIceCandidate(candidate);
     }
   };
 
