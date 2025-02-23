@@ -32,7 +32,7 @@ public class FileTypeDetector {
         }
     }
 
-    private String detectFileType(Object file) throws IOException {
+    public String detectFileType(Object file) throws IOException {
         String mimeType = detectMimeType(file);
 
         if (mimeType.startsWith("image/")) {
@@ -46,16 +46,31 @@ public class FileTypeDetector {
 
     public String detectMimeType(Object file) {
         try {
+            String mimeType;
             if (file instanceof InputStream) {
-                return tika.detect((InputStream) file);
+                mimeType = tika.detect((InputStream) file);
             } else if (file instanceof File) {
-                return tika.detect((File) file);
+                mimeType = tika.detect((File) file);
             } else {
                 throw new IllegalArgumentException("Unsupported file type for detection");
             }
+
+            log.info("파일 MIME 타입: {}", mimeType);
+            return mimeType;
         } catch (IOException e) {
             log.warn("MIME 타입 감지 실패, 기본값 사용: binary/octet-stream", e);
             throw new CustomException(ErrorCode.MIMETYPE_DETECTION_FAILED.getCode(), ErrorCode.MIMETYPE_DETECTION_FAILED.getMsg());
+        }
+    }
+
+
+    public File convertMultipartToFile(MultipartFile multipartFile) {
+        try {
+            File tempFile = File.createTempFile("temp_", multipartFile.getOriginalFilename());
+            multipartFile.transferTo(tempFile);
+            return tempFile;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
