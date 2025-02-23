@@ -1,8 +1,12 @@
 import { useCallback } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import { useStompWebSocket } from '@/src/shared/providers';
+import { QUERY_KEYS } from '@/src/shared/services';
 
 export const useStockWebSocket = () => {
+  const queryClient = useQueryClient();
   const { client, isConnected } = useStompWebSocket();
 
   const subscribe = useCallback(() => {
@@ -23,6 +27,11 @@ export const useStockWebSocket = () => {
       try {
         const payload = JSON.parse(message.body);
         console.log('📩 Received:', payload);
+
+        queryClient.setQueryData(QUERY_KEYS.stocks(), (prev: any[] = []) => [
+          ...prev,
+          payload,
+        ]);
       } catch (error) {
         console.error('❌ 메시지 파싱 실패:', error);
       }
@@ -32,7 +41,7 @@ export const useStockWebSocket = () => {
       console.log(`📴 Unsubscribing from /subscribe/stock`);
       subscription.unsubscribe();
     };
-  }, [client, isConnected]);
+  }, [client, isConnected, queryClient]);
 
   return { subscribe };
 };
