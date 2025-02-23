@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/src/shared/services';
 
-const StockChartContainer = () => {
+const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
   const queryClient = useQueryClient();
   const data = dummyStockData;
   const { subscribe } = useStockWebSocket();
@@ -22,7 +22,7 @@ const StockChartContainer = () => {
 
   const stockData = queryClient
     .getQueryData<any[]>(QUERY_KEYS.stocks())
-    ?.filter((data) => data.code === '035420');
+    ?.filter((data) => data.code === stockCode);
   const stocksDataForTest = queryClient.getQueryData<any[]>(
     QUERY_KEYS.stocks(),
   );
