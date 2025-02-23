@@ -138,6 +138,10 @@ export default function page() {
 
   //미디어 스트림 생성
   const getLocalStream = async () => {
+    if (localVideoRef.current?.srcObject) {
+      console.log('기존 로컬 미디어 스트림 재사용');
+      return localVideoRef.current.srcObject;
+    }
     console.log('🎥 내 비디오 스트림 요청 중...');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
