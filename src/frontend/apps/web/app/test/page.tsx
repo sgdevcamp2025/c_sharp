@@ -102,6 +102,11 @@ export default function page() {
       case 'newParticipantArrived':
         handleNewParticipant(data);
         break;
+      case 'receiveVideoAnswer':
+        handleVideoResponse(data);
+        break;
+      case 'iceCandidate':
+        break;
     }
   };
 
@@ -250,6 +255,16 @@ export default function page() {
     //내 정보도 리스트에 저장
     participants.current[participantId] = { rtcPeer: remoteRtcPeer };
     console.log(`${participantId}정보 로컬에 등록완료`);
+  };
+
+  //sdp answer 처리
+  const handleVideoResponse = (data: any) => {
+    const { sender, sdpAnswer } = data;
+    console.log(`${sender}의 sdp answer 받음`);
+
+    if (participants.current[sender]) {
+      participants.current[sender].rtcPeer.processAnswer(sdpAnswer);
+    }
   };
 
   return (
