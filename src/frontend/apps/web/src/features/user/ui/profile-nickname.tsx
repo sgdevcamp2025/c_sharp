@@ -3,30 +3,32 @@
 import { useUserStore } from '@/src/entities';
 import { Button, Input, Label } from '@workspace/ui/components';
 import { Pencil } from 'lucide-react';
-import { useState } from 'react';
+import { useReducer, useRef } from 'react';
+import { ACTIONS, profileChangeReducer } from '../model/profile-change-reducer';
 
 const ProfileNickname = () => {
   const nickname = useUserStore((state) => state.user?.nickname ?? '');
 
-  const [isNameEditMode, setIsNameEditMode] = useState(false);
-  const [newNickname, setNewNickname] = useState(nickname);
-  const [isError, setIsError] = useState(false);
+  const nameInput = useRef<HTMLInputElement>(null);
+  const [state, dispatch] = useReducer(profileChangeReducer, {
+    isEditMode: false,
+    isError: false,
+  });
 
   const handleNameEdit = async () => {
-    if (isNameEditMode) {
-      console.log('changing..');
-      console.log(newNickname);
-      if (newNickname === nickname) {
-        setIsNameEditMode((prev) => !prev);
+    if (state.isEditMode) {
+      const newNickname = nameInput.current?.value?.trim() ?? nickname;
+
+      if (!newNickname) {
+        dispatch({ type: ACTIONS.SET_ERROR });
         return;
       }
-      if (!newNickname.trim()) {
-        console.log('빈값에러');
-        setIsError(true);
-        return;
+
+      if (newNickname !== nickname) {
+        //api호출
       }
     }
-    setIsNameEditMode((prev) => !prev);
+    dispatch({ type: ACTIONS.TOGGLE_EDIT });
   };
 
   return (
@@ -34,18 +36,21 @@ const ProfileNickname = () => {
       <Label htmlFor="name">Name</Label>
       <Input
         id="name"
-        disabled={!isNameEditMode}
-        variant={isError ? 'error' : 'default'}
+        disabled={!state.isEditMode}
+        variant={state.isError ? 'error' : 'default'}
         placeholder="Enter your name"
-        value={newNickname}
-        onChange={(e) => setNewNickname(e.target.value)}
+        ref={nameInput}
+        defaultValue={nickname}
+        onFocus={() => {
+          dispatch({ type: ACTIONS.RESET_ERROR });
+        }}
       />
       <Button
         variant="ghost"
         size="sm"
         onClick={handleNameEdit}
       >
-        {isNameEditMode ? '저장' : <Pencil />}
+        {state.isEditMode ? '저장' : <Pencil />}
       </Button>
     </div>
   );
