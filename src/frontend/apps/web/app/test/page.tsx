@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as StompJs from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import kurentoUtils from 'kurento-utils';
 
 const STOMP_SERVER_URL = process.env.NEXT_PUBLIC_STOMP_SERVER;
 const RTC_CONFIGURATION = {
@@ -18,10 +17,11 @@ const RTC_CONFIGURATION = {
   iceTransportPolicy: 'all',
   bundlePolicy: 'max-bundle',
   iceCandidatePoolSize: 0,
-};
+} as RTCConfiguration;
 const STOMP_PATH = {
   PUB_URL: process.env.NEXT_PUBLIC_PUB_URL,
   SUB_URL: process.env.NEXT_PUBLIC_SUB_URL,
+  PRIVATE_SUB_URL: process.env.NEXT_PUBLIC_PRIVATE_SUB_URL,
 };
 
 export default function page() {
@@ -46,6 +46,9 @@ export default function page() {
   //다른참가자 미디어 스트림 목록
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
 
+  const localStream = useRef<MediaStream | null>(null);
+  const iceCandidateQueue = useRef<{ [key: string]: RTCIceCandidate[] }>({});
+
   //웹소켓(sockjs+stomp) 연결
   useEffect(() => {
     if (stompClient.current) {
@@ -67,6 +70,10 @@ export default function page() {
         stompClient.current?.subscribe(
           `${STOMP_PATH.SUB_URL}/${channelId}`,
           handleSignal,
+        );
+        stompClient.current?.subscribe(
+          `${STOMP_PATH.PRIVATE_SUB_URL}/${userId}`,
+          handlePrivateMessage,
         );
       },
       onStompError: (frame) => {
@@ -102,6 +109,19 @@ export default function page() {
       case 'newParticipantArrived':
         handleNewParticipant(data);
         break;
+      // case 'receiveVideoAnswer':
+      //   handleVideoResponse(data);
+      //   break;
+      // case 'iceCandidate':
+      //   handleIceResponse(data);
+      //   break;
+    }
+  };
+
+  const handlePrivateMessage = (msg: StompJs.Message) => {
+    const data = JSON.parse(msg.body);
+    console.log('서버에서 온 private메시지 : ', data);
+    switch (data.id) {
       case 'receiveVideoAnswer':
         handleVideoResponse(data);
         break;
@@ -122,43 +142,31 @@ export default function page() {
       return;
     }
 
-    const stream = await getLocalStream();
-    if (!stream) return;
+    if (!localStream.current) localStream.current = await getLocalStream();
+    if (!localStream.current) return;
 
-    console.log('방 참가 요청 시작 !');
-
-    const message = JSON.stringify({ id: 'joinHuddle', channelId, userId });
-    console.log('보내는 메시지:', message);
-
+    console.log('📡 방 참가 요청 시작!');
     stompClient.current?.publish({
       destination: `${STOMP_PATH.PUB_URL}`,
-      body: message,
+      body: JSON.stringify({ id: 'joinHuddle', channelId, userId }),
     });
   };
 
   //미디어 스트림 생성
   const getLocalStream = async () => {
-    if (localVideoRef.current?.srcObject) {
-      console.log('기존 로컬 미디어 스트림 재사용');
-      return localVideoRef.current.srcObject;
-    }
-    console.log('🎥 내 비디오 스트림 요청 중...');
     try {
+      if (localStream.current) return localStream.current;
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
+      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
 
-      // ✅ 내 비디오 태그에 스트림 연결
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
-      }
-
-      console.log('✅ 내 비디오 스트림 설정 완료');
       return stream;
     } catch (error) {
       console.error('❌ 비디오 스트림 가져오기 실패:', error);
-      return null; // 실패 시 null 반환
+      return null;
     }
   };
 
@@ -206,50 +214,65 @@ export default function page() {
   const createWebRtcPeer = (
     mode: 'sendonly' | 'recvonly',
     videoElement: HTMLVideoElement | null,
-    callback: (offerSdp: any) => void,
+    callback: (offerSdp: string) => void,
     participantId?: number,
   ) => {
-    const options = {
-      localVideo: mode === 'sendonly' ? videoElement : undefined,
-      remoteVideo: mode === 'recvonly' ? videoElement : undefined,
-      configuration: RTC_CONFIGURATION,
-      mediaConstraints: { audio: true, video: { width: 320, frameRate: 15 } },
-      onicecandidate: (candidate: any) => {
-        if (!candidate) return;
+    // ✅ 기존 PeerConnection이 있으면 재사용하지 않고 새로 생성
+    const peerConnection = new RTCPeerConnection(RTC_CONFIGURATION);
+    console.log('✅ 새 PeerConnection 생성 완료:', participantId);
 
+    // ✅ 상대방 비디오 트랙 설정 (recvonly 모드일 경우)
+    peerConnection.ontrack = (event) => {
+      console.log('📸 Remote Track Received:', event);
+      if (videoElement) {
+        videoElement.srcObject = event.streams[0];
+      }
+    };
+
+    // ✅ sendonly 모드일 때 Local Video Stream 설정
+    if (mode === 'sendonly' && localStream.current) {
+      localStream.current.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream.current!);
+      });
+      console.log('✅ Local Video Stream 트랙 추가 완료');
+    } else {
+      // ✅ recvonly 모드일 때 addTransceiver 사용
+      peerConnection.addTransceiver('video', { direction: 'recvonly' });
+      peerConnection.addTransceiver('audio', { direction: 'recvonly' });
+      console.log('✅ Transceiver 설정 완료 (recvonly 모드)');
+    }
+
+    // ✅ ICE Candidate 수집 및 전송
+    peerConnection.onicecandidate = (event) => {
+      if (event.candidate) {
         const message = JSON.stringify({
           id: 'onIceCandidate',
-          candidate,
+          candidate: event.candidate,
           sender: mode === 'sendonly' ? userId : participantId,
         });
         stompClient.current?.publish({
           destination: `${STOMP_PATH.PUB_URL}`,
           body: message,
         });
-      },
+      }
     };
 
-    return new kurentoUtils.WebRtcPeer[
-      mode === 'sendonly' ? 'WebRtcPeerSendonly' : 'WebRtcPeerRecvonly'
-    ](options, function (error: any) {
-      if (error) {
-        console.error('❌ WebRTC Peer 생성 실패:', error);
-        return;
-      }
-
-      console.log('✅ WebRTC Peer 생성 완료, SDP Offer 생성 시작...');
-
-      this.generateOffer((offerSdp) => {
-        if (!offerSdp) {
-          console.error('❌ SDP Offer 생성 실패');
-          return;
-        }
-
-        console.log('✅ SDP Offer 생성 성공:', offerSdp);
-
-        callback(offerSdp);
+    // ✅ SDP Offer 생성
+    peerConnection
+      .createOffer()
+      .then((offer) => {
+        peerConnection.setLocalDescription(offer);
+        console.log('✅ SDP Offer 생성 성공:', offer.sdp);
+        callback(offer.sdp);
+      })
+      .catch((error) => {
+        console.error('❌ SDP Offer 생성 실패:', error);
       });
-    });
+
+    // ✅ 생성된 PeerConnection 객체 저장
+    participants.current[participantId!] = { rtcPeer: peerConnection };
+
+    return peerConnection;
   };
 
   //새로운 참가자 알림
@@ -284,7 +307,6 @@ export default function page() {
       participantId,
     );
 
-    //내 정보도 리스트에 저장
     participants.current[participantId] = { rtcPeer: remoteRtcPeer };
     console.log(`${participantId}정보 로컬에 등록완료`);
   };
@@ -304,9 +326,25 @@ export default function page() {
     const { sender, sdpAnswer } = data;
     console.log(`${sender}의 sdp answer 받음`);
 
-    if (participants.current[sender]) {
-      participants.current[sender].rtcPeer.processAnswer(sdpAnswer);
+    const peerConnection = participants.current[sender]?.rtcPeer;
+    if (!peerConnection) {
+      console.error(`❌ PeerConnection 없음: ${sender}`);
+      return;
     }
+
+    peerConnection
+      .setRemoteDescription(
+        new RTCSessionDescription({
+          type: 'answer',
+          sdp: sdpAnswer,
+        }),
+      )
+      .then(() => {
+        console.log('✅ SDP Answer 적용 완료');
+      })
+      .catch((error) => {
+        console.error('❌ SDP Answer 적용 실패:', error);
+      });
   };
 
   //ice answer 처리
