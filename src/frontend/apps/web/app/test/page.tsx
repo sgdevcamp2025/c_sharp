@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as StompJs from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import kurentoUtils from 'kurento-utils';
 
 const STOMP_SERVER_URL = 'http://13.125.13.209:8090/ws';
 const RTC_CONFIGURATION = {
@@ -132,11 +133,70 @@ export default function page() {
     console.log('방입장 성공');
     setIsInCall(true);
 
+    //내 sdp(peer)생성 후 offer전송 (생성이 완료되면 iceCandidate도 전송 : createWebRtcPeer())
+    const localRtcPeer = createWebRtcPeer(
+      'sendonly',
+      localVideoRef.current,
+      (offerSdp: any) => {
+        const message = JSON.stringify({
+          id: 'receiveVideoFrom',
+          sdpOffer: offerSdp,
+          sender: userId,
+        });
+        console.log('보내는 메시지:', message);
+
+        stompClient.current?.publish({
+          destination: `${STOMP_PATH.PUB_URL}`,
+          body: message,
+        });
+      },
+    );
+
+    //내 정보도 리스트에 저장
+    participants.current[userId] = { rtcPeer: localRtcPeer };
+
+    //기존 참가자들 offer
     list.forEach((participantId: number) => {
       participants.current[participantId] = { id: participantId };
     });
     console.log('기존참가자 등록 완료!');
     console.log('참가자 목록-existing:', participants.current);
+  };
+
+  //webRtc Peer생성 및 iceCandidate전송
+  const createWebRtcPeer = (
+    mode: 'sendonly' | 'recvonly',
+    videoElement: HTMLVideoElement | null,
+    callback: (offerSdp: any) => void,
+    participantId?: number,
+  ) => {
+    const options = {
+      localVideo: mode === 'sendonly' ? videoElement : undefined,
+      remoteVideo: mode === 'recvonly' ? videoElement : undefined,
+      configuration: RTC_CONFIGURATION,
+      mediaConstraints: { audio: true, video: { width: 320, frameRate: 15 } },
+      onicecandidate: (candidate: any) => {
+        if (!candidate) return;
+
+        const message = JSON.stringify({
+          id: 'onIceCandidate',
+          userId,
+          candidate,
+          sender: mode === 'sendonly' ? userId : participantId,
+        });
+        stompClient.current?.publish({
+          destination: `${STOMP_PATH.PUB_URL}`,
+          body: message,
+        });
+      },
+    };
+
+    return new kurentoUtils.WebRtcPeer[
+      mode === 'sendonly' ? 'WebRtcPeerSendonly' : 'WebRtcPeerRecvonly'
+    ](options, function (error: any) {
+      if (error) return console.error(error);
+      this.generateOffer(callback);
+    });
   };
 
   //새로운 참가자 알림
