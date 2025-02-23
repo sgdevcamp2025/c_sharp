@@ -24,6 +24,7 @@ export const FilePreviewList = ({
         {selectedFiles.map((fileData, index) => (
           <FilePreviewItem
             key={index}
+            id={index}
             fileData={fileData}
             onRemove={onRemoveFile}
           />
