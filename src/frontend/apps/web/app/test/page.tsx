@@ -5,14 +5,14 @@ import * as StompJs from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import kurentoUtils from 'kurento-utils';
 
-const STOMP_SERVER_URL = 'http://13.125.13.209:8090/ws';
+const STOMP_SERVER_URL = process.env.NEXT_PUBLIC_STOMP_SERVER;
 const RTC_CONFIGURATION = {
   iceServers: [
-    { urls: 'stun:13.125.13.209:3478' },
+    { urls: process.env.NEXT_PUBLIC_STUN_SERVER },
     {
-      urls: 'turn:13.125.13.209:3478?transport=udp',
-      username: 'kurentouser',
-      credential: 'kurentopassword',
+      urls: process.env.NEXT_PUBLIC_TRUN_SERVER,
+      username: process.env.NEXT_PUBLIC_TURN_USERNAME,
+      credential: process.env.NEXT_PUBLIC_TURN_CREDENTIAL,
     },
   ],
   iceTransportPolicy: 'all',
@@ -20,8 +20,8 @@ const RTC_CONFIGURATION = {
   iceCandidatePoolSize: 0,
 };
 const STOMP_PATH = {
-  PUB_URL: '/app/signal',
-  SUB_URL: '/topic/huddle',
+  PUB_URL: process.env.NEXT_PUBLIC_PUB_URL,
+  SUB_URL: process.env.NEXT_PUBLIC_SUB_URL,
 };
 
 export default function page() {
@@ -138,6 +138,10 @@ export default function page() {
       'sendonly',
       localVideoRef.current,
       (offerSdp: any) => {
+        if (!offerSdp) {
+          console.log('SDP가 null임!!!!!');
+          return;
+        }
         const message = JSON.stringify({
           id: 'receiveVideoFrom',
           sdpOffer: offerSdp,
@@ -194,8 +198,23 @@ export default function page() {
     return new kurentoUtils.WebRtcPeer[
       mode === 'sendonly' ? 'WebRtcPeerSendonly' : 'WebRtcPeerRecvonly'
     ](options, function (error: any) {
-      if (error) return console.error(error);
-      this.generateOffer(callback);
+      if (error) {
+        console.error('❌ WebRTC Peer 생성 실패:', error);
+        return;
+      }
+
+      console.log('✅ WebRTC Peer 생성 완료, SDP Offer 생성 시작...');
+
+      this.generateOffer((offerSdp) => {
+        if (!offerSdp) {
+          console.error('❌ SDP Offer 생성 실패');
+          return;
+        }
+
+        console.log('✅ SDP Offer 생성 성공:', offerSdp);
+
+        callback(offerSdp);
+      });
     });
   };
 
