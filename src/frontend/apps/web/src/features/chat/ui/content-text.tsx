@@ -18,9 +18,7 @@ export type ContentTextProps = {
 
 const ContentText = ({
   type,
-  // avatarUrls,
   message,
-  // setIsThreadOpen,
   hideUserInfo = false,
 }: ContentTextProps) => {
   console.log('123', message);
@@ -87,20 +85,7 @@ const ContentText = ({
             </div>
           ))}
         </div>
-        {/* <div onClick={() => setIsThreadOpen(true)}>
-        <AvatarList
-          avatarUrls={avatarUrls}
-          setIsThreadOpen={setIsThreadOpen}
-        />
-      </div> */}
       </div>
-      {/* <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-        <MessageSquareText
-          size="15"
-          className="cursor-pointer hover:text-gray-600"
-          onClick={() => setIsThreadOpen(true)}
-        />
-      </div> */}
     </div>
   );
 };
