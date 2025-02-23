@@ -68,7 +68,9 @@ const ContentText = ({
                 <Image
                   src={msg.imageUrl}
                   alt="Image"
-                  className="w-32 h-32"
+                  width={256}
+                  height={256}
+                  className="max-w-72 max-h-72 object-cover border border-gray-300 rounded-md"
                 />
               )}
               {msg.type === 'VIDEO' && (
