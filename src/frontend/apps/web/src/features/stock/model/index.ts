@@ -4,3 +4,4 @@ export { columns } from './stocks-table.columns';
 export { dummyStockData } from './stock-chart.mock';
 export { useStockChart } from './use-stock-chart';
 export { useStockWebSocket } from './use-stock-websocket';
+export { STOCK_SLUG_TO_CODE, STOCK_SLUG_TO_NAME } from './stock.mappings';
