@@ -40,11 +40,11 @@ export default function page() {
   //참여자 목록
   const participants = useRef<{ [key: string]: any }>({});
 
-  //다른참가자 미디어 스트림 목록
-  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
-
   //내 미디어 스트림
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  //다른참가자 미디어 스트림 목록
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
 
   //웹소켓(sockjs+stomp) 연결
   useEffect(() => {
@@ -112,7 +112,7 @@ export default function page() {
   };
 
   //방참가 pub(방 생성)-완료되면 참가자 리스트 sub
-  const joinRoom = () => {
+  const joinRoom = async () => {
     if (!!!userId || !!!channelId) {
       alert('userId와 channelId를 입력해주세요');
       return;
@@ -121,6 +121,9 @@ export default function page() {
       console.log('WEBSOCKET 연결 끊김');
       return;
     }
+
+    const stream = await getLocalStream();
+    if (!stream) return;
 
     console.log('방 참가 요청 시작 !');
 
@@ -131,6 +134,28 @@ export default function page() {
       destination: `${STOMP_PATH.PUB_URL}`,
       body: message,
     });
+  };
+
+  //미디어 스트림 생성
+  const getLocalStream = async () => {
+    console.log('🎥 내 비디오 스트림 요청 중...');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+
+      // ✅ 내 비디오 태그에 스트림 연결
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+
+      console.log('✅ 내 비디오 스트림 설정 완료');
+      return stream;
+    } catch (error) {
+      console.error('❌ 비디오 스트림 가져오기 실패:', error);
+      return null; // 실패 시 null 반환
+    }
   };
 
   //방참가 완료 & 기존 참가자 목록ID 저장
@@ -230,9 +255,11 @@ export default function page() {
 
     console.log(`새로운 참가자 입장 : ${newPeerId}`);
 
+    const remoteVideo = createRemoteVideoElement(newPeerId);
+
     const remoteRtcPeer = createWebRtcPeer(
       'recvonly',
-      null,
+      remoteVideo,
       (offerSdp: any) => {
         if (!offerSdp) {
           console.log(`${participantId}:SDP가 null임!!!!!`);
@@ -256,6 +283,16 @@ export default function page() {
     //내 정보도 리스트에 저장
     participants.current[participantId] = { rtcPeer: remoteRtcPeer };
     console.log(`${participantId}정보 로컬에 등록완료`);
+  };
+
+  //상대방 비디오 생성
+  const createRemoteVideoElement = (newPeerId: number) => {
+    if (!videoRefs.current[newPeerId]) {
+      const remoteVideo = document.createElement('video');
+      remoteVideo.autoplay = true;
+      videoRefs.current[newPeerId] = remoteVideo;
+    }
+    return videoRefs.current[newPeerId];
   };
 
   //sdp answer 처리
