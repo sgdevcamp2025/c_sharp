@@ -1,13 +1,22 @@
+'use client';
+
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '@workspace/ui/components';
 import StockChartItem from './stock-chart-item';
-import { ChartType, dummyStockData } from '../model';
+import { ChartType, dummyStockData, useStockWebSocket } from '../model';
+import { useEffect } from 'react';
 
 const StockChartContainer = () => {
   const data = dummyStockData;
+  const { subscribe } = useStockWebSocket();
+
+  useEffect(() => {
+    return subscribe();
+  }, [subscribe]);
+
   return (
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel
