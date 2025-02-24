@@ -12,15 +12,5 @@ export const useMessages = (topic: string) => {
     staleTime: Infinity,
   });
 
-  const addOptimisticMessage = (newMessage: WebSocketResponsePayload) => {
-    queryClient.setQueryData(
-      queryKey,
-      (prevMessages: WebSocketResponsePayload[] = []) => [
-        ...prevMessages,
-        newMessage,
-      ],
-    );
-  };
-
-  return { data: messages, addOptimisticMessage };
+  return { data: messages };
 };

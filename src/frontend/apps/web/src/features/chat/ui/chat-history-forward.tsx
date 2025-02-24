@@ -12,7 +12,7 @@ export type ChatHistoryProps = {
 
 const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
   const channelId = 1;
-  const initialCursor = 1473;
+  const initialCursor = undefined;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useForwardInfiniteHistory(channelId, initialCursor);
 
