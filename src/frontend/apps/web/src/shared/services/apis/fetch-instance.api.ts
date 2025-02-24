@@ -19,7 +19,10 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
   options: FetchOptions<TBody> = {},
 ): Promise<TResponse> {
   try {
-    const token = cookies().get('token')?.value;
+    const accessToken = cookies().get('accessToken')?.value;
+
+    // const token =
+    //   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3NDAwMTgyNTMsImV4cCI6MTc3MTU1NDI1MywidXNlcklkIjoxfQ.8bnw2CjXWgrdNOWr8z2U-rytvqhns3_0Y1VO4tjIB6s-2Wk6GNpQn0-jvvN0BnoGC67pEr-g073vUOGczF-8xg';
 
     // 🟢 options 객체에서 필요한 값들을 구조 분해 할당
     const {
@@ -41,8 +44,8 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
 
     // 🟢 기본 헤더 설정 (Content-Type 자동 처리)
     const finalHeaders: Record<string, string> = {
-      ...(includeAuthToken && token
-        ? { Authorization: `Bearer ${token}` }
+      ...(includeAuthToken && accessToken
+        ? { Authorization: `Bearer ${accessToken}` }
         : {}),
       ...(body && !(body instanceof FormData)
         ? { 'Content-Type': 'application/json' }

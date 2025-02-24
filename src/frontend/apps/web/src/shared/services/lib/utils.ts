@@ -21,5 +21,5 @@ export const getBaseUrl = (serverType: ApiServerType): string => {
     throw new Error(`❌ Unknown serverType: ${serverType}`);
   }
 
-  return `http://${process.env.NEXT_PUBLIC_BASE_URL}:${port}`;
+  return `${process.env.NEXT_PUBLIC_REAL_BASE_URL}`;
 };
