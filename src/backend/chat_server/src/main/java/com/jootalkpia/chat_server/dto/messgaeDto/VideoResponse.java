@@ -5,9 +5,8 @@ import lombok.Builder;
 @Builder
 public record VideoResponse(
         Long videoId,
-        Long videoThumbnailId,
-        String thumbnailUrl,
-        String videoUrl
+        String videoUrl,
+        String thumbnailUrl
 ) implements MessageResponse {
     @Override
     public String type() {
