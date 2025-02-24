@@ -16,11 +16,10 @@ const getClientToken = async (): Promise<string | undefined> => {
 };
 
 export const clientFetchInstance = async <TResponse, TBody = JsonValue>(
-  serverType: ApiServerType,
   url: string,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
   options: FetchOptions<TBody> = {},
 ): Promise<TResponse> => {
   const token = await getClientToken();
-  return Fetch<TResponse, TBody>(serverType, url, method, options, token);
+  return Fetch<TResponse, TBody>(url, method, options, token);
 };
