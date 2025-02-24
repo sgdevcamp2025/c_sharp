@@ -20,8 +20,7 @@ public class KafkaConsumer {
 
     @KafkaListener(
             topics = "${topic.minute}",
-            groupId = "${group.minute}",
-            concurrency = "2"
+            groupId = "${group.minute}"
     )
     public void processMinutePrice(String kafkaMessage) {
         log.info("Received Kafka minute message ===> {}", kafkaMessage);

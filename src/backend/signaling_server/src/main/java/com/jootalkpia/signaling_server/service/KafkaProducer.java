@@ -14,15 +14,17 @@ public class KafkaProducer {
     private final Gson gson = new Gson();
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public void sendHurdleStatusMessage(MessageToKafka messageToKafka) { // 미르님 원하는 DTO로 변경 필수
-        String jsonHurdleStatusMessage = gson.toJson(messageToKafka);
+    public void sendHuddleStatusMessage(MessageToKafka messageToKafka) {
+        String jsonHuddleStatusMessage = gson.toJson(messageToKafka);
 
-        kafkaTemplate.send("jootalkpia.hurdle.prd.status", jsonHurdleStatusMessage).whenComplete((result, ex) -> {
+        kafkaTemplate.send("jootalkpia.huddle.prd.status", jsonHuddleStatusMessage).whenComplete((result, ex) -> {
             if (ex == null) {
                 log.info(result.toString());
             } else {
                 log.error(ex.getMessage(), ex); //추후 예외처리
             }
         });
+
+        log.info("message to kafka for channelId {} sent! ", messageToKafka.channelId(), messageToKafka.status());
     }
 }
