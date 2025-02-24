@@ -16,3 +16,4 @@ export {
   createChunks,
   generateTempFileIdentifier,
 } from './chunk-file.utils';
+export { processChatHistory } from './process-chat-history.util';
