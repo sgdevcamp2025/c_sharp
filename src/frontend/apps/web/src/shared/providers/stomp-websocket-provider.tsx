@@ -18,18 +18,18 @@ type WebSocketContextProps = {
 };
 
 type WebSocketProviderProps = {
-  userId: number;
   children: ReactNode;
 };
 
 const StompWebSocketContext = createContext<WebSocketContextProps | null>(null);
 
 export const StompWebSocketProvider = ({
-  userId,
   children,
 }: WebSocketProviderProps) => {
   const client = useRef<StompJs.Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = user.userId;
   // const BASE_URL = `http://${process.env.NEXT_PUBLIC_BASE_URL}:${process.env.NEXT_PUBLIC_CHAT_SERVER1_PORT}`;
   const BASE_URL = `${process.env.NEXT_PUBLIC_REAL_BASE_URL}`;
 

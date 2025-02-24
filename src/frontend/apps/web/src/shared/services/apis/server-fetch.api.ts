@@ -6,7 +6,7 @@ import type {
   FetchOptions,
   JsonValue,
 } from '@/src/shared/services/models';
-import { isomorphicFetch } from './ismorphic-fetch.api';
+import { Fetch } from './fetch.api';
 
 export async function serverFetchInstance<TResponse, TBody = JsonValue>(
   serverType: ApiServerType,
@@ -15,11 +15,5 @@ export async function serverFetchInstance<TResponse, TBody = JsonValue>(
   options: FetchOptions<TBody> = {},
 ): Promise<TResponse> {
   const accessToken = cookies().get('accessToken')?.value;
-  return isomorphicFetch<TResponse, TBody>(
-    serverType,
-    url,
-    method,
-    options,
-    accessToken,
-  );
+  return Fetch<TResponse, TBody>(serverType, url, method, options, accessToken);
 }

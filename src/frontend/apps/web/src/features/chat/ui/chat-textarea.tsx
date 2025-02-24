@@ -16,8 +16,9 @@ const ChatTextArea = ({
   const [message, setMessage] = useState('');
   const [attachmentList, setAttachmentList] = useState<number[]>([]);
   const isComposing = useRef(false);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  const fileManagements = useFileManagements(1, 1, 1);
+  const fileManagements = useFileManagements(1, 1, user.userId);
   const { setFilePreviews, setUploadedFileIds } = fileManagements;
 
   const handleSendClick = () => {

@@ -16,7 +16,7 @@ export default function RootLayout({
       </header>
       <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">
         <AuthWrapper>
-          <StompWebSocketProvider userId={1}>
+          <StompWebSocketProvider>
             <RQProvider>{children}</RQProvider>
           </StompWebSocketProvider>
         </AuthWrapper>
