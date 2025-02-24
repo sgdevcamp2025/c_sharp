@@ -243,17 +243,31 @@ export default function page() {
     }
 
     // ✅ ICE Candidate 수집 및 전송
+    // ✅ ICE Candidate 저장 및 전송
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
-        const message = JSON.stringify({
-          id: 'onIceCandidate',
-          candidate: event.candidate,
-          sender: mode === 'sendonly' ? userId : participantId,
-        });
-        stompClient.current?.publish({
-          destination: `${STOMP_PATH.PUB_URL}`,
-          body: message,
-        });
+        if (
+          !participants.current[participantId]?.rtcPeer.remoteDescription ||
+          peerConnection.remoteDescription.type !== 'answer'
+        ) {
+          console.log(
+            `⏳ ICE Candidate 대기 중 (Answer 없음): ${participantId}`,
+          );
+          if (!iceCandidateQueue.current[participantId]) {
+            iceCandidateQueue.current[participantId] = [];
+          }
+          iceCandidateQueue.current[participantId].push(event.candidate);
+        } else {
+          console.log(`🚀 ICE Candidate 즉시 전송: ${participantId}`);
+          stompClient.current?.publish({
+            destination: `${STOMP_PATH.PUB_URL}`,
+            body: JSON.stringify({
+              id: 'onIceCandidate',
+              candidate: event.candidate,
+              sender: mode === 'sendonly' ? userId : participantId,
+            }),
+          });
+        }
       }
     };
 
@@ -341,6 +355,17 @@ export default function page() {
       )
       .then(() => {
         console.log('✅ SDP Answer 적용 완료');
+
+        //iceCandidate 추가
+        const queuedCandidates = iceCandidateQueue.current[sender] || [];
+        console.log(`🧊 저장된 ICE Candidate 개수: ${queuedCandidates.length}`);
+
+        queuedCandidates.forEach((candidate) => {
+          peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        });
+
+        // ✅ 적용 후 큐 초기화
+        delete iceCandidateQueue.current[sender];
       })
       .catch((error) => {
         console.error('❌ SDP Answer 적용 실패:', error);
@@ -352,8 +377,30 @@ export default function page() {
     const { sender, candidate } = data;
     console.log(`${sender}의 ice answer 받음`);
 
-    if (participants.current[sender]) {
-      participants.current[sender].rtcPeer.addIceCandidate(candidate);
+    const peerConnection = participants.current[sender]?.rtcPeer;
+
+    if (!peerConnection) {
+      console.warn(`⚠️ PeerConnection 없음, ICE Candidate 저장: ${sender}`);
+      if (!iceCandidateQueue.current[sender]) {
+        iceCandidateQueue.current[sender] = [];
+      }
+      iceCandidateQueue.current[sender].push(candidate);
+      return;
+    }
+
+    // SDP Answer가 설정된 후 ICE Candidate 적용
+    if (
+      peerConnection.remoteDescription &&
+      peerConnection.remoteDescription.type === 'answer'
+    ) {
+      console.log(`✅ ICE Candidate 즉시 적용: ${sender}`);
+      peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    } else {
+      console.log(`⏳ ICE Candidate 대기 (SDP Answer 미설정): ${sender}`);
+      if (!iceCandidateQueue.current[sender]) {
+        iceCandidateQueue.current[sender] = [];
+      }
+      iceCandidateQueue.current[sender].push(candidate);
     }
   };
 
