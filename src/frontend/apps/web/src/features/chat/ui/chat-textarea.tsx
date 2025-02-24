@@ -1,8 +1,12 @@
 'use client';
 
 import { useRef, useState } from 'react';
+
 import { Textarea } from '@workspace/ui/components';
+
 import ChatToggleGroup from './chat-toggle-group';
+
+import { useFileManagements } from '../model';
 
 const ChatTextArea = ({
   onSend,
@@ -13,10 +17,17 @@ const ChatTextArea = ({
   const [attachmentList, setAttachmentList] = useState<number[]>([]);
   const isComposing = useRef(false);
 
+  const fileManagements = useFileManagements(1, 1, 1);
+  const { setFilePreviews, setUploadedFileIds } = fileManagements;
+
   const handleSendClick = () => {
     if (!message.trim() && attachmentList.length === 0) return;
     onSend(message, attachmentList);
+    // console.log('message', message);
+    // console.log('attachmentList', attachmentList);
     setMessage('');
+    setFilePreviews([]);
+    setUploadedFileIds([]);
     setAttachmentList([]);
   };
 
@@ -49,6 +60,7 @@ const ChatTextArea = ({
           name="image"
           onSend={handleSendClick}
           setAttachmentList={setAttachmentList}
+          fileManagements={fileManagements}
         />
       </div>
     </div>

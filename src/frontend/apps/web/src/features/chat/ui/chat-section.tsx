@@ -1,13 +1,10 @@
 'use client';
-import { useQueryClient } from '@tanstack/react-query';
-
-import { useMessages, useWebSocketClient } from '@/src/features/chat/model';
+import { useMessages } from '@/src/features/chat/model';
 
 import ChatItemList from './chat-message-list';
 import ChatTextarea from './chat-textarea';
 
-import { useSendMessage } from '../lib';
-// import ThreadPanel from './thread-panel';
+import { useSendMessage } from '../model';
 
 const ChatSection = () => {
   const channelId = 1;
@@ -16,12 +13,7 @@ const ChatSection = () => {
     nickname: 'User',
     profileImage: 'https://via.placeholder.com/150',
   };
-  const { data: messages, addOptimisticMessage } = useMessages(
-    `/subscribe/chat.${channelId}`,
-  );
-  const { publishMessage } = useWebSocketClient(channelId);
-  const queryClient = useQueryClient();
-
+  const { data: messages } = useMessages(`/subscribe/chat.${channelId}`);
   const handleSendMessage = useSendMessage(channelId, currentUser);
 
   return (
