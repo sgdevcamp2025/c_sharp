@@ -1,7 +1,9 @@
 package com.jootalkpia.history_server.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jootalkpia.history_server.domain.Message;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record MessageDto(
         String type,
         String text,
@@ -23,6 +25,18 @@ public record MessageDto(
                 .thumbnailUrl(this.thumbnailUrl)
                 .videoUrl(this.videoUrl)
                 .build();
+    }
+    public static MessageDto documentToDto(Message message) {
+        return new MessageDto(
+                message.getType(),
+                message.getText(),
+                message.getImageId(),
+                message.getImageUrl(),
+                message.getVideoId(),
+                message.getVideoThumbnailId(),
+                message.getThumbnailUrl(),
+                message.getVideoUrl()
+        );
     }
 }
 

@@ -18,9 +18,7 @@ export type ContentTextProps = {
 
 const ContentText = ({
   type,
-  // avatarUrls,
   message,
-  // setIsThreadOpen,
   hideUserInfo = false,
 }: ContentTextProps) => {
   // console.log('123', message);

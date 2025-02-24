@@ -8,9 +8,10 @@ const LoginButton = () => {
   const router = useRouter();
 
   const handleKakaoLogin = () => {
-    router.push('/stock');
-  }; //kakao login 로직으로 변경 예정
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI}&response_type=code`;
 
+    router.push(kakaoAuthUrl);
+  };
   return (
     <Button
       onClick={handleKakaoLogin}
@@ -18,7 +19,7 @@ const LoginButton = () => {
       className="p-0 border-none bg-transparent w-auto h-auto"
     >
       <Image
-        src="/images/kakao_login_large_narrow.png"
+        src="/images/kakao-login-large-narrow.png"
         alt="카카오 로그인"
         width={200}
         height={50}

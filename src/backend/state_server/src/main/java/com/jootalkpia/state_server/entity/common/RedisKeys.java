@@ -1,4 +1,4 @@
-package com.jootalkpia.state_server.entity;
+package com.jootalkpia.state_server.entity.common;
 
 public class RedisKeys {
     private static final String SESSION_PREFIX = "sessions";

@@ -8,8 +8,11 @@ const Header = ({ authContent }: { authContent: React.ReactNode }) => {
   return (
     <>
       <Link href="/stock">
-        <Avatar variant="square">
-          <AvatarImage src="https://github.com/shadcn.png" />
+        <Avatar
+          variant="square"
+          className="w-28"
+        >
+          <AvatarImage src="/images/logo-horizontal.png" />
           <AvatarFallback className="text-primary font-bold">
             주톡피아
           </AvatarFallback>

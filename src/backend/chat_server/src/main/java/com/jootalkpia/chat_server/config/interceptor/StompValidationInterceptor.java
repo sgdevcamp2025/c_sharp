@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StompValidationInterceptor implements ChannelInterceptor {
     private static final String HEADER_USER_ID = "X-User-ID";
-    private static final String SUBSCRIBE_CHAT_PREFIX = "/subscribe/chat.";
+    private static final String SUBSCRIBE_PREFIX = "/subscribe";
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -39,6 +39,6 @@ public class StompValidationInterceptor implements ChannelInterceptor {
     }
 
     private boolean isValidChatDestination(String destination) {
-        return destination != null && destination.startsWith(SUBSCRIBE_CHAT_PREFIX);
+        return destination != null && destination.startsWith(SUBSCRIBE_PREFIX);
     }
 }

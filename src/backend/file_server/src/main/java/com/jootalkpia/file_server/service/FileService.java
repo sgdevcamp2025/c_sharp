@@ -1,9 +1,9 @@
 package com.jootalkpia.file_server.service;
 
 import com.jootalkpia.file_server.dto.ChangeProfileResponseDto;
-import com.jootalkpia.file_server.dto.MultipartChunk;
 import com.jootalkpia.file_server.dto.UploadChunkRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileRequestDto;
+import com.jootalkpia.file_server.dto.UploadFilesRequestDto;
 import com.jootalkpia.file_server.dto.UploadFileResponseDto;
 import com.jootalkpia.file_server.dto.UploadFilesResponseDto;
 import com.jootalkpia.file_server.entity.Files;
@@ -19,13 +19,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -101,13 +98,14 @@ public class FileService {
             filesEntity.setUrl(s3Url);
             filesEntity.setFileType(fileType);
             filesEntity.setFileSize(mergedFile.length());
+            filesEntity.setMimeType(fileTypeDetector.detectMimeType(mergedFile));
             fileRepository.save(filesEntity);
 
             // 임시 데이터 정리
             TEMP_FILE_STORAGE.remove(tempFileIdentifier);
             chunkList.forEach(File::delete);
 
-            return new UploadFileResponseDto(fileId, fileType);
+            return new UploadFileResponseDto("200", "complete", fileId, fileType);
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_PROCESSING_FAILED.getCode(), ErrorCode.FILE_PROCESSING_FAILED.getMsg());
         }
@@ -147,7 +145,60 @@ public class FileService {
     }
 
     @Transactional
-    public UploadFilesResponseDto uploadFiles(Long userId, UploadFileRequestDto uploadFileRequestDto) {
+    public void uploadThumbnail(Long fileId, MultipartFile thumbnail) {
+        log.info("upload thumbnail file id: {}", fileId);
+        Files fileEntity = fileRepository.findById(fileId)
+                .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND.getCode(), ErrorCode.FILE_NOT_FOUND.getMsg()));
+
+        if (!"VIDEO".equals(fileEntity.getFileType())) {
+            throw new CustomException(ErrorCode.UNSUPPORTED_FILE_TYPE.getCode(), ErrorCode.UNSUPPORTED_FILE_TYPE.getMsg());
+        }
+        log.info("upload thumbnail file id: {}", fileId);
+
+        try {
+            String suffix = fileTypeDetector.detectFileTypeFromMultipartFile(thumbnail);
+            log.info("upload thumbnail file id: {}", fileId);
+            File tempFile = File.createTempFile("thumbnail_", suffix);
+            thumbnail.transferTo(tempFile);
+
+            String folder = "thumbnails/";
+            String urlThumbnail = s3Service.uploadFileMultipart(tempFile, folder, fileId);
+
+            fileEntity.setUrlThumbnail(urlThumbnail);
+
+            tempFile.delete();
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.FILE_PROCESSING_FAILED.getCode(), "Failed to process thumbnail file");
+        }
+    }
+
+    @Transactional
+    public UploadFileResponseDto uploadFile(UploadFileRequestDto uploadFileRequestDto) {
+        try {
+            String fileType = fileTypeDetector.detectFileTypeFromMultipartFile(uploadFileRequestDto.getFile());
+
+            Long fileId = null;
+            Files filesEntity = new Files();
+            fileRepository.save(filesEntity);
+            fileId = filesEntity.getFileId();
+
+            String s3Url = uploadEachFile(fileType, fileId, uploadFileRequestDto.getFile());
+
+            filesEntity.setUrl(s3Url);
+            filesEntity.setFileType(fileType);
+            filesEntity.setFileSize(uploadFileRequestDto.getFile().getSize());
+            filesEntity.setMimeType(uploadFileRequestDto.getFile().getContentType());
+
+            fileRepository.save(filesEntity);
+            return new UploadFileResponseDto("200", "complete", fileId, fileType);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED.getCode(), ErrorCode.IMAGE_UPLOAD_FAILED.getMsg());
+        }
+    }
+
+
+    @Transactional
+    public UploadFilesResponseDto uploadFiles(Long userId, UploadFilesRequestDto uploadFileRequestDto) {
         MultipartFile[] files = uploadFileRequestDto.getFiles();
         MultipartFile[] thumbnails = uploadFileRequestDto.getThumbnails();
 

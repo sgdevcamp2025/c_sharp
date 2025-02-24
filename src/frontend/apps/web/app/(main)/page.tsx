@@ -23,20 +23,23 @@ export const metadata = {
   },
 };
 
-//logo이미지가 생길 경우 추가 예정입니다.
 export default function Page() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh gap-4">
+    <div className="flex flex-col items-center justify-center min-h-svh gap-12">
       <div className="flex items-center gap-2">
         <Image
-          src="/"
+          src="/images/logo-icon.png"
           alt="logo"
-          width={40}
-          height={40}
+          width={110}
+          height={110}
         />
-        <h1 className="text-3xl font-bold text-orange-500">주톡피아</h1>
+        <div className="flex flex-col">
+          <p className="text-gray-500 text-md text-right mr-2">
+            주식 실시간 커뮤니티
+          </p>
+          <h1 className="text-5xl font-bold text-orange-500">주톡피아</h1>
+        </div>
       </div>
-      <p className="text-gray-500 text-lg">주식 실시간 커뮤니티</p>
       <LoginButton />
     </div>
   );

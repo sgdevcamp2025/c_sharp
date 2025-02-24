@@ -1,12 +1,12 @@
 'use client';
 
+import { useUserStore } from '@/src/entities';
 import { Button, Input, Label } from '@workspace/ui/components';
 import { Pencil } from 'lucide-react';
 
 const ProfileNickname = () => {
-  //임시변수
   const isNameEditMode = false;
-  const name = '공작새';
+  const nickname = useUserStore((state) => state.user?.nickname ?? '');
 
   return (
     <div className="flex w-full  items-center space-x-2">
@@ -15,7 +15,7 @@ const ProfileNickname = () => {
         id="name"
         disabled={!isNameEditMode}
         placeholder="Enter your name"
-        value={name}
+        value={nickname}
       />
       <Button
         variant="ghost"

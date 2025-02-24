@@ -8,6 +8,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class UploadFileResponseDto {
+    private String code;
+    private String status;
     private Long fileId;
     private String fileType;
 }
