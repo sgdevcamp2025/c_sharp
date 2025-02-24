@@ -26,8 +26,8 @@ const STOMP_PATH = {
 
 export default function page() {
   //유저id 입력, 채널 id입력을 위한 변수
-  const [userId, setUserId] = useState<number | ''>('');
-  const [channelId, setChannelId] = useState<number | ''>('');
+  const [userId, setUserId] = useState<number>(0);
+  const [channelId, setChannelId] = useState<number>(0);
   const [isSetupConfirmed, setIsSetupConfirmed] = useState(false);
 
   //방참가 여부
@@ -46,7 +46,7 @@ export default function page() {
   //다른참가자 미디어 스트림 목록
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
 
-  const localStream = useRef<MediaStream | null>(null);
+  const localStream = useRef<any>(null);
   const iceCandidateQueue = useRef<{ [key: string]: RTCIceCandidate[] }>({});
 
   //웹소켓(sockjs+stomp) 연결
@@ -103,18 +103,15 @@ export default function page() {
     console.log('서버에서 온 메시지 : ', data);
 
     switch (data.id) {
-      case 'existingParticipants':
-        handleExistingParticipants(data);
-        break;
       case 'newParticipantArrived':
         handleNewParticipant(data);
         break;
-      // case 'receiveVideoAnswer':
-      //   handleVideoResponse(data);
-      //   break;
-      // case 'iceCandidate':
-      //   handleIceResponse(data);
-      //   break;
+      case 'receiveVideoAnswer':
+        handleVideoResponse(data);
+        break;
+      case 'iceCandidate':
+        handleIceResponse(data);
+        break;
     }
   };
 
@@ -122,6 +119,9 @@ export default function page() {
     const data = JSON.parse(msg.body);
     console.log('서버에서 온 private메시지 : ', data);
     switch (data.id) {
+      case 'existingParticipants':
+        handleExistingParticipants(data);
+        break;
       case 'receiveVideoAnswer':
         handleVideoResponse(data);
         break;
@@ -142,42 +142,85 @@ export default function page() {
       return;
     }
 
-    if (!localStream.current) localStream.current = await getLocalStream();
-    if (!localStream.current) return;
+    if (!localStream.current || localStream.current.active === false)
+      localStream.current = await getLocalStream();
+    if (localStream.current) {
+      await activateLocalStream(localStream.current);
+    }
 
     console.log('📡 방 참가 요청 시작!');
     stompClient.current?.publish({
-      destination: `${STOMP_PATH.PUB_URL}`,
+      destination: `/app/signal`,
       body: JSON.stringify({ id: 'joinHuddle', channelId, userId }),
     });
   };
+  //스트림이 활성되었지는지 offer생성 전에 확인
+  const waitForMetadata = (videoElement: HTMLVideoElement) => {
+    return new Promise<void>((resolve) => {
+      videoElement.onloadedmetadata = () => {
+        console.log('✅ Local Video Stream 메타데이터 로딩 완료');
+        resolve();
+      };
+    });
+  };
+  const activateLocalStream = async (stream: MediaStream) => {
+    if (!localVideoRef.current) return;
+
+    localVideoRef.current.srcObject = stream;
+
+    // ✅ 메타데이터 로딩을 기다림
+    // await waitForMetadata(localVideoRef.current);
+
+    // ✅ 재생 시도
+    try {
+      await localVideoRef.current.play();
+      console.log('✅ Local Video Stream 활성화 완료');
+    } catch (error) {
+      console.error('❌ Local Video Stream 재생 실패:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (localVideoRef.current && localStream.current) {
+      console.log('🔄 Video 태그에 스트림 다시 할당');
+      localVideoRef.current.srcObject = localStream.current;
+    }
+  }, [isInCall]);
 
   //미디어 스트림 생성
   const getLocalStream = async () => {
     try {
-      if (localStream.current) return localStream.current;
+      console.log('🎥 새로운 LocalStream 요청 시작');
 
+      // ✅ 기존 스트림이 있다면 모든 트랙을 정지시켜서 중복을 방지
+      if (localStream.current && localStream.current.activate) {
+        // console.log('🛑 기존 LocalStream 정지');
+        // localStream.current.getTracks().forEach((track) => track.stop());
+        console.log('기존 로컬스토리지 재사용');
+        return localStream.current;
+      }
+
+      // ✅ 기존 스트림이 있더라도 항상 새로 가져오기
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
-      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
 
+      localStream.current = stream;
       return stream;
     } catch (error) {
       console.error('❌ 비디오 스트림 가져오기 실패:', error);
       return null;
     }
   };
-
   //방참가 완료 & 기존 참가자 목록ID 저장
-  const handleExistingParticipants = (data: any) => {
+  const handleExistingParticipants = async (data: any) => {
     const list = data.data;
     console.log('방입장 성공');
     setIsInCall(true);
 
     //내 sdp(peer)생성 후 offer전송 (생성이 완료되면 iceCandidate도 전송 : createWebRtcPeer())
-    const localRtcPeer = createWebRtcPeer(
+    const localRtcPeer = await createWebRtcPeer(
       'sendonly',
       localVideoRef.current,
       (offerSdp: any) => {
@@ -242,18 +285,48 @@ export default function page() {
       console.log('✅ Transceiver 설정 완료 (recvonly 모드)');
     }
 
-    // ✅ ICE Candidate 수집 및 전송
+    // ✅ ICE Candidate 저장 및 전송
+    // peerConnection.onicecandidate = (event) => {
+    //   if (event.candidate) {
+    //     console.log('iceCandidate', event.candidate);
+    //     if (
+    //       !participants.current[participantId]?.rtcPeer.remoteDescription ||
+    //       peerConnection.remoteDescription.type !== 'answer'
+    //     ) {
+    //       console.log(
+    //         `⏳ ICE Candidate 대기 중 (Answer 없음): ${participantId}`,
+    //       );
+    //       if (!iceCandidateQueue.current[participantId]) {
+    //         iceCandidateQueue.current[participantId] = [];
+    //       }
+    //       iceCandidateQueue.current[participantId].push(event.candidate);
+    //     } else {
+    //       console.log(
+    //         `🚀 ICE Candidate 즉시 전송: ${mode === 'sendonly' ? userId : participantId}`,
+    //       );
+    //       stompClient.current?.publish({
+    //         destination: `${STOMP_PATH.PUB_URL}`,
+    //         body: JSON.stringify({
+    //           id: 'onIceCandidate',
+    //           candidate: event.candidate,
+    //           sender: mode === 'sendonly' ? userId : participantId,
+    //         }),
+    //       });
+    //     }
+    //   }
+    // };
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
-        const message = JSON.stringify({
-          id: 'onIceCandidate',
-          candidate: event.candidate,
-          sender: mode === 'sendonly' ? userId : participantId,
-        });
-        stompClient.current?.publish({
-          destination: `${STOMP_PATH.PUB_URL}`,
-          body: message,
-        });
+        console.log('iceCandidate 생성:', event.candidate);
+
+        // ✅ **무조건 큐에 저장하고, handleVideoResponse에서 꺼내도록 함**
+        if (!iceCandidateQueue.current[participantId]) {
+          iceCandidateQueue.current[participantId] = [];
+        }
+        iceCandidateQueue.current[participantId].push(event.candidate);
+        console.log(
+          `⏳ ICE Candidate 저장 (Answer 기다리는 중): ${participantId}`,
+        );
       }
     };
 
@@ -276,7 +349,7 @@ export default function page() {
   };
 
   //새로운 참가자 알림
-  const handleNewParticipant = (participantId) => {
+  const handleNewParticipant = async (participantId) => {
     const newPeerId = participantId;
     if (newPeerId === userId) return; //내 id무시
 
@@ -284,7 +357,7 @@ export default function page() {
 
     const remoteVideo = createRemoteVideoElement(newPeerId);
 
-    const remoteRtcPeer = createWebRtcPeer(
+    const remoteRtcPeer = await createWebRtcPeer(
       'recvonly',
       remoteVideo,
       (offerSdp: any) => {
@@ -323,12 +396,12 @@ export default function page() {
 
   //sdp answer 처리
   const handleVideoResponse = (data: any) => {
-    const { sender, sdpAnswer } = data;
-    console.log(`${sender}의 sdp answer 받음`);
+    const { senderId, sdpAnswer } = data;
+    console.log(`${senderId}의 sdp answer 받음`);
 
-    const peerConnection = participants.current[sender]?.rtcPeer;
+    const peerConnection = participants.current[senderId]?.rtcPeer;
     if (!peerConnection) {
-      console.error(`❌ PeerConnection 없음: ${sender}`);
+      console.error(`❌ PeerConnection 없음: ${senderId}`);
       return;
     }
 
@@ -341,6 +414,17 @@ export default function page() {
       )
       .then(() => {
         console.log('✅ SDP Answer 적용 완료');
+
+        // ✅ **여기서만 ICE Candidate 전송**
+        const queuedCandidates = iceCandidateQueue.current[senderId] || [];
+        console.log(`🧊 저장된 ICE Candidate 개수: ${queuedCandidates.length}`);
+
+        queuedCandidates.forEach((candidate) => {
+          peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        });
+
+        // ✅ 적용 후 큐 초기화
+        delete iceCandidateQueue.current[senderId];
       })
       .catch((error) => {
         console.error('❌ SDP Answer 적용 실패:', error);
@@ -349,11 +433,33 @@ export default function page() {
 
   //ice answer 처리
   const handleIceResponse = (data: any) => {
-    const { sender, candidate } = data;
-    console.log(`${sender}의 ice answer 받음`);
+    const { senderId, candidate } = data;
+    console.log(`${senderId}의 ice answer 받음`);
 
-    if (participants.current[sender]) {
-      participants.current[sender].rtcPeer.addIceCandidate(candidate);
+    const peerConnection = participants.current[senderId]?.rtcPeer;
+
+    if (!peerConnection) {
+      console.warn(`⚠️ PeerConnection 없음, ICE Candidate 저장: ${senderId}`);
+      if (!iceCandidateQueue.current[senderId]) {
+        iceCandidateQueue.current[senderId] = [];
+      }
+      iceCandidateQueue.current[senderId].push(candidate);
+      return;
+    }
+
+    // SDP Answer가 설정된 후 ICE Candidate 적용
+    if (
+      peerConnection.remoteDescription &&
+      peerConnection.remoteDescription.type === 'answer'
+    ) {
+      console.log(`✅ ICE Candidate 즉시 적용: ${senderId}`);
+      peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    } else {
+      console.log(`⏳ ICE Candidate 대기 (SDP Answer 미설정): ${senderId}`);
+      if (!iceCandidateQueue.current[senderId]) {
+        iceCandidateQueue.current[senderId] = [];
+      }
+      iceCandidateQueue.current[senderId].push(candidate);
     }
   };
 
@@ -370,9 +476,7 @@ export default function page() {
           type="number"
           placeholder="userId"
           value={userId}
-          onChange={(e) =>
-            setUserId(e.target.value ? Number(e.target.value) : '')
-          }
+          onChange={(e) => setUserId(Number(e.target.value))}
         />
         <label>채널아이디</label>
         <input
@@ -380,9 +484,7 @@ export default function page() {
           type="number"
           placeholder="channelId"
           value={channelId}
-          onChange={(e) =>
-            setChannelId(e.target.value ? Number(e.target.value) : '')
-          }
+          onChange={(e) => setChannelId(Number(e.target.value))}
         />
         {/* 방에 참가가 되면, 나오는 버튼 */}
         {!isSetupConfirmed ? (
