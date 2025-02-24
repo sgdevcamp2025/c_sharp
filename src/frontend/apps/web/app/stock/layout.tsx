@@ -1,14 +1,21 @@
 import AuthWrapper from '@/src/features/auth/ui/auth-wrapper';
+import { getAccessToken } from '@/src/features/stock';
 import { ProfilePopover } from '@/src/features/user';
-import { Header, StompWebSocketProvider, RQProvider } from '@/src/shared';
+import {
+  Header,
+  StompWebSocketProvider,
+  RQProvider,
+  WebSocketProvider,
+} from '@/src/shared';
 
 import '@workspace/ui/globals.css';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const token = await getAccessToken();
   return (
     <>
       <header className="h-[68px] w-full flex items-center justify-between px-4 py-1 bg-muted">
@@ -17,7 +24,11 @@ export default function RootLayout({
       <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">
         <AuthWrapper>
           <StompWebSocketProvider userId={1}>
-            <RQProvider>{children}</RQProvider>
+            <RQProvider>
+              <WebSocketProvider token={token?.approval_key}>
+                {children}
+              </WebSocketProvider>
+            </RQProvider>
           </StompWebSocketProvider>
         </AuthWrapper>
       </div>
