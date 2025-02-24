@@ -2,14 +2,19 @@ package com.jootalkpia.signaling_server.rtc;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.IceCandidate;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @Slf4j
@@ -77,4 +82,16 @@ public class CallHandler {
             huddleManager.removeHuddle(huddle);
         }
     }
+
+    @GetMapping("/api/v1/huddle/{channelId}")
+    public ResponseEntity<?> getHuddleStatus(@PathVariable("channelId") Long channelId) {
+        String isHuddleOn = huddleManager.getHuddleStatus(channelId) ? "on" : "off";
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("channelId", channelId);
+        response.put("status", isHuddleOn);
+
+        return ResponseEntity.ok(response);
+    }
+
 }
