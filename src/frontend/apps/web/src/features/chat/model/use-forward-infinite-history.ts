@@ -12,7 +12,7 @@ export function useForwardInfiniteHistory(
   return useInfiniteQuery<HistoryResponse>({
     queryKey: QUERY_KEYS.forwardHistory(channelId),
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
-      return getHistoryChat(channelId, 'forward', pageParam as number, 30);
+      return getHistoryChat(channelId, 'forward', pageParam as number, 5);
     },
     getNextPageParam: (lastPage: HistoryResponse): number | undefined =>
       lastPage.hasNext && lastPage.lastCursorId !== null
