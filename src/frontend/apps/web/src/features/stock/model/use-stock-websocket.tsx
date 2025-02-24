@@ -11,34 +11,32 @@ export const useStockWebSocket = () => {
 
   const subscribe = useCallback(() => {
     if (!client) {
-      console.error('❌ WebSocket Client가 없습니다.');
+      console.error(' WebSocket Client가 없습니다.');
       return;
     }
 
     if (!isConnected) {
-      console.warn(
-        '⏳ WebSocket이 아직 연결되지 않았습니다. 구독을 대기합니다.',
-      );
+      console.warn('WebSocket이 아직 연결되지 않았습니다. 구독을 대기합니다.');
       return;
     }
 
-    console.log(`📡 Subscribing to /subscribe/chat/stock`);
+    console.log(`Subscribing to /subscribe/stock`);
     const subscription = client.subscribe(`/subscribe/stock`, (message) => {
+      console.log('주식메시지 ', message.body);
       try {
         const payload = JSON.parse(message.body);
-        console.log('📩 Received:', payload);
+        console.log('Received:', payload);
 
-        queryClient.setQueryData(QUERY_KEYS.stocks(), (prev: any[] = []) => [
-          ...prev,
-          payload,
-        ]);
+        queryClient.setQueryData(
+          QUERY_KEYS.stock(payload.code),
+          (prev: any[] = []) => [...prev, payload],
+        );
       } catch (error) {
-        console.error('❌ 메시지 파싱 실패:', error);
+        console.error('메시지 파싱 실패:', error);
       }
     });
 
     return () => {
-      console.log(`📴 Unsubscribing from /subscribe/stock`);
       subscription.unsubscribe();
     };
   }, [client, isConnected, queryClient]);
