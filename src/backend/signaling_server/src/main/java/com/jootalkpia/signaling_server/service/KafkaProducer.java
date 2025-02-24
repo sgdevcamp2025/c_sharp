@@ -17,7 +17,7 @@ public class KafkaProducer {
     public void sendHurdleStatusMessage(MessageToKafka messageToKafka) { // 미르님 원하는 DTO로 변경 필수
         String jsonHurdleStatusMessage = gson.toJson(messageToKafka);
 
-        kafkaTemplate.send("jootalkpia.hurdle.prd.status", jsonHurdleStatusMessage).whenComplete((result, ex) -> {
+        kafkaTemplate.send("jootalkpia.huddle.prd.status", jsonHurdleStatusMessage).whenComplete((result, ex) -> {
             if (ex == null) {
                 log.info(result.toString());
             } else {
