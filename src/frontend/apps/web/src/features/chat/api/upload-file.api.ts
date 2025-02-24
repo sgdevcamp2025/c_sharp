@@ -1,5 +1,5 @@
-import { ChunkFileData, ResponseChunkFileData } from '../model';
-import { postRequest } from '@/src/shared/services/apis';
+import { ResponseChunkFileData } from '../model';
+import { clientFetchInstance } from '@/src/shared/services/apis';
 
 /**
  * 각 청크 데이터를 개별적으로 업로드하는 함수.
@@ -30,10 +30,13 @@ export async function uploadFiles({
   // }
 
   try {
-    const response = await postRequest<ResponseChunkFileData, FormData>(
-      'file',
+    const response = await clientFetchInstance<ResponseChunkFileData, FormData>(
+      'file', // serverType
       '/api/v1/files/chunk',
-      formData,
+      'POST',
+      {
+        body: formData,
+      },
     );
     console.log('[uploadFiles] Response =>', response);
     return response;
