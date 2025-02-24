@@ -10,6 +10,7 @@ import {
   ReactNode,
 } from 'react';
 import * as StompJs from '@stomp/stompjs';
+import { getUserIdFromCookie } from '../services/lib';
 import SockJS from 'sockjs-client';
 
 type WebSocketContextProps = {
@@ -28,8 +29,8 @@ export const StompWebSocketProvider = ({
 }: WebSocketProviderProps) => {
   const client = useRef<StompJs.Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const userId = user.userId;
+  const userId = getUserIdFromCookie();
+
   // const BASE_URL = `http://${process.env.NEXT_PUBLIC_BASE_URL}:${process.env.NEXT_PUBLIC_CHAT_SERVER1_PORT}`;
   const BASE_URL = `${process.env.NEXT_PUBLIC_REAL_BASE_URL}`;
 
