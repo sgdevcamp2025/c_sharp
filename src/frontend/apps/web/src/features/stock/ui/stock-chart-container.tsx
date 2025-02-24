@@ -13,18 +13,14 @@ import { QUERY_KEYS } from '@/src/shared/services';
 
 const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
   const queryClient = useQueryClient();
-  const data = dummyStockData;
   const { subscribe } = useStockWebSocket();
 
   useEffect(() => {
     return subscribe();
   }, [subscribe]);
 
-  const stockData = queryClient
-    .getQueryData<any[]>(QUERY_KEYS.stocks())
-    ?.filter((data) => data.code === stockCode);
-  const stocksDataForTest = queryClient.getQueryData<any[]>(
-    QUERY_KEYS.stocks(),
+  const stockData = queryClient.getQueryData<any[]>(
+    QUERY_KEYS.stock(stockCode),
   );
 
   return (
@@ -36,7 +32,7 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
         className="flex items-center justify-center bg-gray-200"
       >
         <StockChartItem
-          data={data}
+          data={stockData}
           type={ChartType.Candlestick}
         />
       </ResizablePanel>
@@ -48,7 +44,7 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
         className="flex items-center justify-center bg-gray-300"
       >
         <StockChartItem
-          data={data}
+          data={stockData}
           type={ChartType.Histogram}
         />
       </ResizablePanel>
