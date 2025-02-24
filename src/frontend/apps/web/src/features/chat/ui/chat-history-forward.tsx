@@ -25,7 +25,6 @@ const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
     }
   }, [data, containerRef]);
 
-  // 스크롤 이벤트: 사용자가 스크롤 하단에 도달하면 fetchNextPage 호출 후 스크롤 보정
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -37,11 +36,9 @@ const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
         hasNextPage &&
         !isFetchingNextPage
       ) {
-        // fetch 전 현재 컨테이너 전체 높이를 기록합니다.
         const prevScrollHeight = container.scrollHeight;
         fetchNextPage().then(() => {
           const newScrollHeight = container.scrollHeight;
-          // 새로운 메시지들이 추가되어 전체 높이가 늘어난 만큼 scrollTop을 보정합니다.
           container.scrollTop += newScrollHeight - prevScrollHeight;
         });
       }
