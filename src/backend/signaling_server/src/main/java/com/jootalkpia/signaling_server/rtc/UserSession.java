@@ -48,7 +48,7 @@ public class UserSession implements Closeable {
             public void onEvent(IceCandidateFoundEvent event) {
                 JsonObject response = new JsonObject();
                 response.addProperty("id", "iceCandidate");
-                response.addProperty("userId", userId);
+                response.addProperty("senderId", userId);
                 response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
 
                 sendMessage(response);
