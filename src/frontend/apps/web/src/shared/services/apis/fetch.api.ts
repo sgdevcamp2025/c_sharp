@@ -4,13 +4,12 @@ import type {
   HttpMethod,
   ApiResponse,
   ApiErrorResponse,
-  ApiServerType,
+  // ApiServerType,
 } from '@/src/shared/services/models';
 import { getBaseUrl } from '@/src/shared/services/lib/utils';
 import { ERROR_MESSAGES } from '@/src/shared/services/models';
 
 export async function Fetch<TResponse, TBody = JsonValue>(
-  serverType: ApiServerType,
   url: string,
   method: HttpMethod,
   options: FetchOptions<TBody> = {},
@@ -25,7 +24,7 @@ export async function Fetch<TResponse, TBody = JsonValue>(
     includeAuthToken = true,
     ...restOptions
   } = options;
-  const BASE_URL = getBaseUrl(serverType);
+  const BASE_URL = getBaseUrl();
   const queryParams = params
     ? `?${new URLSearchParams(params).toString()}`
     : '';

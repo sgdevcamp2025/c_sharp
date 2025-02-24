@@ -15,7 +15,6 @@ type LoginReq = {
 
 export const requestLogin = async (authorizationCode: string) => {
   const { user, token } = await postRequest<LoginRes, LoginReq>(
-    'gateway',
     `/api/v1/user/login?authorizationCode=${authorizationCode}`,
     {
       platform: 'KAKAO',
