@@ -1,3 +1,5 @@
+'use server';
+
 import { patchRequest } from '@/src/shared/services';
 import { setCookie } from '@/src/shared/services/lib';
 
@@ -5,8 +7,8 @@ export const changeNickname = async (nickname: string) => {
   try {
     const { user } = await patchRequest<any, any>(
       'gateway',
-      `/api/v1/user/profile/nickname=${nickname}`,
-      {},
+      '/api/v1/user/profile',
+      { nickname: nickname },
     );
 
     if (!user || !user.id) {
