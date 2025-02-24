@@ -13,17 +13,16 @@ export const formatChatTime = (
   if (hideUserInfo) {
     return `${hour}:${minute < 10 ? '0' + minute : minute}`;
   } else {
-    let period = '';
+    let period = '오전 ';
     let hour12 = hour;
+
     if (hour >= 12) {
       period = '오후 ';
       hour12 = hour > 12 ? hour - 12 : hour;
-    } else {
-      if (hour === 0) {
-        period = '오전 ';
-        hour12 = 12;
-      }
+    } else if (hour === 0) {
+      hour12 = 12;
     }
-    return `${period}${hour12}:${minute < 10 ? '0' + minute : minute}분`;
+
+    return `${period}${hour12}:${minute < 10 ? '0' + minute : minute}`;
   }
 };

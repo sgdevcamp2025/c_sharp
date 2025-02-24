@@ -1,5 +1,5 @@
-import { getRequest } from '@/src/shared/services';
+import { clientFetchInstance } from '@/src/shared/services';
 
 export async function getPing() {
-  return getRequest<string>('file', '/api/v1/files/test');
+  return clientFetchInstance<string>('/api/v1/files/test', 'GET');
 }

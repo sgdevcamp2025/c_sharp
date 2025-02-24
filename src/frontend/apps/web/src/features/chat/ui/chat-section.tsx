@@ -8,10 +8,11 @@ import { useSendMessage } from '../model';
 
 const ChatSection = () => {
   const channelId = 1;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const currentUser = {
-    userId: 1,
-    nickname: 'User',
-    profileImage: 'https://via.placeholder.com/150',
+    userId: user.userId,
+    nickname: user.nickname,
+    profileImage: user.profileImage,
   };
   const { data: messages } = useMessages(`/subscribe/chat.${channelId}`);
   const handleSendMessage = useSendMessage(channelId, currentUser);
