@@ -1,4 +1,3 @@
-// isomorphicFetch.ts
 import type {
   FetchOptions,
   JsonValue,
@@ -10,7 +9,7 @@ import type {
 import { getBaseUrl } from '@/src/shared/services/lib/utils';
 import { ERROR_MESSAGES } from '@/src/shared/services/models';
 
-export async function isomorphicFetch<TResponse, TBody = JsonValue>(
+export async function Fetch<TResponse, TBody = JsonValue>(
   serverType: ApiServerType,
   url: string,
   method: HttpMethod,
