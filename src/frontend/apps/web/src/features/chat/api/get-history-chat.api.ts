@@ -15,7 +15,6 @@ export const getHistoryChat = async (
     params.cursorId = String(cursorId);
   }
   return clientFetchInstance<HistoryResponse, never>(
-    'history',
     `/api/v1/history/${direction}/${channelId}`,
     'GET',
     {

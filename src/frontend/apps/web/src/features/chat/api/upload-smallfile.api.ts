@@ -23,7 +23,6 @@ export async function uploadSmallFiles({
 
   try {
     const response = await clientFetchInstance<ResponseChunkFileData, FormData>(
-      'file',
       '/api/v1/files/small',
       'POST',
       {

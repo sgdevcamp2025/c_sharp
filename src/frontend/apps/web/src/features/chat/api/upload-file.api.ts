@@ -31,7 +31,6 @@ export async function uploadFiles({
 
   try {
     const response = await clientFetchInstance<ResponseChunkFileData, FormData>(
-      'file', // serverType
       '/api/v1/files/chunk',
       'POST',
       {

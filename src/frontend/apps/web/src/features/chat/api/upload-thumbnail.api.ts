@@ -26,7 +26,6 @@ export async function uploadThumbnail({
 
   try {
     const response = await postRequest<FileResponse, FormData>(
-      'file',
       '/api/v1/files/thumbnail',
       formData,
     );
