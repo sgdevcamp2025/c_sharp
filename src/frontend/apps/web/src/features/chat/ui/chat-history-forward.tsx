@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 import { useForwardInfiniteHistory } from '@/src/features/chat/model';
 import { processChatHistory } from '../lib/process-chat-history.util';
 import ChatHistoryItem from './chat-history-item';
+import { Badge, Separator } from '@workspace/ui/components';
 
 export type ChatHistoryProps = {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -11,7 +12,7 @@ export type ChatHistoryProps = {
 
 const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
   const channelId = 1;
-  const initialCursor = undefined;
+  const initialCursor = 1473;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useForwardInfiniteHistory(channelId, initialCursor);
 
@@ -50,12 +51,17 @@ const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
 
   return (
     <>
-      {hasNextPage && isFetchingNextPage && (
-        <div className="flex w-full p-[10px] justify-center">
-          <Loader2
-            className="animate-spin"
-            color="#F87315"
-          />
+      {processedThreads.length > 0 && (
+        <div className="flex items-center w-full space-x-2">
+          <Separator className="flex-1" />
+          <Badge
+            size="default"
+            variant="default"
+            className="whitespace-nowrap flex-shrink-0"
+          >
+            읽은 내용
+          </Badge>
+          <Separator className="flex-1" />
         </div>
       )}
 
@@ -65,6 +71,14 @@ const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
           thread={thread}
         />
       ))}
+      {hasNextPage && isFetchingNextPage && (
+        <div className="flex w-full p-[10px] justify-center">
+          <Loader2
+            className="animate-spin"
+            color="#F87315"
+          />
+        </div>
+      )}
     </>
   );
 };
