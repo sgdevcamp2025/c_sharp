@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
+import ChatMessageItem from './chat-message-item';
 import ChatReverseHistory from './chat-history-reverse';
 import ChatForwardHistory from './chat-history-forward';
 
 import { useChatAutoScroll, type WebSocketResponsePayload } from '../model';
 import { processMessages } from '../lib';
 import { Toaster } from '@workspace/ui/components';
-import ChatMessageItem from './chat-message-item';
 
 export type ChatContentProps = {
   type?: 'default' | 'live';
