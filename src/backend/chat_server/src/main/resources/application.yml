@@ -42,11 +42,11 @@ topic:
   workspace: jootalkpia.workspace.prd.channel
 
 group:
-  minute: minute-price-save-consumer-group-${SERVER_PORT}-boram
-  chat: chat-message-handle-consumer-group-${SERVER_PORT}-boram
-  push: push-message-handle-consumer-group-${SERVER_PORT}-boram
-  hurdle: huddle-status-handle-consumer-group-${SERVER_PORT}-boram
-  workspace: workspace-channel-handle-consumer-group-${SERVER_PORT}-boram
+  minute: minute-price-save-consumer-group-${SERVER_PORT}
+  chat: chat-message-handle-consumer-group-${SERVER_PORT}
+  push: push-message-handle-consumer-group-${SERVER_PORT}
+  hurdle: huddle-status-handle-consumer-group-${SERVER_PORT}
+  workspace: workspace-channel-handle-consumer-group-${SERVER_PORT}
 
 server:
  port: ${SERVER_PORT}
