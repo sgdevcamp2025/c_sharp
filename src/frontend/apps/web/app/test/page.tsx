@@ -100,25 +100,17 @@ export default function page() {
   //구독 리스트 (기존참가자 목록, 새로운 참가자 정보)
   const handleSignal = (msg: StompJs.Message) => {
     const data = JSON.parse(msg.body);
-    console.log('서버에서 온 메시지 : ', data);
-
-    switch (data.id) {
-      case 'newParticipantArrived':
-        handleNewParticipant(data);
-        break;
-      case 'receiveVideoAnswer':
-        handleVideoResponse(data);
-        break;
-      case 'iceCandidate':
-        handleIceResponse(data);
-        break;
-    }
+    console.log('broad서버에서 온 메시지 : ', data);
   };
 
   const handlePrivateMessage = (msg: StompJs.Message) => {
     const data = JSON.parse(msg.body);
     console.log('서버에서 온 private메시지 : ', data);
     switch (data.id) {
+      case 'newParticipantArrived':
+        console.log('🟢 newParticipantArrived 이벤트 감지됨!');
+        handleNewParticipant(data.name);
+        break;
       case 'existingParticipants':
         handleExistingParticipants(data);
         break;
@@ -149,6 +141,10 @@ export default function page() {
     }
 
     console.log('📡 방 참가 요청 시작!');
+    console.log(
+      '보내는메시지:',
+      JSON.stringify({ id: 'joinHuddle', channelId, userId }),
+    );
     stompClient.current?.publish({
       destination: `/app/signal`,
       body: JSON.stringify({ id: 'joinHuddle', channelId, userId }),
@@ -260,6 +256,7 @@ export default function page() {
     callback: (offerSdp: string) => void,
     participantId?: number,
   ) => {
+    console.log('create peer!');
     // ✅ 기존 PeerConnection이 있으면 재사용하지 않고 새로 생성
     const peerConnection = new RTCPeerConnection(RTC_CONFIGURATION);
     console.log('✅ 새 PeerConnection 생성 완료:', participantId);
@@ -343,21 +340,22 @@ export default function page() {
       });
 
     // ✅ 생성된 PeerConnection 객체 저장
-    participants.current[participantId!] = { rtcPeer: peerConnection };
+    // participants.current[participantId] = { rtcPeer: peerConnection };
 
     return peerConnection;
   };
 
   //새로운 참가자 알림
-  const handleNewParticipant = async (participantId) => {
+  const handleNewParticipant = (participantId) => {
+    console.log('new data : ', participantId);
     const newPeerId = participantId;
     if (newPeerId === userId) return; //내 id무시
 
     console.log(`새로운 참가자 입장 : ${newPeerId}`);
 
     const remoteVideo = createRemoteVideoElement(newPeerId);
-
-    const remoteRtcPeer = await createWebRtcPeer(
+    console.log('new peer 생성 시작');
+    const remoteRtcPeer = createWebRtcPeer(
       'recvonly',
       remoteVideo,
       (offerSdp: any) => {
@@ -377,10 +375,10 @@ export default function page() {
           body: message,
         });
       },
-      participantId,
+      newPeerId,
     );
 
-    participants.current[participantId] = { rtcPeer: remoteRtcPeer };
+    participants.current[newPeerId] = { rtcPeer: remoteRtcPeer };
     console.log(`${participantId}정보 로컬에 등록완료`);
   };
 
@@ -419,8 +417,18 @@ export default function page() {
         const queuedCandidates = iceCandidateQueue.current[senderId] || [];
         console.log(`🧊 저장된 ICE Candidate 개수: ${queuedCandidates.length}`);
 
+        queuedCandidates.forEach((candidate) => {});
         queuedCandidates.forEach((candidate) => {
           peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+          console.log(`🚀 ICE Candidate 전송됨 → ${senderId}`, candidate);
+          stompClient.current?.publish({
+            destination: `${STOMP_PATH.PUB_URL}`,
+            body: JSON.stringify({
+              id: 'onIceCandidate',
+              candidate: candidate,
+              sender: senderId,
+            }),
+          });
         });
 
         // ✅ 적용 후 큐 초기화
