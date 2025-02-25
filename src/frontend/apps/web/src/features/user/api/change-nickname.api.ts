@@ -11,11 +11,9 @@ type Body = {
 
 export const changeNickname = async (nickname: string) => {
   try {
-    const user = await patchRequest<Response, Body>(
-      'gateway',
-      '/api/v1/user/profile',
-      { nickname: nickname },
-    );
+    const user = await patchRequest<Response, Body>('/api/v1/user/profile', {
+      nickname: nickname,
+    });
 
     if (!user || !user.userId) {
       throw new Error('User not found');
