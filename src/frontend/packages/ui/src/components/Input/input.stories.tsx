@@ -20,6 +20,10 @@ const meta: Meta<typeof Input> = {
   argTypes: {
     placeholder: { control: 'text' },
     disabled: { control: 'boolean' },
+    variant: {
+      control: 'select',
+      options: ['default', 'error'],
+    },
   },
 };
 export default meta;
