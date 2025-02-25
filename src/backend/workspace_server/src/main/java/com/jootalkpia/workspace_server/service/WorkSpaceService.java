@@ -2,6 +2,7 @@ package com.jootalkpia.workspace_server.service;
 
 import com.jootalkpia.workspace_server.dto.ChannelListDTO;
 import com.jootalkpia.workspace_server.dto.SimpleChannel;
+import com.jootalkpia.workspace_server.dto.WorkspaceToKafka;
 import com.jootalkpia.workspace_server.entity.Channels;
 import com.jootalkpia.workspace_server.entity.ChatMessage;
 import com.jootalkpia.workspace_server.entity.UserChannel;
@@ -36,6 +37,7 @@ public class WorkSpaceService {
     private final WorkSpaceRepository workSpaceRepository;
     private final UserRepository userRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final KafkaProducer kafkaProducer;
 
     public ChannelListDTO getChannels(Long userId, Long workspaceId) {
         // workspaceId로 모든 채널 조회
@@ -120,6 +122,11 @@ public class WorkSpaceService {
                 .build();
 
         channelRepository.save(channel);
+
+        kafkaProducer.sendChannelStatusMessage(
+                new WorkspaceToKafka(workspaceId,
+                                    channel.getChannelId(),
+                                    channel.getName()));
 
         return new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt(),0L);
     }
