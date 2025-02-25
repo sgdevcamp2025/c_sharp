@@ -5,16 +5,18 @@ import { useForwardInfiniteHistory } from '@/src/features/chat/model';
 import { processChatHistory } from '../lib/process-chat-history.util';
 import ChatHistoryItem from './chat-history-item';
 import { Badge, Separator } from '@workspace/ui/components';
+import { useChatId } from '@/src/shared';
 
 export type ChatHistoryProps = {
   containerRef: React.RefObject<HTMLDivElement>;
 };
 
 const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
-  const channelId = 1;
+  const { channelId } = useChatId();
+
   const initialCursor = undefined;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useForwardInfiniteHistory(channelId, initialCursor);
+    useForwardInfiniteHistory(Number(channelId), initialCursor);
 
   const messages = data?.pages.flatMap((page) => page.threads) ?? [];
   const processedThreads = processChatHistory(messages);

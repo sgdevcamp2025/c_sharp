@@ -6,13 +6,14 @@ import { useReverseInfiniteHistory } from '@/src/features/chat/model';
 
 import { processChatHistory } from '../lib';
 import ChatHistoryItem from './chat-history-item';
+import { useChatId } from '@/src/shared';
 
 export type ChatHistoryProps = {
   containerRef: React.RefObject<HTMLDivElement>;
 };
 
 const ChatReverseHistory = ({ containerRef }: ChatHistoryProps) => {
-  const channelId = 1;
+  const { channelId } = useChatId();
   const initialCursor = undefined;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useReverseInfiniteHistory(channelId, initialCursor);
