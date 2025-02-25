@@ -88,18 +88,18 @@ public class KafkaConsumer {
             groupId = "${group.hurdle}"
     )
     public void processHurdleStatusMessage(String kafkaMessage) {
-        log.info("message ===> " + kafkaMessage);
-
-        ObjectMapper mapper = new ObjectMapper();
-
+        log.info("Received Kafka huddle message ===> {}", kafkaMessage);
         try {
-            ChatMessageToKafka chatMessageToKafka = mapper.readValue(kafkaMessage, ChatMessageToKafka.class); //추후 DTO 변경 필수
+            HuddleToKafka huddleData = objectMapper.readValue(kafkaMessage, HuddleToKafka.class);
+            String huddleDataJson = objectMapper.writeValueAsString(huddleData);
+            Long channelId = huddleData.channelId();
 
-            // 클라이언트에게 허들 관련 데이터 전달하는 로직
+            messagingTemplate.convertAndSend("/subscribe/hurdle." + channelId, huddleDataJson);
 
-            log.info("dto ===> " + chatMessageToKafka.toString());
+            log.info("Broadcasted hurdle data via WebSocket: " + huddleDataJson);
+
         } catch (Exception ex) {
-            log.error(ex.getMessage(), ex); // 추후에 GlobalException 처리
+            log.error("Error processing huddle message: " + ex.getMessage(), ex);
         }
     }
 
@@ -119,7 +119,7 @@ public class KafkaConsumer {
             log.info("Broadcasted workspace data via WebSocket: " + workspaceDataJson);
 
         } catch (Exception ex) {
-            log.error("Error processing stock message: " + ex.getMessage(), ex);
+            log.error("Error processing workspace message: " + ex.getMessage(), ex);
         }
     }
 }
