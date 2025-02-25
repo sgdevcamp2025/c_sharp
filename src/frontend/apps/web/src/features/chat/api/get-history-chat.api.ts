@@ -1,4 +1,4 @@
-import { clientFetchInstance } from '@/src/shared/services';
+import { clientFetchInstance, TAG_KEYS } from '@/src/shared/services';
 
 import type { HistoryResponse } from '../model';
 
@@ -20,6 +20,9 @@ export const getHistoryChat = async (
     {
       params,
       includeAuthToken: true,
+      cache: 'force-cache',
+      revalidate: 300,
+      tags: [`${TAG_KEYS.CHAT_HISTORY(channelId)}`],
     },
   );
 };
