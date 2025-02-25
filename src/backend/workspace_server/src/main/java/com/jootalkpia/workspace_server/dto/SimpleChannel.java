@@ -12,4 +12,5 @@ public class SimpleChannel {
     private Long channelId;
     private String channelName;
     private LocalDateTime createdAt;
+    private Long unreadNum;
 }

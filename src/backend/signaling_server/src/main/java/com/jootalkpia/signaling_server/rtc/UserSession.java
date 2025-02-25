@@ -51,7 +51,7 @@ public class UserSession implements Closeable {
                 response.addProperty("senderId", userId);
                 response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
 
-                sendMessage(response);
+                sendPrivateMessage(userId, response);
             }
         });
     }
@@ -94,7 +94,7 @@ public class UserSession implements Closeable {
                     response.addProperty("id", "iceCandidate");
                     response.addProperty("senderId", sender.getUserId());
                     response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-                    sendMessage(response);
+                    sendPrivateMessage(userId, response);
                 }
             });
 

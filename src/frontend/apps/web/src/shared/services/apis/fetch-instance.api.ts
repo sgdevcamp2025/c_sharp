@@ -7,22 +7,17 @@ import type {
   JsonValue,
   ApiErrorResponse,
   ApiResponse,
-  ApiServerType,
 } from '@/src/shared/services/models';
 import { getBaseUrl } from '@/src/shared/services/lib/utils';
 import { cookies } from 'next/headers';
 
 export async function fetchInstance<TResponse, TBody = JsonValue>(
-  serverType: ApiServerType,
   url: string,
   method: HttpMethod,
   options: FetchOptions<TBody> = {},
 ): Promise<TResponse> {
   try {
     const accessToken = cookies().get('accessToken')?.value;
-
-    // const token =
-    //   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3NDAwMTgyNTMsImV4cCI6MTc3MTU1NDI1MywidXNlcklkIjoxfQ.8bnw2CjXWgrdNOWr8z2U-rytvqhns3_0Y1VO4tjIB6s-2Wk6GNpQn0-jvvN0BnoGC67pEr-g073vUOGczF-8xg';
 
     // 🟢 options 객체에서 필요한 값들을 구조 분해 할당
     const {
@@ -35,7 +30,7 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
       ...restOptions
     } = options;
 
-    const BASE_URL = getBaseUrl(serverType);
+    const BASE_URL = getBaseUrl();
     // 🟢 URL에 쿼리 파라미터 추가
     const queryParams = params
       ? `?${new URLSearchParams(params).toString()}`
@@ -65,8 +60,15 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
 
     // body 데이터가 있고, GET 요청이 아닐 때만 body 필드 추가
     if (body && method !== 'GET') {
-      finalOptions.body =
-        body instanceof FormData ? body : JSON.stringify(body);
+      if (
+        body instanceof FormData ||
+        body instanceof Blob ||
+        body instanceof File
+      ) {
+        finalOptions.body = body;
+      } else {
+        finalOptions.body = JSON.stringify(body);
+      }
     }
 
     // API 호출

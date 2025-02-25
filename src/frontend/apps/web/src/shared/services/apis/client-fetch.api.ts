@@ -5,26 +5,21 @@ import type {
   FetchOptions,
   JsonValue,
 } from '@/src/shared/services/models';
-import { isomorphicFetch } from './ismorphic-fetch.api';
+import { getAccessTokenFromCookie } from '../lib';
 
-const getClientToken = (): string | undefined => {
-  // const match = document.cookie.match(new RegExp('(^| )accessToken=([^;]+)'));
-  // return match ? match[2] : undefined;
-  return process.env.NEXT_PUBLIC_TEST_TOKEN;
+import { Fetch } from './fetch.api';
+
+const getClientToken = async (): Promise<string | undefined> => {
+  const match = await getAccessTokenFromCookie();
+  return match;
+  // return process.env.NEXT_PUBLIC_TEST_TOKEN;
 };
 
-export const clientFetchInstance = <TResponse, TBody = JsonValue>(
-  serverType: ApiServerType,
+export const clientFetchInstance = async <TResponse, TBody = JsonValue>(
   url: string,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
   options: FetchOptions<TBody> = {},
 ): Promise<TResponse> => {
-  const token = getClientToken();
-  return isomorphicFetch<TResponse, TBody>(
-    serverType,
-    url,
-    method,
-    options,
-    token,
-  );
+  const token = await getClientToken();
+  return Fetch<TResponse, TBody>(url, method, options, token);
 };

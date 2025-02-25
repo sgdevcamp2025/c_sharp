@@ -1,11 +1,11 @@
 'use client';
 
-import type { FileData } from '../model';
+import type { FilePreview } from '../model';
 import { FilePreviewItem } from './file-preview-item';
 
 type FilePreviewListProps = {
-  selectedFiles: FileData[];
-  onRemoveFile: (id: string) => void;
+  selectedFiles: FilePreview[];
+  onRemoveFile: (id: number) => void;
 };
 
 export const FilePreviewList = ({
@@ -16,16 +16,19 @@ export const FilePreviewList = ({
     return null;
   }
 
+  // console.log(selectedFiles);
+
   return (
     <div className="overflow-x-auto w-full">
       <div className="flex gap-2 pb-2 w-max">
-        {/* {selectedFiles.map((fileData) => (
+        {selectedFiles.map((fileData, index) => (
           <FilePreviewItem
-            key={fileData.id}
+            key={index}
+            id={index}
             fileData={fileData}
             onRemove={onRemoveFile}
           />
-        ))} */}
+        ))}
       </div>
     </div>
   );

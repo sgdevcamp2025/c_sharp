@@ -8,3 +8,4 @@ export {
 export { QUERY_KEYS } from './querykey';
 export { clientFetchInstance } from './client-fetch.api';
 export { serverFetchInstance } from './server-fetch.api';
+export { Fetch } from './fetch.api';

@@ -89,7 +89,6 @@ public class ChatService {
                                         .build();
             case "VIDEO" -> VideoResponse.builder()
                                         .videoId(file.getFileId())
-                                        .videoThumbnailId(fileRepository.findByUrl(file.getUrlThumbnail()).getFileId())
                                         .videoUrl(file.getUrl())
                                         .thumbnailUrl(file.getUrlThumbnail())
                                         .build();
