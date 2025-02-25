@@ -4,4 +4,4 @@ export {
   formatHistogramChart,
 } from './stock-chart.util';
 
-export { formatRealTimeStock } from './stock-realtime.util';
+export { StockForTable } from './stock-realtime.util';
