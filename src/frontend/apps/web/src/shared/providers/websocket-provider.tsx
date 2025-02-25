@@ -2,6 +2,15 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '../services';
+import { getAccessToken } from '@/src/features/stock';
+
+const REQUESTLIST = [
+  ['1', 'H0STCNT0', '005930'],
+  ['1', 'H0STCNT0', '000660'],
+  ['1', 'H0STCNT0', '035720'],
+  ['1', 'H0STCNT0', '035420'],
+  ['1', 'H0STCNT0', '012450'],
+] as const;
 
 type WebSocketContextType = {
   stockData: Record<string, any>;
@@ -23,10 +32,8 @@ export function WebSocketProvider({
   const pingCount = useRef<number>(0);
   const [stockData, setStockData] = useState<Record<string, any>>({});
 
+  const url = 'ws://ops.koreainvestment.com:31000';
   useEffect(() => {
-    const url = 'ws://ops.koreainvestment.com:31000';
-    const token = 'd8dd055b-62cc-4290-bef1-06fd56e3bc11';
-
     console.log('✅ [Token Received]:', token);
 
     function setupWebSocket() {
@@ -44,27 +51,19 @@ export function WebSocketProvider({
 
         socket.send(JSON.stringify({ token }));
 
-        const requestlist = [
-          ['1', 'H0STCNT0', '005930'],
-          ['1', 'H0STCNT0', '005930'],
-          ['1', 'H0STCNT0', '005930'],
-          ['1', 'H0STCNT0', '005930'],
-          ['1', 'H0STCNT0', '005930'],
-        ];
-        requestlist.forEach((request) => {
-          console.log(request[2]);
+        REQUESTLIST.forEach(([type, id, code]) => {
           socket.send(
             JSON.stringify({
               header: {
                 approval_key: token,
                 custtype: 'P',
-                tr_type: request[0],
+                tr_type: type,
                 'content-type': 'utf-8',
               },
               body: {
                 input: {
-                  tr_id: request[1],
-                  tr_key: request[2],
+                  tr_id: id,
+                  tr_key: code,
                 },
               },
             }),
@@ -88,12 +87,9 @@ export function WebSocketProvider({
           socket.send(event.data);
         } else {
           pingCount.current = 0;
-
-          queryClient.setQueryData(QUERY_KEYS.stockList(), event.data);
-          setStockData((prev) => {
-            const newData = { ...prev, [event.data.code]: event.data };
-            return newData;
-          });
+          const data = JSON.parse(event.data);
+          queryClient.setQueryData(QUERY_KEYS.stock(data.code), data);
+          setStockData(data);
         }
       };
 
