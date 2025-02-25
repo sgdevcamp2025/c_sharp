@@ -1,5 +1,6 @@
-import { ResponseChunkFileData } from '../model';
 import { uploadFiles } from './upload-file.api';
+
+import { ResponseChunkFileData } from '../model';
 
 export const uploadChunkWithRetry = async (
   chunk: Blob,

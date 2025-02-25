@@ -9,7 +9,7 @@ import type {
 import { useStompWebSocket } from '@/src/shared/providers';
 import { QUERY_KEYS } from '@/src/shared/services';
 
-export const useWebSocketClient = (channelId: number) => {
+export const useChatSubscribe = (channelId: number) => {
   const queryClient = useQueryClient();
   const { client } = useStompWebSocket();
   const [isConnected, setIsConnected] = useState(false);
@@ -33,7 +33,7 @@ export const useWebSocketClient = (channelId: number) => {
       return;
     }
 
-    console.log(`📡 Subscribing to /subscribe/chat.${channelId}`);
+    // console.log(`📡 Subscribing to /subscribe/chat.${channelId}`);
     const subscription = client.subscribe(
       `/subscribe/chat.${channelId}`,
       (message) => {

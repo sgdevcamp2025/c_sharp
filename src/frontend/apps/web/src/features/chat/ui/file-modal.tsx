@@ -1,8 +1,9 @@
-import { Button } from '@workspace/ui/components';
-import { Modal } from '@workspace/ui/components/Modal/modal';
+import Image from 'next/image';
+
+import { Button, Modal } from '@workspace/ui/components';
+
 import { FilePreview } from '../model';
 import { formatFileSize } from '../lib';
-import Image from 'next/image';
 
 type FileModalProps = {
   isOpen: boolean;
