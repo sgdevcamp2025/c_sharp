@@ -256,8 +256,12 @@ export default function page() {
     callback: (offerSdp: string) => void,
     participantId?: number,
   ) => {
-    console.log('create peer!');
-    // ✅ 기존 PeerConnection이 있으면 재사용하지 않고 새로 생성
+    console.log('create peer!', participantId);
+
+    if (participants.current[participantId]) {
+      console.log(`⚠️ 기존 PeerConnection 재사용: ${participantId}`);
+      return participants.current[participantId].rtcPeer;
+    }
     const peerConnection = new RTCPeerConnection(RTC_CONFIGURATION);
     console.log('✅ 새 PeerConnection 생성 완료:', participantId);
 
