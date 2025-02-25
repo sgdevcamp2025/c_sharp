@@ -22,6 +22,7 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
   const stockData = queryClient.getQueryData<any[]>(
     QUERY_KEYS.stock(stockCode),
   );
+  console.log(stockData);
 
   return (
     <ResizablePanelGroup direction="vertical">
@@ -31,10 +32,10 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
         maxSize={80}
         className="flex items-center justify-center bg-gray-200"
       >
-        <StockChartItem
-          data={stockData}
+        {/* <StockChartItem
+          data={dummyStockData}
           type={ChartType.Candlestick}
-        />
+        /> */}
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel
@@ -43,10 +44,10 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
         maxSize={80}
         className="flex items-center justify-center bg-gray-300"
       >
-        <StockChartItem
-          data={stockData}
+        {/* <StockChartItem
+          data={dummyStockData}
           type={ChartType.Histogram}
-        />
+        /> */}
       </ResizablePanel>
     </ResizablePanelGroup>
   );
