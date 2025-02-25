@@ -11,7 +11,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { Stock, columns } from '../model';
+import { columns } from '../model';
 import {
   Button,
   DropdownMenu,
@@ -28,46 +28,48 @@ import {
 } from '@workspace/ui/components';
 import { useRouter } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
+import { useWebSocket } from '@/src/shared';
+import { RealTimeStock } from '../model/stock.types';
 
-const Stockdata: Stock[] = [
+const Stockdata: RealTimeStock[] = [
   {
-    id: '1',
+    code: '1',
     name: '삼성전자',
-    currPrice: '53700',
-    fluctuation: '+0.00',
-    volume: '1000',
+    currentPrice: '53700',
+    priceChange: '+0.00',
+    tradingVolume: '1000',
     slug: 'samsung-electronics',
   },
   {
-    id: '2',
+    code: '2',
     name: 'SK하이닉스',
-    currPrice: '221000',
-    fluctuation: '+0.68',
-    volume: '1000',
+    currentPrice: '221000',
+    priceChange: '+0.68',
+    tradingVolume: '1000',
     slug: 'sk-hynix',
   },
   {
-    id: '3',
+    code: '3',
     name: '카카오',
-    currPrice: '35750',
-    fluctuation: '+0.00',
-    volume: '1000',
+    currentPrice: '35750',
+    priceChange: '+0.00',
+    tradingVolume: '1000',
     slug: 'kakao',
   },
   {
-    id: '4',
+    code: '4',
     name: '네이버',
-    currPrice: '204000',
-    fluctuation: '-0.24',
-    volume: '1000',
+    currentPrice: '204000',
+    priceChange: '-0.24',
+    tradingVolume: '1000',
     slug: 'naver',
   },
   {
-    id: '5',
+    code: '5',
     name: '한화에어로스페이스',
-    currPrice: '411500',
-    fluctuation: '+7.30',
-    volume: '1000',
+    currentPrice: '411500',
+    priceChange: '+7.30',
+    tradingVolume: '1000',
     slug: 'hanwha-aerospace',
   },
 ];
