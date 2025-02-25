@@ -41,7 +41,7 @@ public class WorkSpaceController {
         ValidationUtils.validateWorkSpaceId(workspaceId);
         log.info("Creating channels for workspace with id: {}", workspaceId);
 
-        SimpleChannel channel = workSpaceService.createChannel(workspaceId, channelName);
+        SimpleChannel channel = workSpaceService.createChannel(workspaceId, channelName,userId);
 
         // 유저를 생성된 채널에 가입시킴
         workSpaceService.addMember(workspaceId, userId, channel.getChannelId());
