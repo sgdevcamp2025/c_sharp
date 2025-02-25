@@ -114,7 +114,7 @@ public class KafkaConsumer {
             String workspaceDataJson = objectMapper.writeValueAsString(workspaceData);
             Long workspaceId = workspaceData.workspaceId();
 
-            messagingTemplate.convertAndSend("/subscribe/workspace" + workspaceId, workspaceDataJson);
+            messagingTemplate.convertAndSend("/subscribe/workspace." + workspaceId, workspaceDataJson);
 
             log.info("Broadcasted workspace data via WebSocket: " + workspaceDataJson);
 

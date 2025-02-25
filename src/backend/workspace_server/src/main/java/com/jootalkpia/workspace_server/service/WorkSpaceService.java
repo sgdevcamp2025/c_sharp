@@ -108,7 +108,7 @@ public class WorkSpaceService {
         return channelListDTO;
     }
 
-    public SimpleChannel createChannel(Long workspaceId, String channelName) {
+    public SimpleChannel createChannel(Long workspaceId, String channelName,Long userId) {
         // WorkSpace 객체 조회
         WorkSpace workSpace = fetchWorkSpace(workspaceId);
 
@@ -125,8 +125,10 @@ public class WorkSpaceService {
 
         kafkaProducer.sendChannelStatusMessage(
                 new WorkspaceToKafka(workspaceId,
+                                    userId,
                                     channel.getChannelId(),
-                                    channel.getName()));
+                                    channel.getName()
+                                    ,channel.getCreatedAt()));
 
         return new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt(),0L);
     }
