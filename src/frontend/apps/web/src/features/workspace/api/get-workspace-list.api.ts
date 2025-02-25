@@ -1,17 +1,21 @@
 import { serverFetchInstance, TAG_KEYS } from '@/src/shared/services';
 
+export type joinChannelResponse = {
+  channelId: number;
+  channelName: string;
+  createdAt: Date;
+  unreadNum?: number;
+};
+
+export type unjoinChannelResponse = {
+  channelId?: number;
+  channelName?: string;
+  createdAt?: Date;
+};
+
 export type WorkspaceListResponse = {
-  joinedChannels: {
-    channelId: number;
-    channelName: string;
-    createdAt: Date;
-    unreadNum: number;
-  }[];
-  unjoinedChannels: {
-    channelId?: number;
-    channelName?: string;
-    createdAt?: Date;
-  }[];
+  joinedChannels: joinChannelResponse[];
+  unjoinedChannels: unjoinChannelResponse[];
 };
 
 export const getWorkspaceList = async (workspaceId: number) => {
