@@ -84,8 +84,8 @@ public class KafkaConsumer {
     }
 
     @KafkaListener(
-            topics = "${topic.hurdle}",
-            groupId = "${group.hurdle}"
+            topics = "${topic.huddle}",
+            groupId = "${group.huddle}"
     )
     public void processHurdleStatusMessage(String kafkaMessage) {
         log.info("Received Kafka huddle message ===> {}", kafkaMessage);
