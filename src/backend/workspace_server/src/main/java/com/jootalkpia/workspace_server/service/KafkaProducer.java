@@ -2,7 +2,6 @@ package com.jootalkpia.workspace_server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jootalkpia.workspace_server.dto.WorkspaceToKafka;
-import com.jootalkpia.workspace_server.entity.MessageToKafka;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
