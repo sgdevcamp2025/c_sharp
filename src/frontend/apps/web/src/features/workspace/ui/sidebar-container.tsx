@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { ChevronRight, CirclePlus } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 
 import {
   Collapsible,
@@ -19,13 +18,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@workspace/ui/components';
-import { QUERY_KEYS, useChatId } from '@/src/shared';
+import { useChatId } from '@/src/shared';
 
 import WorkspaceModal from './workspace-modal';
 
-import { getWorkspaceList, WorkspaceListResponse } from '../api';
-import { createWorkspace } from '../api/create-channel.api';
-import { useWorkspaceMessages, useWorkspaceSubscription } from '../model';
+import { useWorkspaceChannels } from '../model';
+import { createWorkspace } from '../api';
 import { getWorkspaceId } from '../lib';
 
 const renderChannels = (
@@ -52,33 +50,12 @@ const renderChannels = (
 };
 
 const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const workspaceId = getWorkspaceId(stockSlug);
   const { setChannelId } = useChatId();
-  const { subscribe } = useWorkspaceSubscription(workspaceId);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = subscribe();
-    return () => {
-      unsubscribe && unsubscribe();
-    };
-  }, [subscribe]);
-
-  const { data: workspaceSocketMessage } = useWorkspaceMessages(workspaceId);
-
-  console.log('workspaceSocketMessage:', workspaceSocketMessage);
-
-  const {
-    data: workspaceData,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery<WorkspaceListResponse>({
-    queryKey: QUERY_KEYS.workspaceList(workspaceId),
-    queryFn: () => getWorkspaceList(workspaceId),
-    enabled: workspaceId !== -1,
-    staleTime: 60 * 1000,
-  });
+  const { joinedChannels, unjoinedChannels, isLoading, error } =
+    useWorkspaceChannels(workspaceId);
 
   if (error) return <div>Error: {String(error)}</div>;
   if (workspaceId === -1) return <div>Error: Invalid workspace id</div>;
@@ -87,7 +64,6 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
 
   const handleCreateChannel = async (data: { workspace?: string }) => {
     await createWorkspace(workspaceId, data.workspace);
-    refetch();
   };
 
   const handleChannelClick = (channelId: number) => {
@@ -137,10 +113,7 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
                         로딩 중...
                       </div>
                     ) : (
-                      renderChannels(
-                        workspaceData?.joinedChannels,
-                        handleChannelClick,
-                      )
+                      renderChannels(joinedChannels, handleChannelClick)
                     )}
                   </SidebarMenu>
                 </SidebarGroupContent>
@@ -171,10 +144,7 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
                         로딩 중...
                       </div>
                     ) : (
-                      renderChannels(
-                        workspaceData?.unjoinedChannels,
-                        handleChannelClick,
-                      )
+                      renderChannels(unjoinedChannels, handleChannelClick)
                     )}
                   </SidebarMenu>
                 </SidebarGroupContent>
