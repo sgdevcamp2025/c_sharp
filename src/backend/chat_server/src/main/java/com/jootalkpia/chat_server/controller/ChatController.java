@@ -5,7 +5,9 @@ import com.jootalkpia.chat_server.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,8 +21,8 @@ public class ChatController {
         chatService.processChatMessage(request, channelId);
     }
 
-    @PostMapping
-    public void sendMessageApi(ChatMessageRequest request, @DestinationVariable Long channelId) {
+    @PostMapping("/chat/{channelId}")
+    public void sendMessageApi(@RequestBody ChatMessageRequest request, @PathVariable Long channelId) {
         chatService.processChatMessage(request, channelId);
     }
 }
