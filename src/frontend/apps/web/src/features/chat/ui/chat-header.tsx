@@ -1,6 +1,7 @@
 import { Button, SidebarTrigger } from '@workspace/ui/components';
 import { Headset } from 'lucide-react';
 import Header from './header';
+import Link from 'next/link';
 
 const ChatHeader = ({ stockSlug }: { stockSlug: string }) => {
   return (
@@ -14,7 +15,13 @@ const ChatHeader = ({ stockSlug }: { stockSlug: string }) => {
           variant="default"
           size="sm"
         >
-          <Headset size={20} />
+          <Link
+            href={'/stock/huddle'}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Headset size={20} />
+          </Link>
         </Button>
       </div>
     </Header>
