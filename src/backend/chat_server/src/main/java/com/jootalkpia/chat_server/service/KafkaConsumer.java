@@ -94,7 +94,7 @@ public class KafkaConsumer {
             String huddleDataJson = objectMapper.writeValueAsString(huddleData);
             Long channelId = huddleData.channelId();
 
-            messagingTemplate.convertAndSend("/subscribe/hurdle." + channelId, huddleDataJson);
+            messagingTemplate.convertAndSend("/subscribe/huddle." + channelId, huddleDataJson);
 
             log.info("Broadcasted hurdle data via WebSocket: " + huddleDataJson);
 
