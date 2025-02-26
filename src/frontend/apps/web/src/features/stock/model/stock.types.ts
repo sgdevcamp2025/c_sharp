@@ -11,7 +11,8 @@ export type StockChartAPIResponse = {
   businessDate: string;
   tradingTime: string;
   currentPrice: string;
-  openPrice: string;
+  openPrice?: string;
+  openingPrice?: string;
   highPrice: string;
   lowPrice: string;
   tradingVolume: string;

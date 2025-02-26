@@ -22,7 +22,6 @@ export const useStockWebSocket = () => {
 
     console.log(`Subscribing to /subscribe/stock`);
     const subscription = client.subscribe(`/subscribe/stock`, (message) => {
-      console.log('주식메시지 ', message.body);
       try {
         const payload = JSON.parse(message.body);
         console.log('Received:', payload);

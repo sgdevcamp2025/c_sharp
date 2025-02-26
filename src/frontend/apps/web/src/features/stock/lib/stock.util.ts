@@ -30,15 +30,17 @@ const formatChartData = <T>(
   formatFn: (item: StockChartAPIResponse, time: Time) => T,
 ): T[] => {
   return response
-    .map((item) => {
-      const formattedTime = formatTimeForChart(
-        item.businessDate,
-        item.tradingTime,
-      );
-      if (!formattedTime) return null;
-      return formatFn(item, formattedTime);
-    })
-    .filter((item): item is T => item !== null);
+    ? response
+        .map((item) => {
+          const formattedTime = formatTimeForChart(
+            item.businessDate,
+            item.tradingTime,
+          );
+          if (!formattedTime) return null;
+          return formatFn(item, formattedTime);
+        })
+        .filter((item): item is T => item !== null)
+    : [];
 };
 
 export const formatCandleChart = (
@@ -46,7 +48,7 @@ export const formatCandleChart = (
 ): CandleChart[] =>
   formatChartData<CandleChart>(response, (item, time) => ({
     time,
-    open: parseFloat(item.openPrice),
+    open: parseFloat(item.openPrice ?? item.openingPrice),
     high: parseFloat(item.highPrice),
     low: parseFloat(item.lowPrice),
     close: parseFloat(item.currentPrice),

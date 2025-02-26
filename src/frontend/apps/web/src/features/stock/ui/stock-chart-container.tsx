@@ -6,9 +6,9 @@ import {
   ResizablePanelGroup,
 } from '@workspace/ui/components';
 import StockChartItem from './stock-chart-item';
-import { ChartType, dummyStockData, useStockWebSocket } from '../model';
+import { ChartType, StockChartAPIResponse, useStockWebSocket } from '../model';
 import { useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/src/shared/services';
 
 const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
@@ -19,11 +19,10 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
     return subscribe();
   }, [subscribe]);
 
-  const stockData = queryClient.getQueryData<any[]>(
-    QUERY_KEYS.stock(stockCode),
-  );
-  console.log(stockData);
-
+  const { data: stockData } = useQuery<StockChartAPIResponse[]>({
+    queryKey: QUERY_KEYS.stock(stockCode),
+    queryFn: () => queryClient.getQueryData(QUERY_KEYS.stock(stockCode)),
+  });
   return (
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel
@@ -32,10 +31,10 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
         maxSize={80}
         className="flex items-center justify-center bg-gray-200"
       >
-        {/* <StockChartItem
-          data={dummyStockData}
+        <StockChartItem
+          data={stockData}
           type={ChartType.Candlestick}
-        /> */}
+        />
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel
@@ -44,10 +43,10 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
         maxSize={80}
         className="flex items-center justify-center bg-gray-300"
       >
-        {/* <StockChartItem
-          data={dummyStockData}
+        <StockChartItem
+          data={stockData}
           type={ChartType.Histogram}
-        /> */}
+        />
       </ResizablePanel>
     </ResizablePanelGroup>
   );
