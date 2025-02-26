@@ -1,8 +1,8 @@
 'use server';
 
+const API_KEY = process.env.API_KEY;
+const API_SECRET_KEY = process.env.API_SECRET_KEY;
 export const getAccessToken = async () => {
-  const API_KEY = process.env.API_KEY;
-  const API_SECRET_KEY = process.env.API_SECRET_KEY;
   const response = await fetch(
     'https://openapivts.koreainvestment.com:29443/oauth2/Approval',
     {

@@ -25,9 +25,7 @@ export default async function RootLayout({
         <AuthWrapper>
           <StompWebSocketProvider userId={1}>
             <RQProvider>
-              <WebSocketProvider token={token?.approval_key}>
-                {children}
-              </WebSocketProvider>
+              <WebSocketProvider token={token}>{children}</WebSocketProvider>
             </RQProvider>
           </StompWebSocketProvider>
         </AuthWrapper>

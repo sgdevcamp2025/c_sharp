@@ -1,8 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { QUERY_KEYS } from '../services';
-import { getAccessToken } from '@/src/features/stock';
 
 const REQUESTLIST = [
   ['1', 'H0STCNT0', '005930'],
@@ -13,7 +11,7 @@ const REQUESTLIST = [
 ] as const;
 
 type WebSocketContextType = {
-  stockData: Record<string, any>;
+  stockData: any;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(
@@ -30,8 +28,12 @@ export function WebSocketProvider({
   const queryClient = useQueryClient();
   const socketRef = useRef<WebSocket | null>(null);
   const pingCount = useRef<number>(0);
-  const [stockData, setStockData] = useState<Record<string, any>>({});
-
+  const [data1, setData1] = useState('');
+  const [data2, setData2] = useState('');
+  const [data3, setData3] = useState('');
+  const [data4, setData4] = useState('');
+  const [data5, setData5] = useState('');
+  const setters = [setData1, setData2, setData3, setData4, setData5];
   const url = 'ws://ops.koreainvestment.com:31000';
   useEffect(() => {
     console.log('✅ [Token Received]:', token);
@@ -72,8 +74,6 @@ export function WebSocketProvider({
       };
 
       socket.onmessage = (event) => {
-        console.log('WebSocket Message:', event.data);
-
         if (event.data.includes('PINGPONG')) {
           pingCount.current += 1;
 
@@ -85,11 +85,20 @@ export function WebSocketProvider({
           }
 
           socket.send(event.data);
+        } else if (event.data.includes('SUCCESS')) {
+          return;
         } else {
           pingCount.current = 0;
-          const data = JSON.parse(event.data);
-          queryClient.setQueryData(QUERY_KEYS.stock(data.code), data);
-          setStockData(data);
+
+          // 응답을 REQUESTLIST와 매칭하여 저장
+          const matchedIndex = REQUESTLIST.findIndex(([_, __, code]) =>
+            event.data.includes(code),
+          );
+          if (matchedIndex !== -1) {
+            setters[matchedIndex](event.data); // 해당 종목 코드의 setter를 호출하여 데이터 업데이트
+          } else {
+            console.warn('❌ 응답에서 종목 코드를 찾을 수 없음:', event.data);
+          }
         }
       };
 
@@ -113,7 +122,13 @@ export function WebSocketProvider({
       }
     };
   }, [queryClient]);
-
+  const stockData = [
+    { code: REQUESTLIST[0][2], data: data1 },
+    { code: REQUESTLIST[1][2], data: data2 },
+    { code: REQUESTLIST[2][2], data: data3 },
+    { code: REQUESTLIST[3][2], data: data4 },
+    { code: REQUESTLIST[4][2], data: data5 },
+  ];
   return (
     <WebSocketContext.Provider value={{ stockData }}>
       {children}

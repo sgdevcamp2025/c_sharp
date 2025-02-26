@@ -6,7 +6,7 @@ const formatRealTimeStock = (data: string) => {
     code: stock[0] || '',
     tradingTime: stock[1] || '',
     currentPrice: stock[1] || '',
-    priceChange: stock[2] || '',
+    priceChange: stock[4] || '',
     openPrice: stock[37] || '',
     highPrice: stock[9] || '',
     lowPrice: stock[10] || '',
