@@ -1,111 +1,164 @@
-import type { FileData } from './file-data.type';
-import {
-  validateFileSize,
-  generateVideoThumbnail,
-  validateTotalFileSize,
-} from '../lib/file.utils';
 import { useState } from 'react';
-import { uploadFiles } from '../api/uploadFile.api';
 
-type ProcessedFile = {
+import {
+  validateFileType,
+  validateTotalFileSize,
+  processFile,
+  createChunks,
+  generateTempFileIdentifier,
+} from '../lib';
+import { uploadChunksQueue, uploadSmallFiles, uploadThumbnail } from '../api';
+
+export type FilePreview = {
+  id: string;
   file: File;
-  thumbnailFile: File | null;
+  previewUrl: string;
+  thumbnailUrl?: string;
+  isLoading: boolean;
 };
 
-export const useFileManagements = (workspaceId: number, channelId: number) => {
-  const [selectedFiles, setSelectedFiles] = useState<FileData[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+export function useFileManagements(
+  workspaceId: number,
+  channelId: number,
+  userId: number,
+) {
+  const [filePreviews, setFilePreviews] = useState<FilePreview[]>([]);
+  const [isFinalLoading, setIsFinalLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-
-  const processFile = async (file: File): Promise<ProcessedFile | null> => {
-    if (!validateFileSize(file)) return null;
-
-    if (file.type.startsWith('image/')) {
-      // 이미지 파일: thumbnailFile은 null 처리
-      return { file, thumbnailFile: null };
-    }
-
-    if (file.type.startsWith('video/')) {
-      try {
-        const thumbnailFile = await generateVideoThumbnail(file);
-        return { file, thumbnailFile };
-      } catch (err) {
-        console.error('Failed to generate thumbnail:', err);
-        return { file, thumbnailFile: null };
-      }
-    }
-
-    return null;
-  };
+  const [uploadedFileIds, setUploadedFileIds] = useState<number[]>([]);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setIsLoading(true);
     setError(null);
+    setIsFinalLoading(true);
 
     try {
       const files = Array.from(event.target.files || []);
-      // 파일 재선택을 위해 input 초기화
       event.target.value = '';
 
-      if (!validateTotalFileSize(files)) {
-        setIsLoading(false);
+      // ────────── [1] 불허 타입 체크: 하나라도 불허면 전체 중단 ──────────
+      for (const file of files) {
+        if (!validateFileType(file)) {
+          setIsFinalLoading(false);
+          return;
+        }
+      }
+
+      // ────────── [2] 파일 전체 사이즈 검사 ──────────
+      const allFiles = [...filePreviews.map((fp) => fp.file), ...files];
+      if (!validateTotalFileSize(allFiles)) {
+        setIsFinalLoading(false);
         return;
       }
 
-      selectedFiles.forEach((fileData) => {
-        fileData.file.forEach((file) => {
-          if (file instanceof File && file.type.startsWith('video/')) {
-            URL.revokeObjectURL(file.name);
-          }
-        });
+      // ────────── [3] 미리보기 데이터 생성 ──────────
+      const timestamp = Date.now();
+      const newPreviews: FilePreview[] = files.map((file, index) => {
+        const id = `${userId}-${timestamp}-${index}`;
+        return {
+          id,
+          file,
+          previewUrl: URL.createObjectURL(file),
+          thumbnailUrl: undefined,
+          isLoading: true,
+        };
       });
 
-      // 선택한 파일들을 순서대로 전처리
-      const processedResults = await Promise.all(files.map(processFile));
-      const processedFiles = processedResults.filter(
-        (f): f is ProcessedFile => f !== null,
-      );
+      setFilePreviews((prev) => [...prev, ...newPreviews]);
 
-      // 원래 선택 순서를 유지하여 파일 배열과 썸네일 배열 구성
-      const fileArray = processedFiles.map((item) => item.file);
-      const thumbnailArray = processedFiles.map((item) => item.thumbnailFile);
+      // ────────── [4] 썸네일 생성 (비디오면) ──────────
+      for (const file of files) {
+        const processed = await processFile(file);
+        if (processed?.thumbnailFile) {
+          const thumbUrl = URL.createObjectURL(processed.thumbnailFile);
+          setFilePreviews((prev) =>
+            prev.map((fp) =>
+              fp.file.name === file.name
+                ? { ...fp, thumbnailUrl: thumbUrl }
+                : fp,
+            ),
+          );
+        }
+      }
 
-      // 백엔드 API 호출을 위한 payload 구성
-      // API 함수 uploadFiles는 채널, 워크스페이스 ID를 number로 받으므로 변환합니다.
-      const payload = {
-        channelId: Number(channelId),
-        workspaceId: Number(workspaceId),
-        files: fileArray,
-        thumbnails: thumbnailArray,
-      };
-      // console.log('Payload:', payload);
+      // ────────── [5] 업로드 로직 ──────────
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        try {
+          // (A) 10MB 이하 소형 파일
+          if (file.size <= 10 * 1024 * 1024) {
+            const smallUploadRes = await uploadSmallFiles({
+              channelId,
+              workspaceId,
+              file,
+            });
+            if (smallUploadRes.code === '200' && smallUploadRes.fileId) {
+              // 비디오인 경우 썸네일 업로드
+              if (file.type.startsWith('video/')) {
+                const processed = await processFile(file);
+                if (processed?.thumbnailFile) {
+                  await uploadThumbnail({
+                    fileId: smallUploadRes.fileId,
+                    thumbnail: processed.thumbnailFile,
+                  });
+                }
+              }
+              setUploadedFileIds((prev) => [...prev, smallUploadRes.fileId]);
+            }
+          } else {
+            // (B) 10MB 초과 -> 청크 업로드
+            const chunks = await createChunks(file);
+            const totalSize = file.size;
+            const tempFileIdentifier = generateTempFileIdentifier(
+              userId,
+              timestamp,
+              i + 1,
+            );
+            const uploadResponses = await uploadChunksQueue(
+              chunks,
+              channelId,
+              workspaceId,
+              tempFileIdentifier,
+              totalSize,
+            );
 
-      const response = await uploadFiles(payload);
-      console.log('Upload response:', response);
-
-      // 미리보기 상태(FileData) 생성 및 추가
-      const newFileData: FileData = {
-        workspaceId: workspaceId.toString(),
-        channelId: channelId.toString(),
-        file: fileArray,
-        thumbnailUrl: thumbnailArray.filter(
-          (thumb): thumb is File => thumb !== null,
-        ),
-      };
-
-      setSelectedFiles((prev) => [...prev, newFileData]);
+            // 청크 업로드 응답에서 fileId를 찾고, 비디오 썸네일 업로드
+            for (const res of uploadResponses) {
+              if (res.code === '200' && res.fileId && res.fileType) {
+                const finalFileId = res.fileId;
+                if (file.type.startsWith('video/')) {
+                  const processed = await processFile(file);
+                  if (processed?.thumbnailFile) {
+                    await uploadThumbnail({
+                      fileId: finalFileId,
+                      thumbnail: processed.thumbnailFile,
+                    });
+                  }
+                }
+                setUploadedFileIds((prev) => [...prev, finalFileId]);
+              }
+            }
+          }
+        } finally {
+          setFilePreviews((prev) =>
+            prev.map((fp) =>
+              fp.file.name === file.name ? { ...fp, isLoading: false } : fp,
+            ),
+          );
+        }
+      }
     } catch (err) {
       console.error('Error during file processing/upload:', err);
       setError(err as Error);
     } finally {
-      setIsLoading(false);
+      setIsFinalLoading(false);
     }
   };
 
+  // 선택한 파일 삭제 처리
   const handleRemoveFile = (index: number) => {
-    setSelectedFiles((prev) => {
+    setFilePreviews((prev) => {
       const newFiles = [...prev];
       newFiles.splice(index, 1);
       return newFiles;
@@ -115,9 +168,11 @@ export const useFileManagements = (workspaceId: number, channelId: number) => {
   return {
     handleFileChange,
     handleRemoveFile,
-    selectedFiles,
-    setSelectedFiles,
-    isLoading,
+    filePreviews,
+    setFilePreviews,
+    isFinalLoading,
     error,
+    uploadedFileIds,
+    setUploadedFileIds,
   };
-};
+}

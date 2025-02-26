@@ -6,7 +6,7 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 topic:
-  push: jootalkpia.push.prd.notification
+  push: jootalkpia.push.prd.message
 group:
   push: notification-handle-consumer-group
 

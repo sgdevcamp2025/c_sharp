@@ -1,8 +1,8 @@
 'use server';
 
 import { postRequest } from '@/src/shared/services';
-import { cookies } from 'next/headers';
 import { AuthToken, User } from '@/src/entities';
+import { setCookie } from '@/src/shared/services/lib';
 
 type LoginRes = {
   user: User;
@@ -15,7 +15,6 @@ type LoginReq = {
 
 export const requestLogin = async (authorizationCode: string) => {
   const { user, token } = await postRequest<LoginRes, LoginReq>(
-    'gateway',
     `/api/v1/user/login?authorizationCode=${authorizationCode}`,
     {
       platform: 'KAKAO',
@@ -23,12 +22,9 @@ export const requestLogin = async (authorizationCode: string) => {
     },
   );
 
-  const cookieOptions = {
-    secure: process.env.MODE === 'production',
-  };
-  cookies().set('userId', String(user.userId), cookieOptions);
-  cookies().set('accessToken', token.accessToken, cookieOptions);
-  cookies().set('refreshToken', token.refreshToken, cookieOptions);
+  setCookie('userId', user.userId);
+  setCookie('accessToken', token.accessToken);
+  setCookie('refreshToken', token.refreshToken);
 
   return user;
 };

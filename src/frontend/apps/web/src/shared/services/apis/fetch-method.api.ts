@@ -45,11 +45,10 @@ type RequestOptions<TBody = never> = Omit<FetchOptions<TBody>, 'body'>;
  */
 
 export async function getRequest<TResponse>(
-  serverType: ApiServerType,
   url: string,
   options?: RequestOptions,
 ): Promise<TResponse> {
-  return fetchInstance<TResponse>(serverType, url, 'GET', options);
+  return fetchInstance<TResponse>(url, 'GET', options);
 }
 
 /**
@@ -82,12 +81,11 @@ export async function getRequest<TResponse>(
  */
 
 export async function postRequest<TResponse, TBody = JsonValue>(
-  serverType: ApiServerType,
   url: string,
   body: TBody,
   options?: RequestOptions<TBody>,
 ): Promise<TResponse> {
-  return fetchInstance<TResponse, TBody>(serverType, url, 'POST', {
+  return fetchInstance<TResponse, TBody>(url, 'POST', {
     ...options,
     body,
   });
@@ -124,12 +122,11 @@ export async function postRequest<TResponse, TBody = JsonValue>(
  *
  */
 export async function patchRequest<TResponse, TBody = JsonValue>(
-  serverType: ApiServerType,
   url: string,
   body: TBody,
   options?: RequestOptions<TBody>,
 ): Promise<TResponse> {
-  return fetchInstance<TResponse, TBody>(serverType, url, 'PATCH', {
+  return fetchInstance<TResponse, TBody>(url, 'PATCH', {
     ...options,
     body,
   });
@@ -168,12 +165,11 @@ export async function patchRequest<TResponse, TBody = JsonValue>(
  * @throws {NetworkError} 네트워크 연결에 문제가 있을 때 발생합니다
  */
 export async function deleteRequest<TResponse, TBody = JsonValue>(
-  serverType: ApiServerType,
   url: string,
   body?: TBody,
   options?: RequestOptions<TBody>,
 ): Promise<TResponse> {
-  return fetchInstance<TResponse, TBody>(serverType, url, 'DELETE', {
+  return fetchInstance<TResponse, TBody>(url, 'DELETE', {
     ...options,
     body,
   });

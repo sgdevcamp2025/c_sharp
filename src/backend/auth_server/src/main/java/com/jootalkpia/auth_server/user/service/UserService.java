@@ -20,6 +20,7 @@ import com.jootalkpia.auth_server.user.dto.response.UserDto;
 import com.jootalkpia.auth_server.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,6 +30,9 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenService tokenService;
     private final KakaoSocialService kakaoSocialService;
+
+    @Value("${default_image}")
+    private String defaultImage;
 
     public LoginResponse create(
             final String authorizationCode,
@@ -59,7 +63,7 @@ public class UserService {
                 userResponse.email(),
                 userResponse.platform(),
                 userResponse.socialNickname()+"#"+userResponse.socialId(),
-                "https://github.com/user-attachments/assets/7e8fc602-6c3e-47bc-a8f4-6a84784a68da"
+                defaultImage
         );
         return userRepository.save(user);
     }

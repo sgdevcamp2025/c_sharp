@@ -90,12 +90,11 @@ export function WebSocketProvider({
         } else {
           pingCount.current = 0;
 
-          // 응답을 REQUESTLIST와 매칭하여 저장
           const matchedIndex = REQUESTLIST.findIndex(([_, __, code]) =>
             event.data.includes(code),
           );
           if (matchedIndex !== -1) {
-            setters[matchedIndex](event.data); // 해당 종목 코드의 setter를 호출하여 데이터 업데이트
+            setters[matchedIndex](event.data);
           } else {
             console.warn('❌ 응답에서 종목 코드를 찾을 수 없음:', event.data);
           }

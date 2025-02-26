@@ -7,6 +7,7 @@ import {
   RQProvider,
   WebSocketProvider,
 } from '@/src/shared';
+import { getUserIdFromCookie } from '@/src/shared/services/lib';
 
 import '@workspace/ui/globals.css';
 
@@ -15,6 +16,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const userId = await getUserIdFromCookie();
   const token = await getAccessToken();
   return (
     <>
@@ -23,11 +25,11 @@ export default async function RootLayout({
       </header>
       <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">
         <AuthWrapper>
-          <StompWebSocketProvider userId={1}>
-            <RQProvider>
+          <RQProvider>
+            <StompWebSocketProvider userId={userId}>
               <WebSocketProvider token={token}>{children}</WebSocketProvider>
-            </RQProvider>
-          </StompWebSocketProvider>
+            </StompWebSocketProvider>
+          </RQProvider>
         </AuthWrapper>
       </div>
     </>
