@@ -1,14 +1,19 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage, Button, Input } from '@workspace/ui/components';
+import { useUserStore } from '@/src/entities';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Input,
+} from '@workspace/ui/components';
 
 const ProfilePicture = () => {
-  //임시변수
   const isPictureEditMode = false;
-  const pictureUrl = 'https://github.com/shadcn.png';
-
+  const profileImage = useUserStore((state) => state.user?.profileImage ?? '');
   return (
-    <div className="w-full flex flex-col items-end">
+    <div className="w-full flex flex-col items-end gap-1">
       {isPictureEditMode ? (
         <Input
           id="picture"
@@ -19,7 +24,7 @@ const ProfilePicture = () => {
           variant="default"
           className="w-full h-full"
         >
-          <AvatarImage src={pictureUrl} />
+          <AvatarImage src={profileImage} />
           <AvatarFallback>Profile Image</AvatarFallback>
         </Avatar>
       )}

@@ -18,89 +18,95 @@ export type ContentTextProps = {
 
 const ContentText = ({
   type,
-  // avatarUrls,
   message,
-  // setIsThreadOpen,
   hideUserInfo = false,
 }: ContentTextProps) => {
-  console.log('123', message);
+  // console.log('123', message);
   const formattedTime = formatChatTime(
     message.common.threadDateTime,
     hideUserInfo,
   );
+  console.log('messages!', message);
 
   return (
     <div className="flex w-full justify-between">
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full group">
+        {/* ---- 상단: 닉네임 + 시간 + 뱃지 ---- */}
+        {!hideUserInfo && (
+          <div className="flex items-center gap-2 mb-2">
+            <div className="text-base font-bold">
+              {message.common.userNickname}
+            </div>
+            <div className="text-sm text-gray-500">{formattedTime}</div>
+            {type === 'live' && (
+              <Badge
+                variant="default"
+                size="sm"
+              >
+                Live
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* ---- 메시지 내용 (TEXT + IMAGE + VIDEO) ---- */}
         <div className="flex flex-col">
-          {!hideUserInfo ? (
-            <div className="flex items-center gap-2">
-              <div className="text-base font-bold">
-                {message.common.userNickname}
-              </div>
-              <div className="text-sm text-gray-500">{formattedTime}</div>
-              {type === 'live' && (
-                <Badge
-                  variant="default"
-                  size="sm"
+          {message.message.map((msg, idx) => {
+            if (msg.type === 'TEXT') {
+              return (
+                <div
+                  key={idx}
+                  className="flex gap-4 items-center"
                 >
-                  Live
-                </Badge>
-              )}
-            </div>
-          ) : (
-            <></>
-          )}
-          {message.message.map((msg, idx) => (
-            <div
-              key={idx}
-              className="text-base flex gap-4 items-center"
-            >
-              {hideUserInfo && (
-                <div className="flex flex-col items-end w-10 h-full text-sm text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-                  {formattedTime}
+                  {hideUserInfo && (
+                    <div className="w-10 opacity-0 group-hover:opacity-100 transition-opacity text-sm text-gray-500">
+                      {formattedTime}
+                    </div>
+                  )}
+                  <div className="whitespace-pre-line break-words pb-2 text-base">
+                    {msg.text.replace(/\\n/g, '\n')}
+                  </div>
                 </div>
-              )}
-              {msg.type === 'TEXT' && (
-                <div className="whitespace-pre-line break-words">
-                  {msg.text.replace(/\\n/g, '\n')}
-                </div>
-              )}
-              {msg.type === 'IMAGE' && (
-                <Image
-                  src={msg.imageUrl}
-                  alt="Image"
-                  className="w-32 h-32"
-                />
-              )}
-              {msg.type === 'VIDEO' && (
-                <video
-                  controls
-                  className="w-48 h-48"
-                >
-                  <source
-                    src={msg.videoUrl}
-                    type="video/mp4"
+              );
+            }
+            return null;
+          })}
+
+          <div
+            className={`flex flex-wrap gap-4 ${hideUserInfo ? 'pl-14' : ''}`}
+          >
+            {message.message.map((msg, idx) => {
+              if (msg.type === 'IMAGE') {
+                return (
+                  <Image
+                    key={idx}
+                    src={msg.imageUrl}
+                    alt="Image"
+                    width={256}
+                    height={256}
+                    className="max-w-72 max-h-72 object-cover border border-gray-300 rounded-md"
                   />
-                </video>
-              )}
-            </div>
-          ))}
+                );
+              }
+              if (msg.type === 'VIDEO') {
+                return (
+                  <video
+                    key={idx}
+                    controls
+                    className="w-48 h-48 object-cover border border-rounded-md border-gray-300 rounded-md"
+                  >
+                    <source
+                      src={msg.videoUrl}
+                      type="video/mp4"
+                    />
+                  </video>
+                );
+              }
+              return null;
+            })}
+          </div>
         </div>
-        {/* <div onClick={() => setIsThreadOpen(true)}>
-        <AvatarList
-          avatarUrls={avatarUrls}
-          setIsThreadOpen={setIsThreadOpen}
-        />
-      </div> */}
       </div>
-      {/* <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-        <MessageSquareText
-          size="15"
-          className="cursor-pointer hover:text-gray-600"
-          onClick={() => setIsThreadOpen(true)}
-        />
-      </div> */}
     </div>
   );
 };

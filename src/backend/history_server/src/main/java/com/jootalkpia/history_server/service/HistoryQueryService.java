@@ -38,9 +38,29 @@ public class HistoryQueryService {
         return new ChatMessagePageResponse(hasNext, lastThreadId, responseMessages);
     }
 
+    public ChatMessagePageResponse getChatMessagesBackward(Long channelId, Long cursorId, int size, Long userId) {
+        List<ChatMessage> chatMessageList = fetchMessagesBackward(channelId, cursorId, size, userId);
+
+        if (chatMessageList.isEmpty()) {
+            return new ChatMessagePageResponse(false, null, Collections.emptyList());
+        }
+
+        List<ThreadDto> responseMessages = convertToDtoList(chatMessageList);
+        boolean hasNext = determineHasNext(responseMessages, size);
+
+        // size + 1로 조회했으므로, 초과한 1개 데이터 제거
+        if (hasNext) {
+            responseMessages = responseMessages.subList(0, size);
+        }
+
+        Long lastThreadId = getLastThreadId(responseMessages);
+
+        return new ChatMessagePageResponse(hasNext, lastThreadId, responseMessages);
+    }
+
 
     /**
-     * DB에서 채팅 메시지를 조회하는 메서드
+     * DB에서 채팅 메시지를 정방향으로 조회하는 메서드
      */
     private List<ChatMessage> fetchMessagesForward(Long channelId, Long cursorId, int size, Long userId) {
         if (cursorId == null) {
@@ -56,6 +76,34 @@ public class HistoryQueryService {
 
         return chatMessageRepository.findByChannelIdAndThreadIdGreaterThanOrderByThreadIdAsc(
                 channelId, cursorId, PageRequest.of(0, size + 1));
+    }
+
+    /**
+     * DB에서 채팅 메시지를 역방향으로 조회하는 메서드
+     */
+    private List<ChatMessage> fetchMessagesBackward(Long channelId, Long cursorId, int size, Long userId) {
+        Long lastReadId = cursorId;
+
+        // 첫 요청 시 처리
+        if (cursorId == null) {
+            lastReadId = userChannelRepository.findLastReadIdByUserIdAndChannelId(userId, channelId);
+
+            // lastReadId가 null이면 (첫 입장 시) 가장 최신 메세지로 설정
+            if (lastReadId == null) {
+                lastReadId = chatMessageRepository.findTopByChannelIdOrderByThreadIdDesc(channelId)
+                        .map(ChatMessage::getThreadId) // 가장 최신 메시지의 threadId 반환
+                        .orElse(null); // 채널에 메시지가 없으면 null 반환
+            }
+
+            // 채널 내 메시지가 없는 경우 빈 리스트 반환
+            if (lastReadId == null) {
+                return Collections.emptyList();
+            }
+        }
+
+        // lastReadId 이하의 메시지를 최신순 (DESC)으로 조회
+        return chatMessageRepository.findByChannelIdAndThreadIdLessThanEqualOrderByThreadIdDesc(
+                channelId, lastReadId, PageRequest.of(0, size + 1));
     }
 
     /**

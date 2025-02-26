@@ -4,7 +4,7 @@ export const VideoPreview = ({
   thumbnailUrl,
   onClick,
 }: {
-  thumbnailUrl: string;
+  thumbnailUrl: string | null;
   onClick: () => void;
 }) => {
   return (

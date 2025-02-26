@@ -28,3 +28,5 @@ jwt:
 
 kakao:
   clientId: ${KAKAO_CLIENTID}
+
+default_image: ${DEFAULT_IMAGE_S3}

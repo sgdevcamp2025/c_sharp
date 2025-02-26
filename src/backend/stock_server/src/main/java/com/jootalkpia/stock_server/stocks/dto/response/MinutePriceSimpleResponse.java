@@ -5,16 +5,16 @@ import com.jootalkpia.stock_server.stocks.dto.MinutePrice;
 import static com.jootalkpia.stock_server.stocks.advice.util.StockValidationUtils.validateMinutePriceOutput;
 
 public record MinutePriceSimpleResponse(
-        String code,
-        String htsKorIsnm,
-        String stckBsopDate,
-        String stckCntgHour,
-        String stckPrpr,
-        String stckOprc,
-        String stckHgpr,
-        String stckLwpr,
-        String cntgVol,
-        String acmlTrPbmn
+        String code, //주식 코드
+        String stockName, // 이름
+        String businessDate, // 영업 일자
+        String tradingTime, // 체결 시간
+        String currentPrice, //현재가
+        String openingPrice, // 시가2
+        String highPrice, //최고가
+        String lowPrice, //최저가
+        String tradingVolume, //체결 거래량
+        String totalTradeAmount // 누적 거래 대금
 ) {
 
     public static MinutePriceSimpleResponse from(MinutePriceDetailedResponse minutePriceDto, String code) {
@@ -37,15 +37,15 @@ public record MinutePriceSimpleResponse(
     public MinutePrice toDocument() {
         return MinutePrice.of(
                 code,
-                htsKorIsnm,
-                stckBsopDate,
-                stckCntgHour,
-                stckPrpr,
-                stckOprc,
-                stckHgpr,
-                stckLwpr,
-                cntgVol,
-                acmlTrPbmn
+                stockName,
+                businessDate,
+                tradingTime,
+                currentPrice,
+                openingPrice,
+                highPrice,
+                lowPrice,
+                tradingVolume,
+                totalTradeAmount
         );
     }
 }

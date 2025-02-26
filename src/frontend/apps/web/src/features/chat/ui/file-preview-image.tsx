@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-export const ImagePreivew = ({
+export const ImagePreview = ({
   preview,
   onClick,
 }: {

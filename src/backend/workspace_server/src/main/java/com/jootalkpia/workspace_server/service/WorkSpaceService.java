@@ -2,7 +2,9 @@ package com.jootalkpia.workspace_server.service;
 
 import com.jootalkpia.workspace_server.dto.ChannelListDTO;
 import com.jootalkpia.workspace_server.dto.SimpleChannel;
+import com.jootalkpia.workspace_server.dto.WorkspaceToKafka;
 import com.jootalkpia.workspace_server.entity.Channels;
+import com.jootalkpia.workspace_server.entity.ChatMessage;
 import com.jootalkpia.workspace_server.entity.UserChannel;
 import com.jootalkpia.workspace_server.entity.Users;
 import com.jootalkpia.workspace_server.entity.WorkSpace;
@@ -20,17 +22,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class WorkSpaceService {
 
+    private final MongoTemplate mongoTemplate;
     private final ChannelRepository channelRepository;
     private final UserChannelRepository userChannelRepository;
     private final WorkSpaceRepository workSpaceRepository;
     private final UserRepository userRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final KafkaProducer kafkaProducer;
 
     public ChannelListDTO getChannels(Long userId, Long workspaceId) {
         // workspaceId로 모든 채널 조회
@@ -56,10 +63,38 @@ public class WorkSpaceService {
         for (Channels channel : channelList) {
             boolean joined = isUserInChannel(userId, channel.getChannelId());
             if (joined == isJoined) {
-                classifiedChannels.add(new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt()));
+                long unreadNum = joined ? countUnreadMessages(userId, channel.getChannelId()) : 0;
+
+                classifiedChannels.add(new SimpleChannel(
+                        channel.getChannelId(),
+                        channel.getName(),
+                        channel.getCreatedAt(),
+                        unreadNum
+                ));
             }
         }
         return classifiedChannels;
+    }
+
+
+    public long countUnreadMessages(Long userId, Long channelId) {
+        UserChannel userChannel = userChannelRepository.findByUsersUserIdAndChannelsChannelId(userId, channelId)
+                .orElse(null);
+
+        if (userChannel == null) {
+            return 0; // 사용자가 채널에 없으면 0 반환
+        }
+
+        Long lastReadId = userChannel.getLastReadId();
+        if (lastReadId == null) {
+            lastReadId = 0L;
+        }
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("channel_id").is(channelId)
+                .and("thread_id").gt(lastReadId)); // lastReadId보다 큰 thread_id 검색
+
+        return mongoTemplate.count(query, ChatMessage.class);
     }
 
     private boolean isUserInChannel(Long userId, Long channelId) {
@@ -73,7 +108,7 @@ public class WorkSpaceService {
         return channelListDTO;
     }
 
-    public SimpleChannel createChannel(Long workspaceId, String channelName) {
+    public SimpleChannel createChannel(Long workspaceId, String channelName,Long userId) {
         // WorkSpace 객체 조회
         WorkSpace workSpace = fetchWorkSpace(workspaceId);
 
@@ -88,7 +123,14 @@ public class WorkSpaceService {
 
         channelRepository.save(channel);
 
-        return new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt());
+        kafkaProducer.sendChannelStatusMessage(
+                new WorkspaceToKafka(workspaceId,
+                                    userId,
+                                    channel.getChannelId(),
+                                    channel.getName()
+                                    ,channel.getCreatedAt()));
+
+        return new SimpleChannel(channel.getChannelId(), channel.getName(), channel.getCreatedAt(),0L);
     }
 
     private boolean isChannelNameDuplicate(Long workspaceId, String channelName) {
