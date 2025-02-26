@@ -41,6 +41,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //common-module
+    implementation project(":common_module")
 }
 
 tasks.named('test') {
