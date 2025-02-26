@@ -1,7 +1,6 @@
 package com.jootalkpia.chat_server.service;
 
 import com.jootalkpia.chat_server.domain.Files;
-import com.jootalkpia.chat_server.domain.Thread;
 import com.jootalkpia.chat_server.domain.User;
 import com.jootalkpia.chat_server.dto.ChatMessageToKafka;
 import com.jootalkpia.chat_server.dto.messgaeDto.ChatMessageRequest;
@@ -11,10 +10,13 @@ import com.jootalkpia.chat_server.dto.messgaeDto.MessageResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.TextResponse;
 import com.jootalkpia.chat_server.dto.messgaeDto.VideoResponse;
 import com.jootalkpia.chat_server.repository.jpa.FileRepository;
-import com.jootalkpia.chat_server.repository.jpa.ThreadRepository;
 import com.jootalkpia.chat_server.repository.jpa.UserRepository;
 import com.jootalkpia.chat_server.util.DateTimeUtil;
+import com.jootalkpia.chat_server.util.SnowflakeIdGenerator;
 import jakarta.transaction.Transactional;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,7 @@ public class ChatService {
 
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
-    private final ThreadRepository threadRepository;
+    private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     @Transactional
     public void processChatMessage(ChatMessageRequest request, Long channelId) {
@@ -41,13 +43,17 @@ public class ChatService {
 
     private CommonResponse createCommonData(Long userId, Long channelId){
         User user = userRepository.findByUserId(userId);
-        Thread thread = new Thread();   // todo:transaction처리 , 예외처리 필요
-        threadRepository.save(thread);
+
+        Long threadId = snowflakeIdGenerator.nextId();
+
+        LocalDateTime now = Instant.ofEpochMilli(System.currentTimeMillis())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
 
         return CommonResponse.builder()
                 .channelId(channelId)
-                .threadId(thread.getThreadId())
-                .threadDateTime(DateTimeUtil.formatDateTime(thread.getCreatedAt()))
+                .threadId(threadId)
+                .threadDateTime(DateTimeUtil.formatDateTime(now))
                 .userId(user.getUserId())
                 .userNickname(user.getNickname())
                 .userProfileImage(user.getProfileImage())
