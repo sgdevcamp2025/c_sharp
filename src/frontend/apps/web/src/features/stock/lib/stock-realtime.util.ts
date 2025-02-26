@@ -1,12 +1,11 @@
 const formatRealTimeStock = (data: string) => {
   const stock = data.split('^');
-
   return {
     businessDate: stock[33] || '',
     code: stock[0] || '',
     tradingTime: stock[1] || '',
-    currentPrice: stock[1] || '',
-    priceChange: stock[4] || '',
+    currentPrice: stock[2] || '',
+    priceChange: stock[5] || '',
     openPrice: stock[37] || '',
     highPrice: stock[9] || '',
     lowPrice: stock[10] || '',

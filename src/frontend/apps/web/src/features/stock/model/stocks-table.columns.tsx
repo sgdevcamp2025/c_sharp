@@ -22,7 +22,7 @@ export const columns: ColumnDef<RealTimeStock>[] = [
       </Button>
     ),
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue('priceChange'));
+      const price = parseFloat(row.getValue('currentPrice'));
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'decimal',
         currency: 'KRW',

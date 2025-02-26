@@ -44,7 +44,6 @@ const StocksListTable = () => {
   const formatted = stockData.map((data) =>
     StockForTable(data.data, data.code),
   );
-  console.log(formatted);
   const table = useReactTable({
     data: formatted,
     columns,
