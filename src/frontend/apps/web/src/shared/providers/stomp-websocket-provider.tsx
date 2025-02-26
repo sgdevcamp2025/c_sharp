@@ -16,6 +16,7 @@ import SockJS from 'sockjs-client';
 type WebSocketContextProps = {
   client: StompJs.Client | null;
   isConnected: boolean;
+  sessionId: string;
 };
 
 type WebSocketProviderProps = {
@@ -31,8 +32,7 @@ export const StompWebSocketProvider = ({
 }: WebSocketProviderProps) => {
   const client = useRef<StompJs.Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-
-  // const BASE_URL = `http://${process.env.NEXT_PUBLIC_BASE_URL}:${process.env.NEXT_PUBLIC_CHAT_SERVER1_PORT}`;
+  const sessionId = useRef<string | null>(null);
   const BASE_URL = `${process.env.NEXT_PUBLIC_REAL_BASE_URL}`;
 
   const connect = useCallback(() => {
@@ -50,6 +50,21 @@ export const StompWebSocketProvider = ({
       onConnect: () => {
         console.log('✅ WebSocket Connected');
         setIsConnected(true);
+
+        const socketUrl = client.current.webSocket['_transport'].ws.url;
+        sessionId.current = socketUrl.split('/').slice(-2, -1)[0];
+
+        client.current.subscribe(
+          `/subscribe/notification.${sessionId.current}`,
+          (message) => {
+            try {
+              const payload = JSON.parse(message.body);
+              console.log('📩 Received:', payload);
+            } catch (error) {
+              console.error('❌ 메시지 파싱 실패:', error);
+            }
+          },
+        );
       },
       onStompError: (frame) => {
         console.error('❌ Broker error:', frame.headers['message'], frame.body);
@@ -73,7 +88,11 @@ export const StompWebSocketProvider = ({
 
   return (
     <StompWebSocketContext.Provider
-      value={{ client: client.current, isConnected }}
+      value={{
+        client: client.current,
+        isConnected,
+        sessionId: sessionId.current,
+      }}
     >
       {children}
     </StompWebSocketContext.Provider>
