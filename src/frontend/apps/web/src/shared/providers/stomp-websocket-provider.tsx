@@ -12,6 +12,9 @@ import {
 import * as StompJs from '@stomp/stompjs';
 
 import SockJS from 'sockjs-client';
+import EventEmitter from 'events';
+
+export const webSocketEvent = new EventEmitter();
 
 type WebSocketContextProps = {
   client: StompJs.Client | null;
@@ -60,6 +63,8 @@ export const StompWebSocketProvider = ({
             try {
               const payload = JSON.parse(message.body);
               console.log('📩 Received:', payload);
+
+              webSocketEvent.emit('alarmReceived', payload);
             } catch (error) {
               console.error('❌ 메시지 파싱 실패:', error);
             }
