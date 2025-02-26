@@ -1,9 +1,9 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { Stock } from './stock.types';
+import { StockTable } from './stock.types';
 import { Button } from '@workspace/ui/components';
 import { ArrowUpDown } from 'lucide-react';
 
-export const columns: ColumnDef<Stock>[] = [
+export const columns: ColumnDef<StockTable>[] = [
   {
     accessorKey: 'name',
     header: () => <div className="text-left">종목명</div>,

@@ -11,7 +11,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { Stock, columns } from '../model';
+import { StockTable, columns } from '../model';
 import {
   Button,
   DropdownMenu,
@@ -29,7 +29,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
 
-const Stockdata: Stock[] = [
+const Stockdata: StockTable[] = [
   {
     id: '1',
     name: '삼성전자',
