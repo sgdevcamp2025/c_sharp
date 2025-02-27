@@ -34,7 +34,11 @@ export function WebSocketProvider({
   const [data4, setData4] = useState('');
   const [data5, setData5] = useState('');
   const setters = [setData1, setData2, setData3, setData4, setData5];
-  const url = 'ws://ops.koreainvestment.com:31000';
+
+  let url = 'wss://ops.koreainvestment.com:31000';
+  if (process.env.NEXT_PUBLIC_MODE === 'local') {
+    url = 'ws://ops.koreainvestment.com:31000';
+  }
   useEffect(() => {
     console.log('✅ [Token Received]:', token);
 
