@@ -14,9 +14,10 @@ export type ChatHistoryProps = {
 
 const ChatReverseHistory = ({ containerRef }: ChatHistoryProps) => {
   const { channelId } = useChatId();
-  const initialCursor = undefined;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useReverseInfiniteHistory(channelId, initialCursor);
+    useReverseInfiniteHistory(channelId);
+
+  console.log(data?.pages[0].lastCursorId);
 
   const messages = data?.pages.flatMap((page) => page.threads) ?? [];
 

@@ -16,7 +16,7 @@ const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
 
   const initialCursor = undefined;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useForwardInfiniteHistory(Number(channelId), initialCursor);
+    useForwardInfiniteHistory(Number(channelId));
 
   const messages = data?.pages.flatMap((page) => page.threads) ?? [];
   const processedThreads = processChatHistory(messages);
