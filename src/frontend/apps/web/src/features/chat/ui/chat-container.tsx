@@ -5,16 +5,17 @@ import { SidebarContainer } from '@/src/features/workspace';
 
 import ChatHeader from './chat-header';
 import ChatSection from './chat-section';
-import { useWebSocketClient } from '../model';
+import { useChatSubscribe } from '../model';
 import { useEffect } from 'react';
+import { useChatId } from '@/src/shared';
 
 type ChatContainerProps = {
   stockSlug: string;
 };
 
 const ChatContainer = ({ stockSlug }: ChatContainerProps) => {
-  const channelId = 1;
-  const { subscribe, isConnected } = useWebSocketClient(channelId);
+  const { channelId } = useChatId();
+  const { subscribe, isConnected } = useChatSubscribe(channelId);
 
   useEffect(() => {
     if (!isConnected) return;
@@ -30,7 +31,7 @@ const ChatContainer = ({ stockSlug }: ChatContainerProps) => {
       <SidebarContainer stockSlug={stockSlug} />
       <SidebarInset className="flex flex-col min-w-0 min-h-0 w-full h-full">
         <ChatHeader stockSlug={stockSlug} />
-        <ChatSection />
+        <ChatSection stockSlug={stockSlug} />
       </SidebarInset>
     </SidebarProvider>
   );

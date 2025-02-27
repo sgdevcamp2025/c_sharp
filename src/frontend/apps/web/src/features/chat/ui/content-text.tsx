@@ -4,15 +4,12 @@ import { Badge } from '@workspace/ui/components';
 
 import type { WebSocketResponsePayload } from '../model';
 import { formatChatTime } from '../lib';
-// import { MessageSquareText } from 'lucide-react';
-// import AvatarList from './avatarlist';
-// import type { ChatContentWithAvatarsProps } from './chat-content';
 
 export type ContentTextProps = {
   type?: 'default' | 'live';
-  // avatarUrls?: string[];
+
   message: WebSocketResponsePayload;
-  // setIsThreadOpen: (value: boolean) => void;
+
   hideUserInfo?: boolean;
 };
 
@@ -21,12 +18,11 @@ const ContentText = ({
   message,
   hideUserInfo = false,
 }: ContentTextProps) => {
-  // console.log('123', message);
   const formattedTime = formatChatTime(
     message.common.threadDateTime,
     hideUserInfo,
   );
-  console.log('messages!', message);
+  // console.log('messages!', message);
 
   return (
     <div className="flex w-full justify-between">

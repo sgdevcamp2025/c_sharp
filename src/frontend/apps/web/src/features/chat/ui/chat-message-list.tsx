@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import ChatMessageItem from './chat-message-item';
 import ChatReverseHistory from './chat-history-reverse';
 import ChatForwardHistory from './chat-history-forward';
@@ -18,7 +16,6 @@ const ChatMessageList = ({
   messages = [],
 }: ChatContentProps) => {
   const { bottomRef, containerRef } = useChatAutoScroll(messages);
-  const [isAtBottom, setIsAtBottom] = useState(true);
 
   // if (!messages || messages.length === 0) return null;
   // console.log('🔗 ChatContent:', { messages });

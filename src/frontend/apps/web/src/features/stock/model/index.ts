@@ -6,5 +6,5 @@ export {
   ChartType,
 } from './stock.types';
 export { columns } from './stocks-table.columns';
-export { dummyStockData } from './stock-chart.mock';
+export { dummyStockData, dummyRealTime } from './stock.mock';
 export { useStockChart } from './use-stock-chart';
