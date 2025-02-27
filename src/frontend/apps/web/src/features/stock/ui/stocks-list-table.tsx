@@ -11,7 +11,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { StockTable, columns } from '../model';
+import { columns } from '../model';
 import {
   Button,
   DropdownMenu,
@@ -28,8 +28,79 @@ import {
 } from '@workspace/ui/components';
 import { useRouter } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
-import { useWebSocket } from '@/src/shared';
-import { StockForTable } from '../lib';
+import { RealTimeStock } from '../model/stock.types';
+export const RealTimeDummy: RealTimeStock[] = [
+  {
+    slug: 'samsung',
+    name: '삼성전자',
+    businessDate: '2025-02-27',
+    code: '005930',
+    tradingTime: '15:30:00',
+    currentPrice: '78,500',
+    priceChange: '+1,200',
+    openPrice: '77,800',
+    highPrice: '79,200',
+    lowPrice: '77,500',
+    tradingVolume: '18,950,000',
+    totalTradeAmount: '1,487,850,000,000',
+  },
+  {
+    slug: 'sk-hynix',
+    name: 'SK하이닉스',
+    businessDate: '2025-02-27',
+    code: '000660',
+    tradingTime: '15:30:00',
+    currentPrice: '125,000',
+    priceChange: '+2,000',
+    openPrice: '123,500',
+    highPrice: '126,300',
+    lowPrice: '122,800',
+    tradingVolume: '9,560,300',
+    totalTradeAmount: '1,195,780,000,000',
+  },
+  {
+    slug: 'hanwha-aerospace',
+    name: '한화에어로스페이스',
+    businessDate: '2025-02-27',
+    code: '012450',
+    tradingTime: '15:30:00',
+    currentPrice: '98,700',
+    priceChange: '-500',
+    openPrice: '99,200',
+    highPrice: '100,000',
+    lowPrice: '97,800',
+    tradingVolume: '1,230,500',
+    totalTradeAmount: '121,563,750,000',
+  },
+  {
+    slug: 'kakao',
+    name: '카카오',
+    businessDate: '2025-02-27',
+    code: '035720',
+    tradingTime: '15:30:00',
+    currentPrice: '53,200',
+    priceChange: '-1,100',
+    openPrice: '54,000',
+    highPrice: '54,500',
+    lowPrice: '52,900',
+    tradingVolume: '5,780,400',
+    totalTradeAmount: '307,226,000,000',
+  },
+  {
+    slug: 'naver',
+    name: '네이버',
+    businessDate: '2025-02-27',
+    code: '035420',
+    tradingTime: '15:30:00',
+    currentPrice: '210,500',
+    priceChange: '+3,000',
+    openPrice: '208,000',
+    highPrice: '211,800',
+    lowPrice: '207,500',
+    tradingVolume: '3,120,800',
+    totalTradeAmount: '656,145,400,000',
+  },
+];
 
 const StocksListTable = () => {
   const router = useRouter();
@@ -39,13 +110,14 @@ const StocksListTable = () => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  const { stockData } = useWebSocket();
+  // const { stockData } = useWebSocket();
 
-  const formatted = stockData.map((data) =>
-    StockForTable(data.data, data.code),
-  );
+  // const formatted = stockData.map((data) =>
+  //   StockForTable(data.data, data.code),
+  // );
+  console.log(RealTimeDummy);
   const table = useReactTable({
-    data: formatted,
+    data: RealTimeDummy,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
