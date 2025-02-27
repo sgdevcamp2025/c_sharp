@@ -12,8 +12,12 @@ import com.jootalkpia.file_server.service.FileTypeDetector;
 import com.jootalkpia.file_server.utils.ValidationUtils;
 import com.jootalkpia.passport.anotation.CurrentUser;
 import com.jootalkpia.passport.component.UserInfo;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -47,12 +51,24 @@ public class FileController {
         return ResponseEntity.ok("Test successful");
     }
 
+    // 시간 측정을 위한 Map 선언
+    public static final Map<Long, Long> UPLOAD_TIME_TRACKER = new ConcurrentHashMap<>();
+    public static final List<Long> RESPONSE_TIMES = Collections.synchronizedList(new ArrayList<>());
+
     @GetMapping("/init-upload/{tempFileIdentifier}")
     public ResponseEntity<Map<String, Object>> initFileUpload(@PathVariable String tempFileIdentifier, @RequestParam String mimeType) {
         log.info("init-upload 요청 받음: {}", tempFileIdentifier);
 
+        // ✅ 요청 시작 시간 기록
+        long startTime = System.currentTimeMillis();
+        log.info("✅ 요청 시작 시간 (Unix Timestamp): {}, tempFileIdentifier: {}", startTime / 1000, tempFileIdentifier);
+        log.info("✅ 요청 시작 시간 (UTC): {}", java.time.Instant.now());
+
         // 초기화 처리
         Long fileId = fileService.initiateMultipartUpload(tempFileIdentifier, mimeType);
+
+        // ✅ UPLOAD_TIME_TRACKER에 시작 시간 저장
+        UPLOAD_TIME_TRACKER.put(fileId, startTime);
 
         // 초기화 완료 응답
         Map<String, Object> response = new HashMap<>();
@@ -60,6 +76,8 @@ public class FileController {
         response.put("status", "initialized");
         return ResponseEntity.ok(response);
     }
+
+
 
 //    @DeleteMapping("/fileId")
 //    public ResponseEntity<Void> deleteFile(@PathVariable Long fileId) {

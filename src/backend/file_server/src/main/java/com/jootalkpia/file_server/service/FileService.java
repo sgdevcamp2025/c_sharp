@@ -21,8 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -39,6 +42,11 @@ public class FileService {
     private final FileRepository fileRepository;
     private final FileTypeDetector fileTypeDetector;
     private final UserRepository userRepository;
+
+    @Autowired
+    @Qualifier("fileMergeExecutor")
+    private Executor fileMergeExecutor;
+
 
     // tempIdentifier: uploadId
     private static final ConcurrentHashMap<Long, String> UPLOAD_ID_STORAGE = new ConcurrentHashMap<>();
@@ -92,20 +100,27 @@ public class FileService {
                 // 마지막 청크 여부 확인
                 if (isLastChunk(totalChunks, uploadId)) {
                     synchronized (PART_TAG_STORAGE) {
-                        s3Service.completeMultipartUpload(fileId, uploadId, PART_TAG_STORAGE.get(uploadId),
-                                mimeType);
-                        log.info("모든 청크 업로드 완료 및 병합 완료: {}", uploadId);
+                        // ✅ 병합 작업을 병합 전용 스레드 풀에서 실행
+                        CompletableFuture.runAsync(() -> {
+                            s3Service.completeMultipartUpload(fileId, uploadId, PART_TAG_STORAGE.get(uploadId), mimeType);
+                            log.info("모든 청크 업로드 완료 및 병합 완료: {}", uploadId);
 
-                        // 상태 초기화
-                        synchronized (UPLOAD_ID_STORAGE) {
-                            UPLOAD_ID_STORAGE.remove(fileId);
-                        }
-                        synchronized (PART_TAG_STORAGE) {
-                            PART_TAG_STORAGE.remove(uploadId);
-                        }
+                            // ✅ time 로그, with fileId
+                            log.info("✅ 파일 병합 완료 시간 (Unix Timestamp): {}, fileId: {}", System.currentTimeMillis() / 1000, fileId);
+                            log.info("✅ 파일 병합 완료 시간 (UTC): {}", java.time.Instant.now());
+
+                            // 상태 초기화
+                            synchronized (UPLOAD_ID_STORAGE) {
+                                UPLOAD_ID_STORAGE.remove(fileId);
+                            }
+                            synchronized (PART_TAG_STORAGE) {
+                                PART_TAG_STORAGE.remove(uploadId);
+                            }
+                        }, fileMergeExecutor);  // ✅ 병합 작업 전용 스레드 풀 사용
                     }
                 }
             });
+
 
             // 각 청크 업로드 완료 시 응답
             Map<String, Object> response = new HashMap<>();

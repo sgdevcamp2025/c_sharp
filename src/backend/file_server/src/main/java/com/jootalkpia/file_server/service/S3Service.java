@@ -1,5 +1,8 @@
 package com.jootalkpia.file_server.service;
 
+import static com.jootalkpia.file_server.controller.FileController.RESPONSE_TIMES;
+import static com.jootalkpia.file_server.controller.FileController.UPLOAD_TIME_TRACKER;
+
 import com.jootalkpia.file_server.entity.FilesEntity;
 import com.jootalkpia.file_server.exception.common.CustomException;
 import com.jootalkpia.file_server.exception.common.ErrorCode;
@@ -113,7 +116,7 @@ public class S3Service {
         s3AsyncClient.completeMultipartUpload(completeRequest)
                 .thenAccept(completeMultipartUploadResponse -> {
                     log.info("S3 멀티파트 업로드 완료: {}", s3Key);
-                    log.info("source {}", bucketName+s3Key);
+                    log.info("source {}", bucketName + s3Key);
 
                     // Content-Type 설정을 위한 CopyObjectRequest 추가
                     CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
@@ -135,6 +138,44 @@ public class S3Service {
 
                                 filesEntity.setUrl(completeMultipartUploadResponse.location());
                                 fileRepository.save(filesEntity);
+
+                                // ✅ 업로드 완료 시간 기록
+                                long endTime = System.currentTimeMillis();
+                                log.info("✅ 파일 병합 완료 시간 (Unix Timestamp): {}, fileId: {}", endTime / 1000, fileId);
+                                log.info("✅ 파일 병합 완료 시간 (UTC): {}", java.time.Instant.now());
+
+                                // ✅ 시작 시간 가져오기 및 총 소요 시간 계산
+                                Long startTime = UPLOAD_TIME_TRACKER.get(fileId);
+                                if (startTime != null) {
+                                    long totalTime = endTime - startTime;
+                                    double totalTimeInSeconds = totalTime / 1000.0;
+                                    log.info("\n--- 결과 요약 ---");
+                                    log.info("총 소요 시간: {} 초, fileId: {}", totalTimeInSeconds, fileId);
+
+                                    // ✅ 응답 시간 통계 계산
+                                    double averageResponseTime = RESPONSE_TIMES.stream().mapToLong(Long::longValue).average().orElse(0.0);
+                                    long maxResponseTime = RESPONSE_TIMES.stream().mapToLong(Long::longValue).max().orElse(0L);
+                                    long minResponseTime = RESPONSE_TIMES.stream().mapToLong(Long::longValue).min().orElse(0L);
+
+                                    // ✅ 성공률 및 실패율 계산 (파일 1개 기준)
+                                    int totalRequests = RESPONSE_TIMES.size();
+                                    int successCount = totalRequests;
+                                    int failureCount = 0;
+                                    double successRate = (successCount / (double) totalRequests) * 100;
+                                    double failureRate = (failureCount / (double) totalRequests) * 100;
+
+                                    // ✅ 결과 요약 출력
+                                    log.info("\n--- 결과 요약 ---");
+                                    log.info("총 소요 시간: {} 초", totalTimeInSeconds);
+                                    log.info("성공률: {}%", successRate);
+                                    log.info("실패율: {}%", failureRate);
+
+                                    // ✅ UPLOAD_TIME_TRACKER 및 RESPONSE_TIMES 초기화
+                                    UPLOAD_TIME_TRACKER.remove(fileId);
+                                    RESPONSE_TIMES.clear();
+                                } else {
+                                    log.warn("❌ 시작 시간 정보 없음 - fileId: {}", fileId);
+                                }
                             }).exceptionally(ex -> {
                                 log.error("S3 Content-Type 설정 실패: {}", s3Key, ex);
                                 throw new CustomException(ErrorCode.CONTENT_TYPE_SETTING_FAILED.getCode(), "Content-Type 설정 실패");
@@ -145,6 +186,7 @@ public class S3Service {
                     throw new CustomException(ErrorCode.CHUNK_MERGING_FAILED.getCode(), ErrorCode.CHUNK_MERGING_FAILED.getMsg());
                 });
     }
+
 
 
     // 멀티파트 업로드 방식으로 S3에 파일 업로드
