@@ -2,12 +2,7 @@ import { ToastAlarm } from '@/src/features/alarm';
 import AuthWrapper from '@/src/features/auth/ui/auth-wrapper';
 import { getAccessToken } from '@/src/features/stock';
 import { ProfilePopover } from '@/src/features/user';
-import {
-  Header,
-  StompWebSocketProvider,
-  RQProvider,
-  WebSocketProvider,
-} from '@/src/shared';
+import { Header, StompWebSocketProvider, RQProvider } from '@/src/shared';
 import { getUserIdFromCookie } from '@/src/shared/services/lib';
 import { Toaster } from '@workspace/ui/components';
 
@@ -29,7 +24,7 @@ export default async function RootLayout({
         <AuthWrapper>
           <RQProvider>
             <StompWebSocketProvider userId={userId}>
-              <WebSocketProvider token={token}>{children}</WebSocketProvider>
+              {children}
             </StompWebSocketProvider>
           </RQProvider>
           <Toaster />
