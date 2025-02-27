@@ -11,7 +11,7 @@ const HuddleButon = ({ stockSlug }: { stockSlug: string }) => {
       size="sm"
     >
       <Link
-        href={`/stock/huddle?${stockSlug}`}
+        href={`/stock/${stockSlug}/huddle`}
         target="_blank"
         rel="noopener noreferrer"
       >
