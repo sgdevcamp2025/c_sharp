@@ -29,7 +29,7 @@ import { getWorkspaceId } from '../lib';
 const renderChannels = (
   channels: any[] | undefined,
   onChannelClick: (channelId: number) => void,
-  activeChannelId: number | null, // 활성 채널 ID 매개변수 추가
+  activeChannelId: number | null,
 ) => {
   if (!channels || channels.length === 0) {
     return (
@@ -38,7 +38,7 @@ const renderChannels = (
   }
 
   return channels.map((channel) => {
-    const isActive = channel.channelId === activeChannelId; // 현재 채널이 활성 상태인지 확인
+    const isActive = channel.channelId === activeChannelId;
 
     return (
       <SidebarMenuItem key={channel.channelId}>
@@ -66,14 +66,13 @@ const renderChannels = (
 
 const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
   const workspaceId = getWorkspaceId(stockSlug);
-  const { setChannelId, channelId } = useChatId(); // channelId도 가져오기
+  const { setChannelId, channelId } = useChatId();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeChannelId, setActiveChannelId] = useState<number | null>(null); // 활성 채널 상태 추가
+  const [activeChannelId, setActiveChannelId] = useState<number | null>(null);
 
   const { joinedChannels, unjoinedChannels, isLoading, error } =
     useWorkspaceChannels(workspaceId);
 
-  // 컴포넌트 마운트 시 로컬 스토리지에서 저장된 채널 ID 불러오기
   useEffect(() => {
     const storedChat = localStorage.getItem('chat');
     if (storedChat) {
@@ -99,8 +98,7 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
 
   const handleChannelClick = (channelId: number) => {
     setChannelId(channelId);
-    setActiveChannelId(channelId); // 활성 채널 업데이트
-
+    setActiveChannelId(channelId);
     const chatData = {
       workspace: workspaceId,
       channelId: channelId,
