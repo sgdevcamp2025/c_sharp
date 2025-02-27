@@ -10,7 +10,7 @@ import { ChartType, StockChartAPIResponse, useStockWebSocket } from '../model';
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/src/shared/services';
-
+import { dummyStockData } from '../model/stock.mock';
 const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
   const queryClient = useQueryClient();
   const { subscribe } = useStockWebSocket();
@@ -23,6 +23,7 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
     queryKey: QUERY_KEYS.stock(stockCode),
     queryFn: () => queryClient.getQueryData(QUERY_KEYS.stock(stockCode)),
   });
+
   return (
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel
@@ -32,7 +33,7 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
         className="flex items-center justify-center bg-gray-200"
       >
         <StockChartItem
-          data={stockData}
+          data={dummyStockData}
           type={ChartType.Candlestick}
         />
       </ResizablePanel>
@@ -44,7 +45,7 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
         className="flex items-center justify-center bg-gray-300"
       >
         <StockChartItem
-          data={stockData}
+          data={dummyStockData}
           type={ChartType.Histogram}
         />
       </ResizablePanel>
