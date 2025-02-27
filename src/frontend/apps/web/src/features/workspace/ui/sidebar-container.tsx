@@ -29,7 +29,6 @@ import {
 import { createWorkspace, getWorkspaceList, joinChannel } from '../api'; // joinChannel 추가
 import { getWorkspaceId } from '../lib';
 
-// 채널 렌더링 함수를 분리 (joinedChannels와 unjoinedChannels를 별도로 처리)
 const renderJoinedChannels = (
   channels: any[] | undefined,
   onChannelClick: (channelId: number) => void,
@@ -170,7 +169,7 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
     if (window.confirm(`'${channel.channelName}' 채널에 가입하시겠습니까?`)) {
       try {
         await joinChannel(workspaceId, channel.channelId);
-        getWorkspaceList(workspaceId);
+        refetch();
         handleChannelClick(channel.channelId);
       } catch (error) {
         console.error('채널 가입 실패:', error);

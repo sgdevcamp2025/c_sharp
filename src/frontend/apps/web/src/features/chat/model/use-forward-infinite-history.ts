@@ -23,5 +23,6 @@ export function useForwardInfiniteHistory(channelId: number) {
     initialPageParam: undefined,
     staleTime: Infinity,
     gcTime: Infinity,
+    enabled: !!channelId,
   });
 }

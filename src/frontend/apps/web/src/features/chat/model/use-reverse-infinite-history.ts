@@ -31,5 +31,6 @@ export function useReverseInfiniteHistory(channelId: number) {
 
     staleTime: Infinity,
     gcTime: Infinity,
+    enabled: !!channelId,
   });
 }

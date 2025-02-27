@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, QueryClient, useQueryClient } from '@tanstack/react-query';
 
 import { QUERY_KEYS } from '@/src/shared';
 
@@ -55,6 +55,7 @@ const workspaceReducer = (state: State, action: Action): State => {
 export const useWorkspaceChannels = (workspaceId: number) => {
   const { subscribe } = useWorkspaceSubscription(workspaceId);
   const { data: workspaceSocketMessage } = useWorkspaceMessages(workspaceId);
+  const queryClient = useQueryClient();
 
   const [state, dispatch] = useReducer(workspaceReducer, initialState);
 
@@ -113,7 +114,9 @@ export const useWorkspaceChannels = (workspaceId: number) => {
     try {
       console.log('채널 목록 새로고침 중...');
       const result = await refetch();
-      console.log('채널 목록 새로고침 완료:', result.data);
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.workspaceList(workspaceId),
+      });
       return result;
     } catch (error) {
       console.error('채널 목록 새로고침 실패:', error);
