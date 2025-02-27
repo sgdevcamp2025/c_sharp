@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import { useForwardInfiniteHistory } from '@/src/features/chat/model';
@@ -14,7 +14,11 @@ export type ChatHistoryProps = {
 const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
   const { channelId } = useChatId();
 
-  const initialCursor = undefined;
+  const [isNearBottom, setIsNearBottom] = useState(false);
+  const scrollThreshold = 100;
+  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isLoadingRef = useRef(false);
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useForwardInfiniteHistory(Number(channelId));
 
@@ -33,23 +37,62 @@ const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
     if (!container) return;
 
     const handleScroll = () => {
-      if (
-        container.scrollTop + container.clientHeight >=
-          container.scrollHeight - 10 &&
-        hasNextPage &&
-        !isFetchingNextPage
-      ) {
-        const prevScrollHeight = container.scrollHeight;
-        fetchNextPage().then(() => {
-          const newScrollHeight = container.scrollHeight;
-          container.scrollTop += newScrollHeight - prevScrollHeight;
-        });
+      if (isLoadingRef.current) return;
+
+      const distanceToBottom =
+        container.scrollHeight - (container.scrollTop + container.clientHeight);
+      const isCloseToBottom = distanceToBottom <= scrollThreshold;
+
+      if (isCloseToBottom && !isNearBottom) {
+        setIsNearBottom(true);
+      } else if (!isCloseToBottom && isNearBottom) {
+        setIsNearBottom(false);
       }
     };
 
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [containerRef, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [containerRef, isNearBottom]);
+
+  useEffect(() => {
+    if (isNearBottom && hasNextPage && !isFetchingNextPage) {
+      if (scrollTimerRef.current) {
+        clearTimeout(scrollTimerRef.current);
+      }
+      scrollTimerRef.current = setTimeout(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const prevScrollTop = container.scrollTop;
+        const prevScrollHeight = container.scrollHeight;
+        isLoadingRef.current = true;
+
+        fetchNextPage()
+          .then(() => {
+            const newScrollHeight = container.scrollHeight;
+
+            container.scrollTop =
+              prevScrollTop + (newScrollHeight - prevScrollHeight);
+            isLoadingRef.current = false;
+          })
+          .catch(() => {
+            isLoadingRef.current = false;
+          });
+      }, 300);
+    }
+
+    return () => {
+      if (scrollTimerRef.current) {
+        clearTimeout(scrollTimerRef.current);
+      }
+    };
+  }, [
+    isNearBottom,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    containerRef,
+  ]);
 
   return (
     <>
@@ -73,6 +116,7 @@ const ChatForwardHistory = ({ containerRef }: ChatHistoryProps) => {
           thread={thread}
         />
       ))}
+
       {hasNextPage && isFetchingNextPage && (
         <div className="flex w-full p-[10px] justify-center">
           <Loader2
