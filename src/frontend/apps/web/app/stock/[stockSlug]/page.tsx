@@ -28,7 +28,7 @@ export default function StockDetailsPage({ params }) {
         >
           <ChevronLeft size={28} />
         </Link>
-        <StockDetailLayout />
+        <StockDetailLayout stockSlug={stockSlug} />
       </div>
 
       <div className="pl-2 basis-[55%] flex-shrink-0 min-w-0">

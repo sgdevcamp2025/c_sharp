@@ -11,7 +11,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { columns } from '../model';
+import { StockTable, columns } from '../model';
 import {
   Button,
   DropdownMenu,

@@ -1,6 +1,4 @@
-import { Time } from 'lightweight-charts';
-
-export type Stock = {
+export type StockTable = {
   id: string;
   name: string;
   currPrice: string;
@@ -13,30 +11,25 @@ export type StockChartAPIResponse = {
   businessDate: string;
   tradingTime: string;
   currentPrice: string;
-  openPrice: string;
+  openPrice?: string;
+  openingPrice?: string;
   highPrice: string;
   lowPrice: string;
   tradingVolume: string;
   totalTradeAmount: string;
 };
 
-export enum ChartType {
-  Candlestick = 'candlestick',
-  Line = 'line',
-  Histogram = 'histogram',
-}
-
-export type CandleChart = {
-  time: Time;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-};
-
-export type DefaultChart = {
-  time: Time;
-  value: number;
+export type StockWS = {
+  code: string;
+  htsKorIsnm: string;
+  stckBsopDate: string;
+  stckCntgHour: string;
+  stckPrpr: string;
+  stckOprc: string;
+  stckHgpr: string;
+  stckLwpr: string;
+  cntgVol: string;
+  acmlTrPbmn: string;
 };
 
 export type RealTimeStock = {
