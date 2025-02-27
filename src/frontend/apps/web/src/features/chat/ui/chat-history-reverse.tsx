@@ -22,7 +22,7 @@ const ChatReverseHistory = ({ containerRef }: ChatHistoryProps) => {
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isLoadingRef = useRef(false);
 
-  console.log(data?.pages[0].lastCursorId);
+  // console.log(data?.pages[0].lastCursorId);
 
   const messages = data?.pages.flatMap((page) => page.threads) ?? [];
 

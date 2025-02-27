@@ -7,7 +7,7 @@ const StockInfo = () => {
 
   const stock = stockData.filter((data) => data.code === '005930')[0];
   const formatted = StockForTable(stock.data, stock.code);
-  console.log(stock);
+  // console.log(stock);
   return (
     <div className="flex flex-col gap-2">
       <div>
