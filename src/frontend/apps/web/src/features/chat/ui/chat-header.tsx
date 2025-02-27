@@ -1,6 +1,6 @@
 import { Button, SidebarTrigger } from '@workspace/ui/components';
-import { Headset } from 'lucide-react';
 import Header from './header';
+import HuddleButon from '../../video/ui/huddle-button';
 
 const ChatHeader = ({ stockSlug }: { stockSlug: string }) => {
   return (
@@ -10,12 +10,7 @@ const ChatHeader = ({ stockSlug }: { stockSlug: string }) => {
         <span className="font-semibold">{stockSlug}</span>
       </div>
       <div className="flex items-center gap-2">
-        <Button
-          variant="default"
-          size="sm"
-        >
-          <Headset size={20} />
-        </Button>
+        <HuddleButon stockSlug={stockSlug} />
       </div>
     </Header>
   );
