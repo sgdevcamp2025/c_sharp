@@ -21,7 +21,7 @@ export const FilePreviewItem = ({
 }: FilePreviewItemProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log(fileData);
+  // console.log(fileData);
 
   return (
     <div className="relative group flex-shrink-0">

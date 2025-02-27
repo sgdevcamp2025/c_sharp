@@ -43,7 +43,7 @@ const WorkspaceModal = ({
     if (externalSubmit) {
       externalSubmit(values);
     } else {
-      console.log(values);
+      // console.log(values);
     }
     setIsOpen(false);
   };

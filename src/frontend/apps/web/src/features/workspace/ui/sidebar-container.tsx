@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
 import { ChevronRight, CirclePlus } from 'lucide-react';
 
 import {
@@ -22,13 +21,20 @@ import { useChatId } from '@/src/shared';
 
 import WorkspaceModal from './workspace-modal';
 
-import { useWorkspaceChannels } from '../model';
-import { createWorkspace } from '../api';
+import {
+  useWorkspaceChannels,
+  useUnreadMessages,
+  useUnreadSubscription,
+} from '../model';
+import { createWorkspace, joinChannel } from '../api'; // joinChannel 추가
 import { getWorkspaceId } from '../lib';
 
-const renderChannels = (
+// 채널 렌더링 함수를 분리 (joinedChannels와 unjoinedChannels를 별도로 처리)
+const renderJoinedChannels = (
   channels: any[] | undefined,
   onChannelClick: (channelId: number) => void,
+  activeChannelId: number | null,
+  unreadData?: any,
 ) => {
   if (!channels || channels.length === 0) {
     return (
@@ -36,31 +42,114 @@ const renderChannels = (
     );
   }
 
-  return channels.map((channel) => (
-    <SidebarMenuItem key={channel.channelId}>
-      <SidebarMenuButton
-        asChild
-        className="px-8 py-1.5 text-sm text-white/80 hover:text-white transition-colors"
-        onClick={() => onChannelClick(channel.channelId)}
-      >
-        <span>{channel.channelName}</span>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  ));
+  return channels.map((channel) => {
+    const isActive = channel.channelId === activeChannelId;
+
+    let unreadNum = channel.unreadNum || 0;
+
+    if (unreadData && unreadData.channels) {
+      const updatedChannel = unreadData.channels.find(
+        (c: any) => c.channelId === channel.channelId,
+      );
+      if (updatedChannel) {
+        unreadNum = updatedChannel.unreadNum;
+      }
+    }
+
+    return (
+      <SidebarMenuItem key={channel.channelId}>
+        <SidebarMenuButton
+          asChild
+          className={`px-8 py-1.5 text-sm transition-colors ${
+            isActive
+              ? 'bg-white/20 text-white font-medium'
+              : 'text-white/80 hover:text-white hover:bg-white/10'
+          }`}
+          onClick={() => onChannelClick(channel.channelId)}
+        >
+          <div className="flex justify-between w-full">
+            <span>{channel.channelName}</span>
+            <span
+              className={`px-1.5 py-0.5 text-xs rounded-full min-w-5 text-center `}
+            >
+              {unreadNum}
+            </span>
+          </div>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  });
+};
+
+const renderUnjoinedChannels = (
+  channels: any[] | undefined,
+  onJoinChannel: (channel: any) => void,
+  activeChannelId: number | null,
+) => {
+  if (!channels || channels.length === 0) {
+    return (
+      <div className="px-8 py-2 text-sm text-white/50">채널이 없습니다</div>
+    );
+  }
+
+  return channels.map((channel) => {
+    return (
+      <SidebarMenuItem key={channel.channelId}>
+        <SidebarMenuButton
+          asChild
+          className="px-8 py-1.5 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+          onClick={() => onJoinChannel(channel)}
+        >
+          <div className="flex justify-between w-full">
+            <span>{channel.channelName}</span>
+            <span className="text-xs text-white/50">가입하기</span>
+          </div>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  });
 };
 
 const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
   const workspaceId = getWorkspaceId(stockSlug);
   const { setChannelId } = useChatId();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeChannelId, setActiveChannelId] = useState<number | null>(null);
 
-  const { joinedChannels, unjoinedChannels, isLoading, error } =
+  const { joinedChannels, unjoinedChannels, isLoading, error, refetch } =
     useWorkspaceChannels(workspaceId);
+
+  // console.log('joinnedChannels', joinedChannels);
+  // console.log('unjoinnedChannels', unjoinedChannels);
+
+  const { subscribe, isConnected } = useUnreadSubscription(workspaceId);
+  const { data: unreadData } = useUnreadMessages(workspaceId);
+
+  useEffect(() => {
+    if (isConnected) {
+      const unsubscribe = subscribe();
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
+    }
+  }, [isConnected, subscribe]);
+
+  useEffect(() => {
+    const storedChat = localStorage.getItem('chat');
+    if (storedChat) {
+      try {
+        const chatData = JSON.parse(storedChat);
+        if (chatData.channelId) {
+          setActiveChannelId(chatData.channelId);
+        }
+      } catch (e) {
+        console.error('Failed to parse stored chat data', e);
+      }
+    }
+  }, []);
 
   if (error) return <div>Error: {String(error)}</div>;
   if (workspaceId === -1) return <div>Error: Invalid workspace id</div>;
-
-  // console.log('workspaceData:', workspaceData);
 
   const handleCreateChannel = async (data: { workspace?: string }) => {
     await createWorkspace(workspaceId, data.workspace);
@@ -68,13 +157,26 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
 
   const handleChannelClick = (channelId: number) => {
     setChannelId(channelId);
-
+    setActiveChannelId(channelId);
     const chatData = {
       workspace: workspaceId,
       channelId: channelId,
     };
 
     localStorage.setItem('chat', JSON.stringify(chatData));
+  };
+
+  const handleJoinChannel = async (channel: any) => {
+    if (window.confirm(`'${channel.channelName}' 채널에 가입하시겠습니까?`)) {
+      try {
+        await joinChannel(workspaceId, channel.channelId);
+        refetch();
+        handleChannelClick(channel.channelId);
+      } catch (error) {
+        console.error('채널 가입 실패:', error);
+        alert('채널 가입에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
   };
 
   return (
@@ -113,7 +215,12 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
                         로딩 중...
                       </div>
                     ) : (
-                      renderChannels(joinedChannels, handleChannelClick)
+                      renderJoinedChannels(
+                        joinedChannels,
+                        handleChannelClick,
+                        activeChannelId,
+                        unreadData,
+                      )
                     )}
                   </SidebarMenu>
                 </SidebarGroupContent>
@@ -121,7 +228,6 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
             </SidebarGroup>
           </Collapsible>
 
-          {/* 두 번째 독립적인 Collapsible */}
           <Collapsible
             defaultOpen
             className="group/collapsible-unjoined"
@@ -144,7 +250,11 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
                         로딩 중...
                       </div>
                     ) : (
-                      renderChannels(unjoinedChannels, handleChannelClick)
+                      renderUnjoinedChannels(
+                        unjoinedChannels,
+                        handleJoinChannel,
+                        activeChannelId,
+                      )
                     )}
                   </SidebarMenu>
                 </SidebarGroupContent>

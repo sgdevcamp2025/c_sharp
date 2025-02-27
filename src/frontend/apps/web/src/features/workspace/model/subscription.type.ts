@@ -5,3 +5,8 @@ export type WorkspaceSubscriptionResponse = {
   channelName: string;
   createdAt: Date;
 };
+
+export type UnreadSubscriptionResponse = {
+  channelId: number;
+  channelName: string;
+};
