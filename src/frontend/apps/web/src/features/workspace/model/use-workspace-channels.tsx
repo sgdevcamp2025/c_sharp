@@ -62,6 +62,7 @@ export const useWorkspaceChannels = (workspaceId: number) => {
     data: workspaceData,
     isLoading,
     error,
+    refetch,
   } = useQuery<WorkspaceListResponse>({
     queryKey: QUERY_KEYS.workspaceList(workspaceId),
     queryFn: () => getWorkspaceList(workspaceId),
@@ -108,5 +109,17 @@ export const useWorkspaceChannels = (workspaceId: number) => {
     }
   }, [workspaceSocketMessage]);
 
-  return { ...state, isLoading, error };
+  const refreshChannels = async () => {
+    try {
+      console.log('채널 목록 새로고침 중...');
+      const result = await refetch();
+      console.log('채널 목록 새로고침 완료:', result.data);
+      return result;
+    } catch (error) {
+      console.error('채널 목록 새로고침 실패:', error);
+      throw error;
+    }
+  };
+
+  return { ...state, isLoading, error, refetch: refreshChannels };
 };

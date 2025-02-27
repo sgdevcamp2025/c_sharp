@@ -8,4 +8,12 @@ export const QUERY_KEYS = {
     ['workspaceList', workspaceId] as const,
   workspaceMessages: (workspaceId: number) =>
     ['workspaceMessages', `/subscribe/workspace.${workspaceId}`] as const,
+  notificationWorkspaceMessages: (
+    sessionId: string | null,
+    workspaceId: number,
+  ) =>
+    [
+      'notificationWorkspaceMessages',
+      `/subscribe/notification.${sessionId}/workspace.${workspaceId}`,
+    ] as const,
 };
