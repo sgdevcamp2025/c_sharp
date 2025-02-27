@@ -101,7 +101,7 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
                 className="group/label text-sm text-white/90 hover:bg-white/10 hover:text-white transition-colors px-4 py-2"
               >
                 <CollapsibleTrigger>
-                  가입된 채널
+                  마이 채널
                   <ChevronRight className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible-joined:rotate-90 opacity-70 group-hover/label:opacity-100" />
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
@@ -132,7 +132,7 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
                 className="group/label text-sm text-white/90 hover:bg-white/10 hover:text-white transition-colors px-4 py-2"
               >
                 <CollapsibleTrigger>
-                  미가입된 채널
+                  다른 채널
                   <ChevronRight className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible-unjoined:rotate-90 opacity-70 group-hover/label:opacity-100" />
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
