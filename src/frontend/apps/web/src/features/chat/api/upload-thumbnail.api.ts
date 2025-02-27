@@ -1,5 +1,6 @@
+import { serverFetchInstance } from '@/src/shared/services/apis';
+
 import type { FileResponse } from '../model';
-import { postRequest } from '@/src/shared/services/apis';
 
 type ThumbnailData = {
   fileId: number;
@@ -25,9 +26,13 @@ export async function uploadThumbnail({
   // }
 
   try {
-    const response = await postRequest<FileResponse, FormData>(
+    const response = await serverFetchInstance<FileResponse, FormData>(
       '/api/v1/files/thumbnail',
-      formData,
+      'POST',
+      {
+        body: formData,
+        includeAuthToken: true,
+      },
     );
     console.log('[uploadFiles] Response =>', response);
     return response;

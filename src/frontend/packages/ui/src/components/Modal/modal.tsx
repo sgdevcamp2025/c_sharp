@@ -28,18 +28,16 @@ export interface ModalProps
 }
 
 const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
-  (
-    {
+  (props, ref): React.ReactElement | null => {
+    const {
       className,
       size,
       asChild = false,
       isOpen = false,
       onClose,
       children,
-      ...props
-    },
-    ref,
-  ) => {
+      ...restProps
+    } = props;
     const Comp = asChild ? Slot : 'div';
     const [mounted, setMounted] = React.useState(false);
 
@@ -81,7 +79,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         onClick={handleBackdropClick}
         role="dialog"
         aria-modal="true"
-        {...props}
+        {...restProps}
       >
         <div className="relative w-full bg-background rounded-lg shadow-lg">
           {children}
@@ -89,10 +87,9 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       </Comp>
     );
 
-    return createPortal(modalContent, document.body);
+    createPortal(modalContent, document.body);
   },
 );
-
 Modal.displayName = 'Modal';
 
 export { Modal, modalVariants };

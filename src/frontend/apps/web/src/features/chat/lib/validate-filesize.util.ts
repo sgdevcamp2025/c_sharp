@@ -2,7 +2,7 @@ export const MAX_IMAGE_SIZE = 20 * 1024 * 1024;
 export const MAX_VIDEO_SIZE = 200 * 1024 * 1024;
 
 export const validateFileSize = (file: File) => {
-  console.log('File type:', file.type);
+  // console.log('File type:', file.type);
 
   if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
     alert('Only image and video files are supported');

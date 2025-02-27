@@ -16,3 +16,5 @@ export * from './Skeleton';
 export * from './Sheet';
 export * from './Sidebar';
 export * from './DropdownMenu';
+export * from './Modal';
+export * from './Form';

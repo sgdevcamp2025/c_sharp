@@ -1,11 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import type {
-  ApiServerType,
-  FetchOptions,
-  JsonValue,
-} from '@/src/shared/services/models';
+import type { FetchOptions, JsonValue } from '@/src/shared/services/models';
 import { Fetch } from './fetch.api';
 
 export async function serverFetchInstance<TResponse, TBody = JsonValue>(

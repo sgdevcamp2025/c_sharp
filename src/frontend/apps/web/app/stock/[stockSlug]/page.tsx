@@ -1,7 +1,10 @@
+import Link from 'next/link';
+
+import { ChevronLeft } from 'lucide-react';
+
 import { ChatContainer } from '@/src/features/chat';
 import { StockDetailLayout } from '@/src/features/stock';
-import { ChevronLeft } from 'lucide-react';
-import Link from 'next/link';
+import { ChatIdProvider } from '@/src/shared';
 
 export async function generateMetadata({ params }) {
   const { stockSlug } = params;
@@ -15,7 +18,6 @@ export async function generateMetadata({ params }) {
 
 export default function StockDetailsPage({ params }) {
   const { stockSlug } = params;
-  // console.log(1, stockSlug);
 
   return (
     <div className="flex py-6 px-[30px] h-full min-w-0 min-h-0">
@@ -30,7 +32,9 @@ export default function StockDetailsPage({ params }) {
       </div>
 
       <div className="pl-2 basis-[55%] flex-shrink-0 min-w-0">
-        <ChatContainer stockSlug={stockSlug} />
+        <ChatIdProvider stockSlug={stockSlug}>
+          <ChatContainer stockSlug={stockSlug} />
+        </ChatIdProvider>
       </div>
     </div>
   );

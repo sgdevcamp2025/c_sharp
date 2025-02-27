@@ -1,8 +1,10 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Textarea } from '@workspace/ui/components';
+import { getUserIdFromCookie } from '@/src/shared/services';
+import { useChatId } from '@/src/shared';
 
 import ChatToggleGroup from './chat-toggle-group';
 
@@ -12,13 +14,24 @@ const ChatTextArea = ({
   onSend,
 }: {
   onSend: (content: string, attachmentList: number[]) => void;
+  stockSlug?: string;
 }) => {
   const [message, setMessage] = useState('');
   const [attachmentList, setAttachmentList] = useState<number[]>([]);
   const isComposing = useRef(false);
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [userId, setUserId] = useState<number | null>(null);
+  const { channelId, workspaceId } = useChatId();
 
-  const fileManagements = useFileManagements(1, 1, user.userId);
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const id = await getUserIdFromCookie();
+      setUserId(id);
+    };
+
+    fetchUserId();
+  }, []);
+
+  const fileManagements = useFileManagements(workspaceId, channelId, userId);
   const { setFilePreviews, setUploadedFileIds } = fileManagements;
 
   const handleSendClick = () => {
