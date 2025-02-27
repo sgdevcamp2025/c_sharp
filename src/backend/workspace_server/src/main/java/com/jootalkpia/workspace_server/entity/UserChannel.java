@@ -43,6 +43,8 @@ public class UserChannel extends BaseEntity {
     @Column(name = "mute", nullable = false)
     private Boolean mute;
 
+    private Long lastReadId;
+
     @Builder
     public UserChannel(Users users, Channels channels, Boolean mute) {
         this.users = users;

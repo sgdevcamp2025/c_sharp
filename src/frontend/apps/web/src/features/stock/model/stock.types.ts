@@ -38,3 +38,18 @@ export type DefaultChart = {
   time: Time;
   value: number;
 };
+
+export type RealTimeStock = {
+  slug?: string;
+  name?: string;
+  businessDate?: string;
+  code?: string;
+  tradingTime?: string;
+  currentPrice?: string;
+  priceChange?: string;
+  openPrice?: string;
+  highPrice?: string;
+  lowPrice?: string;
+  tradingVolume?: string;
+  totalTradeAmount?: string;
+};

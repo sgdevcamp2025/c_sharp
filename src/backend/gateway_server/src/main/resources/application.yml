@@ -62,3 +62,8 @@ spring:
           uri: http://${EC2_PRIVATE_IP}:${WORKSPACE_PORT}
           predicates:
             - Path=/api/v1/workspace/**
+
+        - id: huddle
+          uri: http://${EC2_PRIVATE_IP}:${SIGNALING_PORT}
+          predicates:
+            - Path=/api/v1/huddle/**

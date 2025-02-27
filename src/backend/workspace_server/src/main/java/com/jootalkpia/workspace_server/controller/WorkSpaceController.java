@@ -1,7 +1,6 @@
 package com.jootalkpia.workspace_server.controller;
 
 
-//import com.jootalkpia.aop.JootalkpiaAuthenticationContext;
 import com.jootalkpia.workspace_server.dto.ChannelListDTO;
 import com.jootalkpia.workspace_server.dto.SimpleChannel;
 import com.jootalkpia.workspace_server.service.WorkSpaceService;
@@ -15,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.jootalkpia.passport.anotation.CurrentUser;
+import com.jootalkpia.passport.component.UserInfo;
 
 @RestController
 @Slf4j
@@ -23,39 +24,38 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkSpaceController {
 
     private final WorkSpaceService workSpaceService;
-    private final Long userId = 1L;//JootalkpiaAuthenticationContext.getUserInfo().userId();
 
     @GetMapping("/{workspaceId}/channels")
-    public ResponseEntity<ChannelListDTO> getChannels(@PathVariable Long workspaceId) {
+    public ResponseEntity<ChannelListDTO> getChannels(@PathVariable Long workspaceId, @CurrentUser UserInfo userInfo) {
         // 유효성 검증
         ValidationUtils.validateWorkSpaceId(workspaceId);
         log.info("Getting channels for workspace with id: {}", workspaceId);
 
-        ChannelListDTO channelListDTO = workSpaceService.getChannels(userId, workspaceId);
+        ChannelListDTO channelListDTO = workSpaceService.getChannels(userInfo.userId(), workspaceId);
         return ResponseEntity.ok().body(channelListDTO);
     }
 
     @PostMapping("/{workspaceId}/channels")
-    public ResponseEntity<SimpleChannel> createChannel(@PathVariable Long workspaceId, @RequestParam String channelName) {
+    public ResponseEntity<SimpleChannel> createChannel(@PathVariable Long workspaceId, @RequestParam String channelName, @CurrentUser UserInfo userInfo) {
         // 유효성 검증
         ValidationUtils.validateWorkSpaceId(workspaceId);
         log.info("Creating channels for workspace with id: {}", workspaceId);
 
-        SimpleChannel channel = workSpaceService.createChannel(workspaceId, channelName);
+        SimpleChannel channel = workSpaceService.createChannel(workspaceId, channelName, userInfo.userId());
 
         // 유저를 생성된 채널에 가입시킴
-        workSpaceService.addMember(workspaceId, userId, channel.getChannelId());
+        workSpaceService.addMember(workspaceId, userInfo.userId(), channel.getChannelId());
 
         return ResponseEntity.ok().body(channel);
     }
 
     @PostMapping("/{workspaceId}/channels/{channelId}/members")
-    public ResponseEntity<?> addMember(@PathVariable Long workspaceId, @PathVariable Long channelId) {
+    public ResponseEntity<?> addMember(@PathVariable Long workspaceId, @PathVariable Long channelId, @CurrentUser UserInfo userInfo) {
 
         ValidationUtils.validateWorkSpaceId(workspaceId);
         ValidationUtils.validateChannelId(channelId);
         log.info("Adding member for workspace with id: {} {}", workspaceId, channelId);
 
-        return ResponseEntity.ok(workSpaceService.addMember(workspaceId, userId, channelId));
+        return ResponseEntity.ok(workSpaceService.addMember(workspaceId, userInfo.userId(), channelId));
     }
 }

@@ -2,6 +2,7 @@ package com.jootalkpia.chat_server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jootalkpia.chat_server.dto.*;
+import com.jootalkpia.chat_server.dto.WorkspaceToKafka;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -43,7 +44,7 @@ public class KafkaConsumer {
             concurrency = "2"
     )
     public void processChatMessage(@Header(KafkaHeaders.RECEIVED_KEY) String channelId, String kafkaMessage) {
-        log.info("Received Kafka message ===> channelId: {}, message: {}", channelId, kafkaMessage);
+        log.info("Received Kafka chat message ===> channelId: {}, message: {}", channelId, kafkaMessage);
         try {
             ChatMessageToKafka chatMessage = objectMapper.readValue(kafkaMessage, ChatMessageToKafka.class);
             String chatDataJson = objectMapper.writeValueAsString(chatMessage);
@@ -83,22 +84,22 @@ public class KafkaConsumer {
     }
 
     @KafkaListener(
-            topics = "${topic.hurdle}",
-            groupId = "${group.hurdle}"
+            topics = "${topic.huddle}",
+            groupId = "${group.huddle}"
     )
     public void processHurdleStatusMessage(String kafkaMessage) {
-        log.info("message ===> " + kafkaMessage);
-
-        ObjectMapper mapper = new ObjectMapper();
-
+        log.info("Received Kafka huddle message ===> {}", kafkaMessage);
         try {
-            ChatMessageToKafka chatMessageToKafka = mapper.readValue(kafkaMessage, ChatMessageToKafka.class); //추후 DTO 변경 필수
+            HuddleToKafka huddleData = objectMapper.readValue(kafkaMessage, HuddleToKafka.class);
+            String huddleDataJson = objectMapper.writeValueAsString(huddleData);
+            Long channelId = huddleData.channelId();
 
-            // 클라이언트에게 허들 관련 데이터 전달하는 로직
+            messagingTemplate.convertAndSend("/subscribe/huddle." + channelId, huddleDataJson);
 
-            log.info("dto ===> " + chatMessageToKafka.toString());
+            log.info("Broadcasted hurdle data via WebSocket: " + huddleDataJson);
+
         } catch (Exception ex) {
-            log.error(ex.getMessage(), ex); // 추후에 GlobalException 처리
+            log.error("Error processing huddle message: " + ex.getMessage(), ex);
         }
     }
 
@@ -107,18 +108,18 @@ public class KafkaConsumer {
             groupId = "${group.workspace}"
     )
     public void processChannelStatusMessage(String kafkaMessage) {
-        log.info("message ===> " + kafkaMessage);
-
-        ObjectMapper mapper = new ObjectMapper();
-
+        log.info("Received Kafka workspace message ===> {}", kafkaMessage);
         try {
-            ChatMessageToKafka chatMessageToKafka = mapper.readValue(kafkaMessage, ChatMessageToKafka.class); //추후 DTO 변경 필수
+            WorkspaceToKafka workspaceData = objectMapper.readValue(kafkaMessage, WorkspaceToKafka.class);
+            String workspaceDataJson = objectMapper.writeValueAsString(workspaceData);
+            Long workspaceId = workspaceData.workspaceId();
 
-            // 채널 생성 및 상태 정보 데이터 전달하는 로직
+            messagingTemplate.convertAndSend("/subscribe/workspace." + workspaceId, workspaceDataJson);
 
-            log.info("dto ===> " + chatMessageToKafka.toString());
+            log.info("Broadcasted workspace data via WebSocket: " + workspaceDataJson);
+
         } catch (Exception ex) {
-            log.error(ex.getMessage(), ex); // 추후에 GlobalException 처리
+            log.error("Error processing workspace message: " + ex.getMessage(), ex);
         }
     }
 }
