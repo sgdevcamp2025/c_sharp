@@ -1,20 +1,37 @@
 'use client';
-import { useMessages } from '@/src/features/chat/model';
+import { useChatMessages } from '@/src/features/chat/model';
+import { getUserIdFromCookie } from '@/src/shared/services';
 
 import ChatItemList from './chat-message-list';
 import ChatTextarea from './chat-textarea';
 
 import { useSendMessage } from '../model';
+import { useEffect, useState } from 'react';
+import { useChatId } from '@/src/shared';
 
-const ChatSection = () => {
-  const channelId = 1;
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const currentUser = {
-    userId: user.userId,
-    nickname: user.nickname,
-    profileImage: user.profileImage,
-  };
-  const { data: messages } = useMessages(`/subscribe/chat.${channelId}`);
+const ChatSection = ({ stockSlug }: { stockSlug: string }) => {
+  const { channelId } = useChatId();
+
+  const [currentUser, setCurrentUser] = useState({
+    userId: null,
+    nickname: '',
+    profileImage: '',
+  });
+  useEffect(() => {
+    async function fetchUser() {
+      const userId = await getUserIdFromCookie();
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+
+      setCurrentUser({
+        userId,
+        nickname: storedUser.nickname || '',
+        profileImage: storedUser.profileImage || '',
+      });
+    }
+    fetchUser();
+  }, []);
+
+  const { data: messages } = useChatMessages(`/subscribe/chat.${channelId}`);
   const handleSendMessage = useSendMessage(channelId, currentUser);
 
   return (
@@ -24,7 +41,10 @@ const ChatSection = () => {
           <ChatItemList messages={messages} />
         </div>
         <div className="pr-4 pl-4 pb-4 flex-shrink-0 sticky bottom-0 bg-white shadow-md">
-          <ChatTextarea onSend={handleSendMessage} />
+          <ChatTextarea
+            onSend={handleSendMessage}
+            stockSlug={stockSlug}
+          />
         </div>
       </div>
     </div>

@@ -31,3 +31,18 @@ export type StockWS = {
   cntgVol: string;
   acmlTrPbmn: string;
 };
+
+export type RealTimeStock = {
+  slug?: string;
+  name?: string;
+  businessDate?: string;
+  code?: string;
+  tradingTime?: string;
+  currentPrice?: string;
+  priceChange?: string;
+  openPrice?: string;
+  highPrice?: string;
+  lowPrice?: string;
+  tradingVolume?: string;
+  totalTradeAmount?: string;
+};

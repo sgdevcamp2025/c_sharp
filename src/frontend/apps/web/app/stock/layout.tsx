@@ -1,7 +1,15 @@
+import { ToastAlarm } from '@/src/features/alarm';
 import AuthWrapper from '@/src/features/auth/ui/auth-wrapper';
+import { getAccessToken } from '@/src/features/stock';
 import { ProfilePopover } from '@/src/features/user';
-import { Header, StompWebSocketProvider, RQProvider } from '@/src/shared';
+import {
+  Header,
+  StompWebSocketProvider,
+  RQProvider,
+  WebSocketProvider,
+} from '@/src/shared';
 import { getUserIdFromCookie } from '@/src/shared/services/lib';
+import { Toaster } from '@workspace/ui/components';
 
 import '@workspace/ui/globals.css';
 
@@ -11,7 +19,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const userId = await getUserIdFromCookie();
-
+  const token = await getAccessToken();
   return (
     <>
       <header className="h-[68px] w-full flex items-center justify-between px-4 py-1 bg-muted">
@@ -19,9 +27,13 @@ export default async function RootLayout({
       </header>
       <div className="flex flex-col h-[calc(100vh-68px)] overflow-hidden">
         <AuthWrapper>
-          <StompWebSocketProvider userId={userId}>
-            <RQProvider>{children}</RQProvider>
-          </StompWebSocketProvider>
+          <RQProvider>
+            <StompWebSocketProvider userId={userId}>
+              <WebSocketProvider token={token}>{children}</WebSocketProvider>
+            </StompWebSocketProvider>
+          </RQProvider>
+          <Toaster />
+          <ToastAlarm />
         </AuthWrapper>
       </div>
     </>

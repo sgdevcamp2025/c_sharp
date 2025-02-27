@@ -1,18 +1,18 @@
 'use client';
 
-import type {
-  ApiServerType,
-  FetchOptions,
-  JsonValue,
-} from '@/src/shared/services/models';
-import { getAccessTokenFromCookie } from '../lib';
+import type { FetchOptions, JsonValue } from '@/src/shared/services/models';
 
 import { Fetch } from './fetch.api';
 
-const getClientToken = async (): Promise<string | undefined> => {
-  const match = await getAccessTokenFromCookie();
-  return match;
-  // return process.env.NEXT_PUBLIC_TEST_TOKEN;
+export const getClientToken = async (): Promise<string | undefined> => {
+  try {
+    const response = await fetch('/api/auth/token', { credentials: 'include' }); // API 호출
+    const data = await response.json();
+    return data.token || undefined;
+  } catch (error) {
+    console.error('Failed to fetch token:', error);
+    return undefined;
+  }
 };
 
 export const clientFetchInstance = async <TResponse, TBody = JsonValue>(

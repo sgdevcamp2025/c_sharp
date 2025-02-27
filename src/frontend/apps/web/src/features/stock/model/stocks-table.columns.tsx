@@ -1,17 +1,17 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { StockTable } from './stock.types';
+import { RealTimeStock } from './stock.types';
 import { Button } from '@workspace/ui/components';
 import { ArrowUpDown } from 'lucide-react';
 
-export const columns: ColumnDef<StockTable>[] = [
+export const columns: ColumnDef<RealTimeStock>[] = [
   {
     accessorKey: 'name',
     header: () => <div className="text-left">종목명</div>,
     cell: ({ row }) => <div className="text-left">{row.getValue('name')}</div>,
   },
   {
-    id: 'currPrice',
-    accessorFn: (row) => parseFloat(row.currPrice),
+    id: 'currentPrice',
+    accessorFn: (row) => parseFloat(row.currentPrice),
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -22,7 +22,7 @@ export const columns: ColumnDef<StockTable>[] = [
       </Button>
     ),
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue('currPrice'));
+      const price = parseFloat(row.getValue('currentPrice'));
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'decimal',
         currency: 'KRW',
@@ -31,8 +31,8 @@ export const columns: ColumnDef<StockTable>[] = [
     },
   },
   {
-    id: 'fluctuation',
-    accessorFn: (row) => parseFloat(row.fluctuation),
+    id: 'priceChange',
+    accessorFn: (row) => parseFloat(row.priceChange),
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -42,11 +42,11 @@ export const columns: ColumnDef<StockTable>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue('fluctuation')}%</div>,
+    cell: ({ row }) => <div>{row.getValue('priceChange')}%</div>,
   },
   {
-    id: 'volume',
-    accessorFn: (row) => parseFloat(row.volume),
+    id: 'tradingVolume',
+    accessorFn: (row) => parseFloat(row.tradingVolume),
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -56,6 +56,6 @@ export const columns: ColumnDef<StockTable>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue('volume')}</div>,
+    cell: ({ row }) => <div>{row.getValue('tradingVolume')}</div>,
   },
 ];

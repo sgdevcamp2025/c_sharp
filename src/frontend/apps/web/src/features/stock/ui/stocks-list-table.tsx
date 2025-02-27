@@ -28,49 +28,8 @@ import {
 } from '@workspace/ui/components';
 import { useRouter } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
-
-const Stockdata: StockTable[] = [
-  {
-    id: '1',
-    name: '삼성전자',
-    currPrice: '53700',
-    fluctuation: '+0.00',
-    volume: '1000',
-    slug: 'samsung-electronics',
-  },
-  {
-    id: '2',
-    name: 'SK하이닉스',
-    currPrice: '221000',
-    fluctuation: '+0.68',
-    volume: '1000',
-    slug: 'sk-hynix',
-  },
-  {
-    id: '3',
-    name: '카카오',
-    currPrice: '35750',
-    fluctuation: '+0.00',
-    volume: '1000',
-    slug: 'kakao',
-  },
-  {
-    id: '4',
-    name: '네이버',
-    currPrice: '204000',
-    fluctuation: '-0.24',
-    volume: '1000',
-    slug: 'naver',
-  },
-  {
-    id: '5',
-    name: '한화에어로스페이스',
-    currPrice: '411500',
-    fluctuation: '+7.30',
-    volume: '1000',
-    slug: 'hanwha-aerospace',
-  },
-];
+import { useWebSocket } from '@/src/shared';
+import { StockForTable } from '../lib';
 
 const StocksListTable = () => {
   const router = useRouter();
@@ -80,8 +39,13 @@ const StocksListTable = () => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
+  const { stockData } = useWebSocket();
+
+  const formatted = stockData.map((data) =>
+    StockForTable(data.data, data.code),
+  );
   const table = useReactTable({
-    data: Stockdata,
+    data: formatted,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

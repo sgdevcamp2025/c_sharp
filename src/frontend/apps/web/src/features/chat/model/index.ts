@@ -12,8 +12,8 @@ export type {
   SendMessagePayload,
   WebSocketResponsePayload,
 } from './websocket.type';
-export { useMessages } from './use-messages';
-export { useWebSocketClient } from './use-websocket-client';
+export { useChatMessages } from './use-chat-messages';
+export { useChatSubscribe } from './use-chat-subscribe';
 export { useChatAutoScroll } from './use-chat-autoscroll';
 export { useSendMessage } from './send-message';
 export { useReverseInfiniteHistory } from './use-reverse-infinite-history';

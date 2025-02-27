@@ -9,6 +9,7 @@ export const useLogout = () => {
 
   return () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('chat');
     setUser(null);
     document.cookie =
       'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
