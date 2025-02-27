@@ -6,8 +6,10 @@ import { getHistoryChat } from '../api';
 import type { HistoryResponse } from '../model';
 
 export function useReverseInfiniteHistory(channelId: number) {
+  const queryKey = QUERY_KEYS.reverseHistory(channelId);
+
   return useInfiniteQuery<HistoryResponse>({
-    queryKey: QUERY_KEYS.reverseHistory(channelId),
+    queryKey,
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       if (pageParam === undefined) {
         const data = getHistoryChat(channelId, 'backward', undefined, 30);
@@ -26,5 +28,8 @@ export function useReverseInfiniteHistory(channelId: number) {
         ? lastPage.lastCursorId
         : undefined,
     initialPageParam: undefined,
+
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }

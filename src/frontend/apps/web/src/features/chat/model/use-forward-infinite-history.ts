@@ -6,8 +6,10 @@ import { getHistoryChat } from '../api';
 import type { HistoryResponse } from '../model';
 
 export function useForwardInfiniteHistory(channelId: number) {
+  const queryKey = QUERY_KEYS.forwardHistory(channelId);
+
   return useInfiniteQuery<HistoryResponse>({
-    queryKey: QUERY_KEYS.forwardHistory(channelId),
+    queryKey,
     queryFn: async ({ pageParam }: { pageParam?: unknown }) => {
       if (pageParam === undefined) {
         return getHistoryChat(channelId, 'forward', undefined, 5);
@@ -19,5 +21,7 @@ export function useForwardInfiniteHistory(channelId: number) {
         ? lastPage.lastCursorId
         : undefined,
     initialPageParam: undefined,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
