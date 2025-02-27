@@ -35,7 +35,7 @@ public class AsyncConfig {
         executor.setAllowCoreThreadTimeOut(true);
 
         // ✅ 병합 작업 우선순위 높이기 (우선순위: 1이 가장 높음)
-        executor.setThreadPriority(Thread.NORM_PRIORITY + 2);
+        executor.setThreadPriority(Thread.MAX_PRIORITY);
 
         executor.initialize();
         return executor;

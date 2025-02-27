@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +52,9 @@ public class FileService {
     // tempIdentifier: uploadId
     private static final ConcurrentHashMap<Long, String> UPLOAD_ID_STORAGE = new ConcurrentHashMap<>();
 
-    // uploadId: etag
-    private static final ConcurrentHashMap<String, List<CompletedPart>> PART_TAG_STORAGE = new ConcurrentHashMap<>();
+    // ✅ CopyOnWriteArrayList 사용
+// uploadId: etag
+    private static final ConcurrentHashMap<String, CopyOnWriteArrayList<CompletedPart>> PART_TAG_STORAGE = new ConcurrentHashMap<>();
 
     public Long initiateMultipartUpload(String tempFileIdentifier, String mimeType) {
         FilesEntity filesEntity = new FilesEntity();
@@ -62,10 +64,9 @@ public class FileService {
         Long fileId = savedEntity.getFileId();
 
         String uploadId = s3Service.initiateMultipartUpload(fileId, mimeType);
-        synchronized (UPLOAD_ID_STORAGE) {
-            UPLOAD_ID_STORAGE.put(fileId, uploadId);
-            log.info("Upload ID 저장 - TempFileIdentifier: {}, Upload ID: {}", tempFileIdentifier, uploadId);
-        }
+        UPLOAD_ID_STORAGE.put(fileId, uploadId);
+        log.info("Upload ID 저장 - TempFileIdentifier: {}, Upload ID: {}", tempFileIdentifier, uploadId);
+
         return savedEntity.getFileId();
     }
 
@@ -93,34 +94,26 @@ public class FileService {
             CompletableFuture<CompletedPart> future = s3Service.asyncUploadPartToS3(fileId, uploadId, chunkIndex, chunkFile.getBytes(), s3Key);
 
             future.thenAccept(completedPart -> {
-                synchronized (PART_TAG_STORAGE) {
-                    PART_TAG_STORAGE.computeIfAbsent(uploadId, k -> new ArrayList<>()).add(completedPart);
-                }
+                // ✅ CopyOnWriteArrayList를 사용하여 동기화 필요 없음
+                PART_TAG_STORAGE.computeIfAbsent(uploadId, k -> new CopyOnWriteArrayList<>()).add(completedPart);
 
-                // 마지막 청크 여부 확인
+                // ✅ 마지막 청크 여부 확인 및 즉시 병합
                 if (isLastChunk(totalChunks, uploadId)) {
-                    synchronized (PART_TAG_STORAGE) {
-                        // ✅ 병합 작업을 병합 전용 스레드 풀에서 실행
-                        CompletableFuture.runAsync(() -> {
-                            s3Service.completeMultipartUpload(fileId, uploadId, PART_TAG_STORAGE.get(uploadId), mimeType);
-                            log.info("모든 청크 업로드 완료 및 병합 완료: {}", uploadId);
+                    // ✅ 병합 작업을 병합 전용 스레드 풀에서 즉시 실행
+                    CompletableFuture.runAsync(() -> {
+                        s3Service.completeMultipartUpload(fileId, uploadId, PART_TAG_STORAGE.get(uploadId), mimeType);
+                        log.info("모든 청크 업로드 완료 및 병합 완료: {}", uploadId);
 
-                            // ✅ time 로그, with fileId
-                            log.info("✅ 파일 병합 완료 시간 (Unix Timestamp): {}, fileId: {}", System.currentTimeMillis() / 1000, fileId);
-                            log.info("✅ 파일 병합 완료 시간 (UTC): {}", java.time.Instant.now());
+                        // ✅ time 로그, with fileId
+                        log.info("✅ 파일 병합 완료 시간 (Unix Timestamp): {}, fileId: {}", System.currentTimeMillis() / 1000, fileId);
+                        log.info("✅ 파일 병합 완료 시간 (UTC): {}", java.time.Instant.now());
 
-                            // 상태 초기화
-                            synchronized (UPLOAD_ID_STORAGE) {
-                                UPLOAD_ID_STORAGE.remove(fileId);
-                            }
-                            synchronized (PART_TAG_STORAGE) {
-                                PART_TAG_STORAGE.remove(uploadId);
-                            }
-                        }, fileMergeExecutor);  // ✅ 병합 작업 전용 스레드 풀 사용
-                    }
+                        // ✅ 상태 초기화
+                        UPLOAD_ID_STORAGE.remove(fileId);
+                        PART_TAG_STORAGE.remove(uploadId);
+                    }, fileMergeExecutor);
                 }
             });
-
 
             // 각 청크 업로드 완료 시 응답
             Map<String, Object> response = new HashMap<>();
@@ -135,16 +128,17 @@ public class FileService {
     }
 
     private boolean isLastChunk(int totalChunks, String uploadId) {
-        // S3에 업로드된 CompletedPart 리스트 가져오기
-        List<CompletedPart> completedParts = PART_TAG_STORAGE.get(uploadId);
+        // ✅ CopyOnWriteArrayList 사용으로 동기화 필요 없음
+        CopyOnWriteArrayList<CompletedPart> completedParts = PART_TAG_STORAGE.get(uploadId);
 
-        // 업로드된 청크 개수와 totalChunks 비교
+        // ✅ 업로드된 청크 개수와 totalChunks 비교
         if (completedParts != null && completedParts.size() == totalChunks) {
             log.info("모든 청크가 S3에 업로드됨 - 업로드 ID: {}", uploadId);
             return true;
         }
         return false;
     }
+
 
     public String defineFolderToUpload(String fileType) {
         if ("VIDEO".equalsIgnoreCase(fileType)) {
