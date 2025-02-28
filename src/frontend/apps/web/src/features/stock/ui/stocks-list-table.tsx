@@ -31,7 +31,7 @@ import { ChevronDown } from 'lucide-react';
 import { RealTimeStock } from '../model/stock.types';
 export const RealTimeDummy: RealTimeStock[] = [
   {
-    slug: 'samsung',
+    slug: 'samsung-electronics',
     name: '삼성전자',
     businessDate: '2025-02-27',
     code: '005930',
