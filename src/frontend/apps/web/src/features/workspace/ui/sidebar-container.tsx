@@ -26,9 +26,10 @@ import {
   useUnreadMessages,
   useUnreadSubscription,
 } from '../model';
-import { createWorkspace, getWorkspaceList, joinChannel } from '../api'; // joinChannel 추가
+import { createWorkspace, joinChannel } from '../api'; // joinChannel 추가
 import { getWorkspaceId } from '../lib';
 
+// 채널 렌더링 함수를 분리 (joinedChannels와 unjoinedChannels를 별도로 처리)
 const renderJoinedChannels = (
   channels: any[] | undefined,
   onChannelClick: (channelId: number) => void,
@@ -83,6 +84,7 @@ const renderJoinedChannels = (
 const renderUnjoinedChannels = (
   channels: any[] | undefined,
   onJoinChannel: (channel: any) => void,
+  activeChannelId: number | null,
 ) => {
   if (!channels || channels.length === 0) {
     return (
@@ -121,8 +123,7 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
   // console.log('unjoinnedChannels', unjoinedChannels);
 
   const { subscribe, isConnected } = useUnreadSubscription(workspaceId);
-
-  const { data: unreadData, resetUnreadCount } = useUnreadMessages(workspaceId);
+  const { data: unreadData } = useUnreadMessages(workspaceId);
 
   useEffect(() => {
     if (isConnected) {
@@ -163,7 +164,6 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
     };
 
     localStorage.setItem('chat', JSON.stringify(chatData));
-    resetUnreadCount(channelId);
   };
 
   const handleJoinChannel = async (channel: any) => {
@@ -253,6 +253,7 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
                       renderUnjoinedChannels(
                         unjoinedChannels,
                         handleJoinChannel,
+                        activeChannelId,
                       )
                     )}
                   </SidebarMenu>
