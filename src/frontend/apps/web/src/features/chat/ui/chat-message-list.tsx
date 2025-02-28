@@ -2,9 +2,14 @@ import ChatMessageItem from './chat-message-item';
 import ChatReverseHistory from './chat-history-reverse';
 import ChatForwardHistory from './chat-history-forward';
 
-import { useChatAutoScroll, type WebSocketResponsePayload } from '../model';
+import {
+  useChatAutoScroll,
+  useInvalidateChatHistory,
+  type WebSocketResponsePayload,
+} from '../model';
 import { processMessages } from '../lib';
 import { Toaster } from '@workspace/ui/components';
+import { useChatId } from '@/src/shared';
 
 export type ChatContentProps = {
   type?: 'default' | 'live';
@@ -16,6 +21,8 @@ const ChatMessageList = ({
   messages = [],
 }: ChatContentProps) => {
   const { bottomRef, containerRef } = useChatAutoScroll(messages);
+  const { channelId } = useChatId();
+  useInvalidateChatHistory(channelId);
 
   // if (!messages || messages.length === 0) return null;
   // console.log('🔗 ChatContent:', { messages });

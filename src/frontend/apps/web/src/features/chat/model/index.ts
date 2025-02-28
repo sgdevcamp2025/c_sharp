@@ -19,3 +19,4 @@ export { useSendMessage } from './send-message';
 export { useReverseInfiniteHistory } from './use-reverse-infinite-history';
 export { useForwardInfiniteHistory } from './use-forward-infinite-history';
 export type { HistoryResponse, MessageItem } from './chat-data.type';
+export { useInvalidateChatHistory } from './use-invalidate-chat-history';
