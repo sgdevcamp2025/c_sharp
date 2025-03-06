@@ -7,7 +7,9 @@ on:
       - dev
       - main
     paths:
-      - 'src/frontend/**'
+      - 'src/frontend/apps/web/**'
+      - 'src/frontend/packages/ui/**'
+      - 'src/frontend/pnpm-lock.yaml'
   push:
     branches:
       - fe-refac/fe-ci
@@ -17,10 +19,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  changes:
+  frontend-ci:
     if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -72,5 +74,5 @@ jobs:
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
-          pnpm install --frozen-lockfile --prefer-offline
-          pnpm turbo lint build --parallel --concurrency=10
+          pnpm install --frozen-lockfile --prefer-offline --no-optional
+          pnpm turbo lint build --parallel --concurrency=4 --cache-dir=.turbo
