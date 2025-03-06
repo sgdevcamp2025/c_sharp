@@ -37,6 +37,9 @@ jobs:
         with:
           version: 8
 
+      - name: Ensure pnpm store directory exists
+        run: mkdir -p ~/.pnpm-store
+
       - name: Restore pnpm store cache
         uses: actions/cache@v4
         with:
@@ -68,10 +71,7 @@ jobs:
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
-          # --offline 옵션을 사용하면 캐시된 패키지만 설치합니다.
-          # 네트워크가 필요한 경우에는 이 옵션을 제거하세요.
-          pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
-          # turbo가 이미 devDependencies에 있다면 이 명령은 불필요하므로 제거하거나 조건부 실행할 수 있음
+          pnpm install --offline --strict-peer-dependencies=false --no-frozen-lockfile
           pnpm add turbo --save-dev -w
           pnpm turbo lint build --parallel
 
