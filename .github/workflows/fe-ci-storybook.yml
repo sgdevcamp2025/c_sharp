@@ -9,62 +9,41 @@ on:
     paths:
       - 'src/frontend/packages/ui/**'
       - '../workflows/fe-ci-storybook.yml'
+  push:
+    branches:
+      - fe-refac/fe-ci
+    # paths:
+    #   - 'src/frontend/packages/ui/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: '${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}'
   cancel-in-progress: true
 
 jobs:
   changes:
-    if: ${{ github.actor != 'l10nbot' }} # Avoid running for 'l10nbot'
+    if: "${{ github.actor != 'l10nbot' }}"
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 10
     steps:
-      - name: Check out code
+      - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: src/frontend/pnpm-lock.yaml
 
-      - uses: pnpm/action-setup@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          version: 8
-
-      - name: Cache dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.pnpm-store
-            **/node_modules
-            src/frontend/node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      - name: Install pnpm
-        run: npm install -g pnpm
+          version: 9.12.3
 
       - name: Install dependencies
-        run: |
-          cd src/frontend
-          pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
-          pnpm add turbo --save-dev -w
+        working-directory: src/frontend
+        run: pnpm install --frozen-lockfile --prefer-offline
 
-      - name: CI
-        run: |
-          cd src/frontend
-          pnpm turbo typescript lint format build-storybook --parallel
-
-  required:
-    needs: [changes]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: fail if conditional jobs failed
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'skipped') || contains(needs.*.result, 'cancelled')
-        run: exit 1
+      - name: Build Storybook
+        working-directory: src/frontend
+        run: pnpm turbo build-storybook --parallel

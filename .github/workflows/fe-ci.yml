@@ -8,9 +8,9 @@ on:
       - main
     paths:
       - 'src/frontend/**'
-  push:
-    branches:
-      - fe-refac/fe-ci
+  # push:
+  #   branches:
+  #     - fe-refac/fe-ci
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
