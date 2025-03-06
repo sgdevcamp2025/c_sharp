@@ -41,6 +41,7 @@ jobs:
         run: |
           mkdir -p ~/.pnpm-store
           mkdir -p src/frontend/packages/ui/.turbo
+          mkdir -p src/frontend/apps/web/.turbo
 
       - name: Restore pnpm store cache
         uses: actions/cache@v4
@@ -66,12 +67,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-ui-
 
-      - name: Check pnpm version
-        run: pnpm --version
-
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
-          pnpm install --prefer-offline --strict-peer-dependencies=false --frozen-lockfile
-          pnpm add turbo --save-dev -w
+          pnpm ci --prefer-offline --frozen-lockfile
           pnpm turbo lint build --parallel
