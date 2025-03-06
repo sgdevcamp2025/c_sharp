@@ -36,8 +36,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.15.0
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+          # cache: 'pnpm'
+          # cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
       - name: Ensure Directories Exist
         run: |
@@ -68,5 +68,5 @@ jobs:
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
-          pnpm install --frozen-lockfile --prefer-offline --no-optional
+          pnpm install --frozen-lockfile
           pnpm turbo lint build --parallel --concurrency=10
