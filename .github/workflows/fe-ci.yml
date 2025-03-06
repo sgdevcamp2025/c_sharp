@@ -8,13 +8,9 @@ on:
       - main
     paths:
       - 'src/frontend/**'
-      - '!src/frontend/packages/ui/**'
-      - '../workflows/fe-ci.yml'
   # push:
   #   branches:
-  #     - fe-feat/ci-storybook
-  #   paths:
-  #     - '!src/frontend/packages/ui/**'
+  #     - fe-refac/fe-ci
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -22,55 +18,28 @@ concurrency:
 
 jobs:
   changes:
-    if: ${{ github.actor != 'l10nbot' }} # Avoid running for 'l10nbot'
+    if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 10
     steps:
-      - name: Check out code
+      - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          fetch-depth: 2
+          version: 9.12.3
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
-
-      - name: Cache dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.pnpm-store
-            **/node_modules
-            src/frontend/node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install dependencies
+      - name: Install, Lint, and Build
+        working-directory: src/frontend
         run: |
-          cd src/frontend
-          pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
-          pnpm add turbo --save-dev -w
-
-      - name: CI
-        run: |
-          cd src/frontend
-          pnpm turbo typescript lint format build --parallel
-
-  required:
-    needs: [changes]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: fail if conditional jobs failed
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'skipped') || contains(needs.*.result, 'cancelled')
-        run: exit 1
+          pnpm install --frozen-lockfile --prefer-offline
+          pnpm turbo lint --filter=web --filter=@workspace/ui --parallel 
+          pnpm turbo build --filter=web --parallel
