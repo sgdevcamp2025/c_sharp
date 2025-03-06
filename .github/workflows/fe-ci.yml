@@ -8,14 +8,9 @@ on:
       - main
     paths:
       - 'src/frontend/**'
-      - '!src/frontend/packages/ui/**'
-      - '../workflows/fe-ci.yml'
   push:
     branches:
       - fe-refac/fe-ci
-    paths:
-      - '../workflows/fe-ci.yml'
-      - '!src/frontend/packages/ui/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
