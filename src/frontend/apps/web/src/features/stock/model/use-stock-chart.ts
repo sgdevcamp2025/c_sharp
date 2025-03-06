@@ -28,7 +28,6 @@ export const useStockChart = (
     });
 
     chartRef.current = chart;
-    chart.timeScale().fitContent();
     chart
       .timeScale()
       .applyOptions({ timeVisible: true, secondsVisible: false });
