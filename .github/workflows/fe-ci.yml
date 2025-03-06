@@ -20,7 +20,7 @@ jobs:
   changes:
     if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -64,5 +64,5 @@ jobs:
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
-          pnpm install --frozen-lockfile
-          pnpm turbo lint build --parallel --concurrency=100%
+          pnpm install --frozen-lockfile --offline
+          pnpm turbo lint build --parallel --concurrency=2
