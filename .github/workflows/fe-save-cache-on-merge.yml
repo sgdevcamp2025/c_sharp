@@ -1,14 +1,14 @@
 name: Save Cache on PR Merge
 
 on:
-  # pull_request:
-  #   types: [closed]
-  #   branches:
-  #     - main
-  #     - dev
-  push:
+  pull_request:
+    types: [closed]
     branches:
-      - fe-refac/fe-ci
+      - main
+      - dev
+  # push:
+  #   branches:
+  #     - fe-refac/fe-ci
 
 jobs:
   save-cache:

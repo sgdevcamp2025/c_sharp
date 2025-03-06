@@ -61,10 +61,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-ui-
 
+      # 폴더가 없으면 생성해서 이후 단계에서 오류가 발생하지 않도록 함
+      - name: Ensure UI .turbo directory exists
+        run: mkdir -p src/frontend/packages/ui/.turbo
+
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
+          # --offline 옵션을 사용하면 캐시된 패키지만 설치합니다.
+          # 네트워크가 필요한 경우에는 이 옵션을 제거하세요.
           pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
+          # turbo가 이미 devDependencies에 있다면 이 명령은 불필요하므로 제거하거나 조건부 실행할 수 있음
           pnpm add turbo --save-dev -w
           pnpm turbo lint build --parallel
 
