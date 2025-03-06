@@ -7,9 +7,7 @@ on:
       - dev
       - main
     paths:
-      - 'src/frontend/apps/web/**'
-      - 'src/frontend/packages/ui/**'
-      - 'src/frontend/pnpm-lock.yaml'
+      - 'src/frontend/**'
   push:
     branches:
       - fe-refac/fe-ci
@@ -19,10 +17,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  frontend-ci:
+  changes:
     if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -37,14 +35,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.15.0
+          cache: 'pnpm'
+          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
       - name: Ensure Directories Exist
         run: |
           mkdir -p ~/.pnpm-store
           mkdir -p src/frontend/packages/ui/.turbo
           mkdir -p src/frontend/apps/web/.turbo
-
       - name: Restore pnpm store cache
         uses: actions/cache@v4
         with:
@@ -52,7 +51,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
-
       - name: Restore Web .turbo Cache
         uses: actions/cache@v4
         with:
@@ -60,7 +58,6 @@ jobs:
           key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/apps/web/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-turbo-web-
-
       - name: Restore UI .turbo Cache
         uses: actions/cache@v4
         with:
@@ -68,9 +65,8 @@ jobs:
           key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/packages/ui/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-turbo-ui-
-
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
           pnpm install --frozen-lockfile --prefer-offline --no-optional
-          pnpm turbo lint build --parallel --concurrency=4
+          pnpm turbo lint build --parallel --concurrency=10
