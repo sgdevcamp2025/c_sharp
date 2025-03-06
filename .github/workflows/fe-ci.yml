@@ -36,14 +36,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.15.0
-          # cache: 'pnpm'
-          # cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
       - name: Ensure Directories Exist
         run: |
           mkdir -p ~/.pnpm-store
           mkdir -p src/frontend/packages/ui/.turbo
           mkdir -p src/frontend/apps/web/.turbo
+
       - name: Restore pnpm store cache
         uses: actions/cache@v4
         with:
@@ -51,22 +50,19 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
-      - name: Restore Web .turbo Cache
+
+      - name: Restore Turborepo Cache
         uses: actions/cache@v4
         with:
-          path: src/frontend/apps/web/.turbo
-          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/apps/web/pnpm-lock.yaml') }}
+          path: |
+            src/frontend/apps/web/.turbo
+            src/frontend/packages/ui/.turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-turbo-web-
-      - name: Restore UI .turbo Cache
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/packages/ui/.turbo
-          key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/packages/ui/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-ui-
+            ${{ runner.os }}-turbo-
+
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
           pnpm install --frozen-lockfile
-          pnpm turbo lint build --parallel --concurrency=4
+          pnpm turbo lint build --parallel --concurrency=12
