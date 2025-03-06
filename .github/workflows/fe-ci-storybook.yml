@@ -11,7 +11,7 @@ on:
       - '../workflows/fe-ci-storybook.yml'
   push:
     branches:
-      - fe-refac/ci-storybook
+      - fe-refac/fe-ci
     # paths:
     #   - 'src/frontend/packages/ui/**'
 
