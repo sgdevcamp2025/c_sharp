@@ -72,3 +72,6 @@ jobs:
           pnpm install --prefer-offline --strict-peer-dependencies=false --frozen-lockfile
           pnpm add turbo --save-dev -w
           pnpm turbo lint build --parallel
+
+      - name: Check pnpm version
+        run: pnpm --version
