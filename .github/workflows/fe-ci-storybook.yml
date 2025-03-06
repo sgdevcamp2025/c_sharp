@@ -11,9 +11,9 @@ on:
       - '../workflows/fe-ci-storybook.yml'
   push:
     branches:
-      - fe-refac/fe-ci
-    # paths:
-    #   - 'src/frontend/packages/ui/**'
+      - fe-refac/ci-storybook
+    paths:
+      - 'src/frontend/packages/ui/**'
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}'
@@ -27,13 +27,16 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
-          cache-dependency-path: src/frontend/pnpm-lock.yaml
+          # 캐시 옵션 제거 (pnpm 캐시는 별도로 설치 단계에서 관리)
+          # cache: 'pnpm'
+          # cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
