@@ -18,10 +18,9 @@ concurrency:
 
 jobs:
   changes:
-    if: ${{ github.actor != 'l10nbot' }} # Avoid running for 'l10nbot'
+    if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -33,38 +32,40 @@ jobs:
         with:
           node-version: 20
 
-      - uses: pnpm/action-setup@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
         with:
           version: 8
 
-      - name: Cache dependencies
-        uses: actions/cache/restore@v4
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
         with:
-          path: |
-            ~/.pnpm-store
-            **/node_modules
-            src/frontend/node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      - name: Cache Turborepo cache
-        uses: actions/cache/restore@v4
+      - name: Restore Web .turbo Cache
+        uses: actions/cache@v4
         with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: src/frontend/apps/web/.turbo
+          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/apps/web/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-turbo-
+            ${{ runner.os }}-turbo-web-
 
-      - name: Install dependencies
+      - name: Restore UI .turbo Cache
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/packages/ui/.turbo
+          key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/packages/ui/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-ui-
+
+      - name: Install dependencies and run CI
+        working-directory: src/frontend
         run: |
-          cd src/frontend
           pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
           pnpm add turbo --save-dev -w
-
-      - name: CI
-        run: |
-          cd src/frontend
           pnpm turbo lint build --parallel
 
   required:
@@ -72,6 +73,6 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: fail if conditional jobs failed
+      - name: Fail if any previous job failed
         if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'skipped') || contains(needs.*.result, 'cancelled')
         run: exit 1
