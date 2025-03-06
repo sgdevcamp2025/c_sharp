@@ -21,13 +21,9 @@ jobs:
     if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      TURBO_NO_TELEMETRY: 1
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -37,33 +33,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.15.0
+          node-version: 20
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
-
-      # - name: Ensure Directories Exist
-      #   run: |
-      #     mkdir -p ~/.pnpm-store
-      #     mkdir -p src/frontend/packages/ui/.turbo
-      #     mkdir -p src/frontend/apps/web/.turbo
-
-      # - name: Restore PNPM Store Cache
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.pnpm-store
-      #     key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pnpm-
-
-      # - name: Restore Turborepo Cache
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: |
-      #       src/frontend/apps/web/.turbo
-      #       src/frontend/packages/ui/.turbo
-      #     key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/**/pnpm-lock.yaml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-turbo-
 
       - name: Install dependencies
         working-directory: src/frontend
