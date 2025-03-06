@@ -21,6 +21,8 @@ jobs:
     if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      TURBO_NO_TELEMETRY: 1 # 텔레메트리 비활성화
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -36,6 +38,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.15.0
+          cache: 'pnpm'
+          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
       - name: Ensure Directories Exist
         run: |
@@ -43,7 +47,7 @@ jobs:
           mkdir -p src/frontend/packages/ui/.turbo
           mkdir -p src/frontend/apps/web/.turbo
 
-      - name: Restore pnpm store cache
+      - name: Restore PNPM Store Cache
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
@@ -61,8 +65,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Install dependencies and run CI
+      - name: Install dependencies
+        working-directory: src/frontend
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Run Lint and Build
         working-directory: src/frontend
         run: |
-          pnpm install --frozen-lockfile --prefer-offline
-          pnpm turbo lint build --filter=web --filter=@workspace/ui --parallel --concurrency=4
+          pnpm turbo lint --filter=web --filter=@workspace/ui --parallel --concurrency=4
+          pnpm turbo build --filter=web --parallel --concurrency=4
