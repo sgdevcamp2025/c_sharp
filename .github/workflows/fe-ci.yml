@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      TURBO_NO_TELEMETRY: 1 # 텔레메트리 비활성화
+      TURBO_NO_TELEMETRY: 1
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -38,8 +38,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.15.0
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+          # cache: 'pnpm'
+          # cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
       - name: Ensure Directories Exist
         run: |
@@ -72,5 +72,5 @@ jobs:
       - name: Run Lint and Build
         working-directory: src/frontend
         run: |
-          pnpm turbo lint --filter=web --filter=@workspace/ui --parallel --concurrency=4
-          pnpm turbo build --filter=web --parallel --concurrency=4
+          pnpm turbo lint --filter=web --filter=@workspace/ui 
+          pnpm turbo build --filter=web
