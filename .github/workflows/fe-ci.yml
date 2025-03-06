@@ -70,5 +70,5 @@ jobs:
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
-          pnpm ci --prefer-offline --frozen-lockfile
+          pnpm ci
           pnpm turbo lint build --parallel
