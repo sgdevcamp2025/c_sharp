@@ -6,9 +6,9 @@ on:
     branches:
       - main
       - dev
-  # push:
-  #   branches:
-  #     - fe-refac/fe-ci
+  push:
+    branches:
+      - fe-refac/fe-ci
 
 jobs:
   save-cache:
