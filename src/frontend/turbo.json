@@ -19,22 +19,22 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["apps/web/.next/**"],
       "cache": true,
       "persistent": true
     },
     "build-storybook": {
       "dependsOn": ["^build-storybook"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["storybook-static/**"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["packages/ui/storybook-static/**"],
       "cache": true,
       "persistent": false
     },
     "storybook": {
       "dependsOn": ["^storybook"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["storybook-static/**"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["packages/ui/storybook-static/**"],
       "cache": true,
       "persistent": false
     },
