@@ -12,7 +12,6 @@ on:
 
 jobs:
   save-cache:
-    # if: ${{ github.event.pull_request.merged == true || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -41,12 +40,19 @@ jobs:
           cd src/frontend
           pnpm turbo build --parallel
 
+      # 디렉터리 존재 여부 보장: 캐시 저장 전에 해당 경로가 없으면 생성
+      - name: Ensure caching directories exist
+        run: |
+          mkdir -p ~/.pnpm-store
+          mkdir -p src/frontend/apps/web/.turbo
+          mkdir -p src/frontend/packages/ui/.turbo
+
       - name: Save pnpm store cache
         if: always()
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
 
       - name: Save Turborepo cache for web app
         if: always()
