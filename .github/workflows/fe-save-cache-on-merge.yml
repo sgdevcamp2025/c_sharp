@@ -36,29 +36,28 @@ jobs:
           pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
           pnpm add turbo --save-dev -w
 
+      - name: Build for updating .turbo cache (optional)
+        run: |
+          cd src/frontend
+          pnpm turbo build --parallel
+
       - name: Save pnpm store cache
+        if: always()
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-          save-always: true
 
       - name: Save Turborepo cache for web app
+        if: always()
         uses: actions/cache@v4
         with:
           path: src/frontend/apps/web/.turbo
           key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/apps/web/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-web-
-          save-always: true
 
       - name: Save Turborepo cache for ui package
+        if: always()
         uses: actions/cache@v4
         with:
           path: src/frontend/packages/ui/.turbo
           key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/packages/ui/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-ui-
-          save-always: true
