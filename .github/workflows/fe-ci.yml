@@ -10,11 +10,11 @@ on:
       - 'src/frontend/**'
       - '!src/frontend/packages/ui/**'
       - '../workflows/fe-ci.yml'
-  # push:
-  #   branches:
-  #     - fe-feat/ci-storybook
-  #   paths:
-  #     - '!src/frontend/packages/ui/**'
+  push:
+    branches:
+      - fe-refac/fe-ci
+    paths:
+      - '!src/frontend/packages/ui/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -35,7 +35,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - uses: pnpm/action-setup@v3
         with:
@@ -51,9 +51,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
-
-      - name: Install pnpm
-        run: npm install -g pnpm
 
       - name: Install dependencies
         run: |
