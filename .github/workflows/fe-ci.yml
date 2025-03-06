@@ -14,6 +14,7 @@ on:
     branches:
       - fe-refac/fe-ci
     paths:
+      - '../workflows/fe-ci.yml'
       - '!src/frontend/packages/ui/**'
 
 concurrency:
