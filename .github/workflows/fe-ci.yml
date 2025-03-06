@@ -69,4 +69,4 @@ jobs:
         working-directory: src/frontend
         run: |
           pnpm install --frozen-lockfile
-          pnpm turbo lint build --parallel --concurrency=12
+          pnpm turbo lint build --parallel --concurrency=4
