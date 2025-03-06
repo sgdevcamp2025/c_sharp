@@ -59,11 +59,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src/frontend/apps/web/.turbo
-          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/apps/web/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
 
       - name: Save Turborepo cache for ui package
         if: always()
         uses: actions/cache@v4
         with:
           path: src/frontend/packages/ui/.turbo
-          key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/packages/ui/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
