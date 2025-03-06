@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Check out code
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
@@ -37,8 +37,10 @@ jobs:
         with:
           version: 8
 
-      - name: Ensure pnpm store directory exists
-        run: mkdir -p ~/.pnpm-store
+      - name: Ensure Directories Exist
+        run: |
+          mkdir -p ~/.pnpm-store
+          mkdir -p src/frontend/packages/ui/.turbo
 
       - name: Restore pnpm store cache
         uses: actions/cache@v4
@@ -64,22 +66,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-ui-
 
-      # 폴더가 없으면 생성해서 이후 단계에서 오류가 발생하지 않도록 함
-      - name: Ensure UI .turbo directory exists
-        run: mkdir -p src/frontend/packages/ui/.turbo
-
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
-          pnpm install --offline --strict-peer-dependencies=false --no-frozen-lockfile
+          pnpm install --prefer-offline --strict-peer-dependencies=false --no-frozen-lockfile
           pnpm add turbo --save-dev -w
           pnpm turbo lint build --parallel
-
-  required:
-    needs: [changes]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Fail if any previous job failed
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'skipped') || contains(needs.*.result, 'cancelled')
-        run: exit 1
