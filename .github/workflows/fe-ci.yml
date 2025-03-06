@@ -66,12 +66,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-ui-
 
+      - name: Check pnpm version
+        run: pnpm --version
+
       - name: Install dependencies and run CI
         working-directory: src/frontend
         run: |
           pnpm install --prefer-offline --strict-peer-dependencies=false --frozen-lockfile
           pnpm add turbo --save-dev -w
           pnpm turbo lint build --parallel
-
-      - name: Check pnpm version
-        run: pnpm --version
