@@ -1,18 +1,18 @@
 name: Save Cache on PR Merge
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
-      - dev
+  # pull_request:
+  #   types: [closed]
+  #   branches:
+  #     - main
+  #     - dev
   push:
     branches:
       - fe-refac/fe-ci
 
 jobs:
   save-cache:
-    if: ${{ github.event.pull_request.merged == true }}
+    # if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
