@@ -12,7 +12,7 @@ on:
 
 jobs:
   save-cache:
-    # if: ${{ github.event.pull_request.merged == true }}
+    # if: ${{ github.event.pull_request.merged == true || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -43,11 +43,22 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
+          save-always: true
 
-      - name: Save Turborepo cache
+      - name: Save Turborepo cache for web app
         uses: actions/cache@v4
         with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: src/frontend/apps/web/.turbo
+          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/apps/web/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-turbo-
+            ${{ runner.os }}-turbo-web-
+          save-always: true
+
+      - name: Save Turborepo cache for ui package
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/packages/ui/.turbo
+          key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/packages/ui/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-ui-
+          save-always: true
