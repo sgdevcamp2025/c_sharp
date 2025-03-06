@@ -41,29 +41,29 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
-      - name: Ensure Directories Exist
-        run: |
-          mkdir -p ~/.pnpm-store
-          mkdir -p src/frontend/packages/ui/.turbo
-          mkdir -p src/frontend/apps/web/.turbo
+      # - name: Ensure Directories Exist
+      #   run: |
+      #     mkdir -p ~/.pnpm-store
+      #     mkdir -p src/frontend/packages/ui/.turbo
+      #     mkdir -p src/frontend/apps/web/.turbo
 
-      - name: Restore PNPM Store Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+      # - name: Restore PNPM Store Cache
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ~/.pnpm-store
+      #     key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pnpm-
 
-      - name: Restore Turborepo Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            src/frontend/apps/web/.turbo
-            src/frontend/packages/ui/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
+      # - name: Restore Turborepo Cache
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       src/frontend/apps/web/.turbo
+      #       src/frontend/packages/ui/.turbo
+      #     key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/**/pnpm-lock.yaml') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-turbo-
 
       - name: Install dependencies
         working-directory: src/frontend
