@@ -52,8 +52,7 @@ jobs:
       - name: Install dependencies
         working-directory: src/frontend
         run: |
-          # 변경된 패키지만 설치
-          pnpm install --frozen-lockfile --prefer-offline --filter="...[origin/main]"
+          pnpm install --frozen-lockfile --prefer-offline
 
       - name: Cache installed dependencies
         uses: actions/cache@v4
@@ -104,7 +103,7 @@ jobs:
       - name: Run Lint
         working-directory: src/frontend
         run: |
-          pnpm turbo lint --filter="...[origin/main]" --parallel --concurrency=10
+          pnpm turbo lint --parallel --concurrency=10
 
   build:
     needs: setup
@@ -147,4 +146,4 @@ jobs:
       - name: Run Build
         working-directory: src/frontend
         run: |
-          pnpm turbo build --filter="...[origin/main]" --parallel --concurrency=10
+          pnpm turbo build --parallel --concurrency=10
