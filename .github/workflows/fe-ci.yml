@@ -38,8 +38,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.15.0
-          # cache: 'pnpm'
-          # cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+          cache: 'pnpm'
+          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
       - name: Ensure Directories Exist
         run: |
