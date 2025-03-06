@@ -43,23 +43,3 @@ jobs:
           pnpm install --frozen-lockfile --prefer-offline
           pnpm turbo lint --filter=web --filter=@workspace/ui --parallel 
           pnpm turbo build --filter=web --parallel
-
-      # 디버깅: 빌드 산출물 디렉터리 확인 (예: Next.js 빌드 결과물)
-      - name: 'Debug: List apps/web directory'
-        working-directory: src/frontend/apps/web
-        run: ls -la
-
-      - name: 'Debug: List .next directory (build outputs)'
-        working-directory: src/frontend/apps/web
-        run: |
-          if [ -d ".next" ]; then
-            echo ".next directory exists:";
-            ls -la .next
-          else
-            echo ".next directory not found";
-          fi
-
-      # 디버깅: 워크스페이스 UI 폴더 내용 확인
-      - name: 'Debug: List packages/ui directory'
-        working-directory: src/frontend/packages/ui
-        run: ls -la

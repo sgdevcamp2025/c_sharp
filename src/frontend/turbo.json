@@ -20,21 +20,21 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["src/frontend/apps/web/.next/**"],
+      "outputs": ["./apps/web/.next/**"],
       "cache": true,
       "persistent": true
     },
     "build-storybook": {
       "dependsOn": ["^build-storybook"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["src/frontend/packages/ui/storybook-static/**"],
+      "outputs": ["./packages/ui/storybook-static/**"],
       "cache": true,
       "persistent": false
     },
     "storybook": {
       "dependsOn": ["^storybook"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["src/frontend/packages/ui/storybook-static/**"],
+      "outputs": ["./packages/ui/storybook-static/**"],
       "cache": true,
       "persistent": false
     },
