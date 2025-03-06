@@ -20,7 +20,9 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**"]
+      "outputs": [".next/**"],
+      "cache": true,
+      "persistent": true
     },
     "build-storybook": {
       "dependsOn": ["^build-storybook"],
@@ -39,8 +41,8 @@
     "lint": {
       "dependsOn": ["^lint"],
       "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx}"],
-      "cache": false,
-      "persistent": false
+      "cache": true,
+      "persistent": true
     },
     "dev": {
       "cache": false,
