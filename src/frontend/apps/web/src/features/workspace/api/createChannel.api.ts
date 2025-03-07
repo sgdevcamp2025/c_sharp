@@ -6,7 +6,7 @@ export type WorkspaceResponse = {
   createdAt: Date;
 };
 
-export const createWorkspace = async (
+export const createChannel = async (
   workspaceId: number,
   channelName: string,
 ) => {

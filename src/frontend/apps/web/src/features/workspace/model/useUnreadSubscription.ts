@@ -1,16 +1,14 @@
-// useWorkspaceSubscription.ts
 import { useCallback, useEffect, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useStompWebSocket } from '@/src/shared/providers';
 import { QUERY_KEYS } from '@/src/shared/services';
+import type { UnreadSubscriptionResponse } from '@/src/entities/workspace';
 
-import type { WorkspaceSubscriptionResponse } from './subscription.type';
-
-export const useWorkspaceSubscription = (workspaceId: number) => {
+export const useUnreadSubscription = (workspaceId: number) => {
   const queryClient = useQueryClient();
-  const { client } = useStompWebSocket();
+  const { client, sessionId } = useStompWebSocket();
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
@@ -30,19 +28,25 @@ export const useWorkspaceSubscription = (workspaceId: number) => {
       );
       return;
     }
+    if (!sessionId) {
+      console.warn(
+        '⏳ SessionId가 아직 설정되지 않았습니다. 구독을 대기합니다.',
+      );
+      return;
+    }
 
     const subscription = client.subscribe(
-      `/subscribe/workspace.${workspaceId}`,
+      `/subscribe/notification.${sessionId}/workspace.${workspaceId}`,
       (message) => {
         try {
           const payload = JSON.parse(
             message.body,
-          ) as WorkspaceSubscriptionResponse;
-          console.log('📩 Received workspace message:', payload);
-          console.log('workspace success');
+          ) as UnreadSubscriptionResponse;
+          console.log('📩 qweReceived unread message:', payload);
+          console.log('unRead success');
 
           queryClient.setQueryData(
-            QUERY_KEYS.workspaceMessages(workspaceId),
+            QUERY_KEYS.notificationWorkspaceMessages(sessionId, workspaceId),
             payload,
           );
         } catch (error) {
@@ -52,10 +56,9 @@ export const useWorkspaceSubscription = (workspaceId: number) => {
     );
 
     return () => {
-      console.log(`📴 Unsubscribing from /subscribe/workspace.${workspaceId}`);
       subscription.unsubscribe();
     };
-  }, [client, workspaceId, queryClient]);
+  }, [client, sessionId, workspaceId, queryClient]);
 
   return { subscribe, isConnected };
 };

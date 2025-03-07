@@ -4,12 +4,11 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { useStompWebSocket } from '@/src/shared/providers';
 import { QUERY_KEYS } from '@/src/shared/services';
+import type { WorkspaceSubscriptionResponse } from '@/src/entities/workspace';
 
-import type { UnreadSubscriptionResponse } from './subscription.type';
-
-export const useUnreadSubscription = (workspaceId: number) => {
+export const useWorkspaceSubscription = (workspaceId: number) => {
   const queryClient = useQueryClient();
-  const { client, sessionId } = useStompWebSocket();
+  const { client } = useStompWebSocket();
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
@@ -29,25 +28,19 @@ export const useUnreadSubscription = (workspaceId: number) => {
       );
       return;
     }
-    if (!sessionId) {
-      console.warn(
-        '⏳ SessionId가 아직 설정되지 않았습니다. 구독을 대기합니다.',
-      );
-      return;
-    }
 
     const subscription = client.subscribe(
-      `/subscribe/notification.${sessionId}/workspace.${workspaceId}`,
+      `/subscribe/workspace.${workspaceId}`,
       (message) => {
         try {
           const payload = JSON.parse(
             message.body,
-          ) as UnreadSubscriptionResponse;
-          console.log('📩 qweReceived unread message:', payload);
-          console.log('unRead success');
+          ) as WorkspaceSubscriptionResponse;
+          console.log('📩 Received workspace message:', payload);
+          console.log('workspace success');
 
           queryClient.setQueryData(
-            QUERY_KEYS.notificationWorkspaceMessages(sessionId, workspaceId),
+            QUERY_KEYS.workspaceMessages(workspaceId),
             payload,
           );
         } catch (error) {
@@ -57,9 +50,10 @@ export const useUnreadSubscription = (workspaceId: number) => {
     );
 
     return () => {
+      console.log(`📴 Unsubscribing from /subscribe/workspace.${workspaceId}`);
       subscription.unsubscribe();
     };
-  }, [client, sessionId, workspaceId, queryClient]);
+  }, [client, workspaceId, queryClient]);
 
   return { subscribe, isConnected };
 };

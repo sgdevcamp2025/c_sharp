@@ -1,6 +1,6 @@
-import { WORKSPACE_ID } from '../model';
+import { WORKSPACE_ID } from './WorkspaceId';
 
-export function getWorkspaceId(stockSlug: string): number {
+export const getWorkspaceId = (stockSlug: string): number => {
   switch (stockSlug) {
     case 'samsung-electronics':
       return WORKSPACE_ID.SAMSUNG;
@@ -15,4 +15,4 @@ export function getWorkspaceId(stockSlug: string): number {
     default:
       return -1;
   }
-}
+};

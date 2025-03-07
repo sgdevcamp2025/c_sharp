@@ -1,9 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { QUERY_KEYS } from '@/src/shared/services';
-
-import type { UnreadSubscriptionResponse } from './subscription.type';
 import { useStompWebSocket } from '@/src/shared';
+import type { UnreadSubscriptionResponse } from '@/src/entities/workspace';
 
 export const useUnreadMessages = (workspaceId: number) => {
   const queryClient = useQueryClient();

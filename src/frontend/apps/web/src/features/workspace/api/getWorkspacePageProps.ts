@@ -2,9 +2,9 @@ import type { GetServerSideProps } from 'next';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 
 import { QUERY_KEYS } from '@/src/shared';
-import { getWorkspaceList } from '../api';
+import { getWorkspaceList } from '.';
 
-export type WorkspacePageProps = {
+type WorkspacePageProps = {
   workspaceId: number;
 };
 

@@ -1,6 +1,6 @@
 import { clientFetchInstance, TAG_KEYS } from '@/src/shared/services';
 
-export type SuccessResponse = string;
+type SuccessResponse = string;
 
 export const joinChannel = async (workspaceId: number, channelId: number) => {
   return clientFetchInstance<SuccessResponse, never>(

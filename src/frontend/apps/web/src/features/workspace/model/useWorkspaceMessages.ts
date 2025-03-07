@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { QUERY_KEYS } from '@/src/shared/services';
 
-import type { WorkspaceSubscriptionResponse } from './subscription.type';
+import type { WorkspaceSubscriptionResponse } from '@/src/entities/workspace';
 
 export const useWorkspaceMessages = (workspaceId: number) => {
   const queryClient = useQueryClient();

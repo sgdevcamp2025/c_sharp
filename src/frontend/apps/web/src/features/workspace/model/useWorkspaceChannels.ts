@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from 'react';
 
-import { useQuery, QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { QUERY_KEYS } from '@/src/shared';
 
@@ -10,7 +10,7 @@ import {
   joinChannelResponse,
   unjoinChannelResponse,
 } from '../api';
-import { useWorkspaceMessages, useWorkspaceSubscription } from '../model';
+import { useWorkspaceMessages, useWorkspaceSubscription } from '.';
 
 type Action =
   | { type: 'SET_INITIAL_DATA'; payload: WorkspaceListResponse }

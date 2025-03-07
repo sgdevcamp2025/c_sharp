@@ -17,17 +17,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@workspace/ui/components';
-import { useChatId } from '@/src/shared';
 
-import WorkspaceModal from './workspace-modal';
+import { useChatId } from '@/src/shared';
+import { getWorkspaceId } from '@/src/entities/workspace';
+
+import WorkspaceModal from './WorkspaceModal';
 
 import {
   useWorkspaceChannels,
   useUnreadMessages,
   useUnreadSubscription,
 } from '../model';
-import { createWorkspace, joinChannel } from '../api'; // joinChannel 추가
-import { getWorkspaceId } from '../lib';
+import { createChannel, joinChannel } from '../api';
 
 // 채널 렌더링 함수를 분리 (joinedChannels와 unjoinedChannels를 별도로 처리)
 const renderJoinedChannels = (
@@ -152,7 +153,7 @@ const SidebarContainer = ({ stockSlug }: { stockSlug: string }) => {
   if (workspaceId === -1) return <div>Error: Invalid workspace id</div>;
 
   const handleCreateChannel = async (data: { workspace?: string }) => {
-    await createWorkspace(workspaceId, data.workspace);
+    await createChannel(workspaceId, data.workspace);
   };
 
   const handleChannelClick = (channelId: number) => {

@@ -16,7 +16,7 @@ import {
   Input,
 } from '@workspace/ui/components';
 
-import { WorkspaceFormSchema } from '../model';
+import { WorkspaceFormSchema } from '@/src/entities/workspace';
 
 type FormValues = z.infer<typeof WorkspaceFormSchema>;
 
