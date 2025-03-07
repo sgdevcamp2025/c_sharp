@@ -5,4 +5,4 @@ export type {
   WorkspaceListResponse,
 } from './getWorkspaceList.api';
 export { createChannel } from './createChannel.api';
-export { joinChannel } from './join-channel.api';
+export { joinChannel } from './joinChannel.api';

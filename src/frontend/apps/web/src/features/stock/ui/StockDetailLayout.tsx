@@ -1,6 +1,7 @@
-import { STOCKS } from '../model/stock.constants';
-import StockChartContainer from './stock-chart-container';
-import StockInfoContainer from './stock-info-container';
+import { STOCKS } from '@/src/entities/stock';
+
+import StockChartContainer from './StockChartContainer';
+import StockInfoContainer from './StockInfoContainer';
 
 const StockDetailLayout = ({ stockSlug }: { stockSlug: string }) => {
   const stockCode = STOCKS[stockSlug].code;

@@ -1,17 +1,20 @@
 'use client';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '@workspace/ui/components';
-import StockChartItem from './stock-chart-item';
-import { ChartType, StockChartAPIResponse, useStockWebSocket } from '../model';
-import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/src/shared/services';
-import { dummyStockData } from '../model/stock.mock';
-import { fetchStock } from '../api/fetchStock.api';
+import { dummyStockData } from '@/src/shared';
+import { ChartType, type StockChartAPIResponse } from '@/src/entities/stock';
+
+import StockChartItem from './StockChartItem';
+import { useStockWebSocket } from '../model';
+import { fetchStock } from '../api';
+
 const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
   const { subscribe } = useStockWebSocket();
 

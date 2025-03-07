@@ -1,7 +1,7 @@
 import { SidebarTrigger } from '@workspace/ui/components';
 
 import Header from './Header';
-import HuddleButon from '../../video/ui/huddle-button';
+import HuddleButon from '../../video/ui/HuddleButon';
 
 const ChatHeader = ({ stockSlug }: { stockSlug: string }) => {
   return (

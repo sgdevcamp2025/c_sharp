@@ -1,13 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+
 import {
-  CandleChart,
   ChartType,
-  DefaultChart,
-  StockChartAPIResponse,
-  useStockChart,
-} from '../model';
+  type CandleChart,
+  type DefaultChart,
+  type StockChartAPIResponse,
+} from '@/src/entities/stock';
+
+import { useStockChart } from '../model';
 import {
   formatCandleChart,
   formatHistogramChart,

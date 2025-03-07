@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
 
-import { getWorkspaceId } from '@/src/features/workspace/lib';
+import { getWorkspaceId } from '@/src/entities/workspace';
 
 type ChatContextType = {
   workspaceId: number | null;

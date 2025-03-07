@@ -1,5 +1,7 @@
 'use client';
-
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ChevronDown } from 'lucide-react';
 import {
   ColumnFiltersState,
   SortingState,
@@ -10,8 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useState } from 'react';
-import { columns } from '../model';
+
 import {
   Button,
   DropdownMenu,
@@ -26,9 +27,10 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components';
-import { useRouter } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
-import { RealTimeStock } from '../model/stock.types';
+import { RealTimeStock } from '@/src/entities/stock';
+
+import { columns } from '../model';
+
 export const RealTimeDummy: RealTimeStock[] = [
   {
     slug: 'samsung-electronics',

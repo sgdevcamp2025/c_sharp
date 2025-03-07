@@ -1,5 +1,6 @@
 'use client';
 import { useWebSocket } from '@/src/shared';
+
 import { StockForTable } from '../lib';
 
 const StockInfo = () => {

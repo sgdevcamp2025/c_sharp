@@ -1,5 +1,5 @@
-import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
+import { ColumnDef } from '@tanstack/react-table';
 
 import { Button } from '@workspace/ui/components';
 

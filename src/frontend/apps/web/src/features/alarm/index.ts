@@ -1,1 +1,1 @@
-export { ToastAlarm } from './model/toast-alarm';
+export { ToastAlarm } from './model/ToastAlarm';

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 
 import type { Alarm } from '@/src/entities/alarm';
-import { webSocketEvent } from '@/src/shared/providers/stomp-websocket-provider';
+import { webSocketEvent } from '@/src/shared/providers/StompWebSocketProvider';
 import { useToast } from '@workspace/ui/hooks/Toast/use-toast';
 
 export const ToastAlarm = () => {

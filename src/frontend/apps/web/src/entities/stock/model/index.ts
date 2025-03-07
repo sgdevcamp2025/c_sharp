@@ -7,3 +7,4 @@ export type {
   RealTimeStock,
 } from './stock-type';
 export { ChartType } from './stock-type';
+export { STOCKS } from './Stock';

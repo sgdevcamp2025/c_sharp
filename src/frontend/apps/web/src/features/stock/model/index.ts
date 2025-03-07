@@ -1,9 +1,3 @@
-export { columns } from './stocks-table.columns';
-export {
-  dummyStockData,
-  dummyRealTime,
-  StockTabledata,
-  RealTimeDummy,
-} from './stock.mock';
-export { useStockChart } from './use-stock-chart';
-export { useStockWebSocket } from './use-stock-websocket';
+export { columns } from './StocksTable';
+export { useStockChart } from './useStockChart';
+export { useStockWebSocket } from './useStockWebSocket';
