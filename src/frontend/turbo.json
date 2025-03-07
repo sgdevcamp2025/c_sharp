@@ -42,7 +42,7 @@
       "dependsOn": ["^lint"],
       "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx}"],
       "cache": true,
-      "persistent": true
+      "persistent": false
     },
     "dev": {
       "cache": false,
@@ -52,7 +52,7 @@
       "dependsOn": ["^format"],
       "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx,json,md}"],
       "cache": false,
-      "persistent": true
+      "persistent": false
     },
     "typescript": {
       "dependsOn": ["^typescript"],
