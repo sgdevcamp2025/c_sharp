@@ -9,7 +9,7 @@ import {
 } from '@workspace/ui/components';
 import { QUERY_KEYS } from '@/src/shared/services';
 import { dummyStockData } from '@/src/shared';
-import { ChartType, type StockChartAPIResponse } from '@/src/entities/stock';
+import { CHART_TYPES, type StockChartAPIResponse } from '@/src/entities/stock';
 
 import StockChartItem from './StockChartItem';
 import { useStockWebSocket } from '../model';
@@ -38,7 +38,7 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
       >
         <StockChartItem
           data={stockData}
-          type={ChartType.Candlestick}
+          type={CHART_TYPES.Candlestick}
         />
       </ResizablePanel>
       <ResizableHandle withHandle />
@@ -50,7 +50,7 @@ const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
       >
         <StockChartItem
           data={stockData}
-          type={ChartType.Histogram}
+          type={CHART_TYPES.Histogram}
         />
       </ResizablePanel>
     </ResizablePanelGroup>

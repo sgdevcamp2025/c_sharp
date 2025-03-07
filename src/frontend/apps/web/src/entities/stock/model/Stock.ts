@@ -5,3 +5,9 @@ export const STOCKS = {
   naver: { code: '035420', name: 'NAVER' },
   'hanwha-aerospace': { code: '012450', name: '한화에어로스페이스' },
 } as const;
+
+export const CHART_TYPES = {
+  Candlestick: 'candlestick',
+  Line: 'line',
+  Histogram: 'histogram',
+};

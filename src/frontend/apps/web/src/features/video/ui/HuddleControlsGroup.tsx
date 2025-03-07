@@ -10,24 +10,24 @@ import {
 } from 'lucide-react';
 
 import { Button, ToggleGroup } from '@workspace/ui/components';
-import { HuddleControl } from '@/src/entities/video';
+import { HUDDLE_CONTROLS, type HuddleControl } from '@/src/entities/video';
 
 import HuddleControlItem from './HuddleControlItem';
 import { huddleControlReducer } from '../model';
 
 export const controlIconList = {
-  [HuddleControl.Mic]: { on: <Mic />, off: <MicOff /> },
-  [HuddleControl.Video]: { on: <Video />, off: <VideoOff /> },
-  [HuddleControl.Screen]: { on: <ScreenShare />, off: <ScreenShareOff /> },
+  [HUDDLE_CONTROLS.Mic]: { on: <Mic />, off: <MicOff /> },
+  [HUDDLE_CONTROLS.Video]: { on: <Video />, off: <VideoOff /> },
+  [HUDDLE_CONTROLS.Screen]: { on: <ScreenShare />, off: <ScreenShareOff /> },
 } as const;
 
 const HuddleControlsGroup = () => {
   const [controlGroupState, controlGroupDispatch] = useReducer(
     huddleControlReducer,
     {
-      [HuddleControl.Mic]: false,
-      [HuddleControl.Video]: false,
-      [HuddleControl.Screen]: false,
+      [HUDDLE_CONTROLS.Mic]: false,
+      [HUDDLE_CONTROLS.Video]: false,
+      [HUDDLE_CONTROLS.Screen]: false,
     },
   );
 

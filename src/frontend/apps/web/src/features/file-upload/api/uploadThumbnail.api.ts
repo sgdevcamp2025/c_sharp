@@ -1,6 +1,5 @@
 import { serverFetchInstance } from '@/src/shared/services/apis';
-
-import type { FileResponse } from '../../chat/model';
+import type { FileResponse } from '@/src/entities/file-upload';
 
 type ThumbnailData = {
   fileId: number;

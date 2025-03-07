@@ -1,10 +1,8 @@
 import { Time } from 'lightweight-charts';
 
-export enum ChartType {
-  Candlestick = 'candlestick',
-  Line = 'line',
-  Histogram = 'histogram',
-}
+import { CHART_TYPES } from './Stock';
+
+export type ChartType = (typeof CHART_TYPES)[keyof typeof CHART_TYPES];
 
 export type CandleChart = {
   time: Time;

@@ -11,7 +11,8 @@ import {
 } from 'lightweight-charts';
 
 import {
-  ChartType,
+  CHART_TYPES,
+  type ChartType,
   type CandleChart,
   type DefaultChart,
 } from '@/src/entities/stock';
@@ -22,7 +23,7 @@ export const useStockChart = (
   data: CandleChart[] | DefaultChart[],
 ) => {
   const chartRef = useRef<IChartApi | null>(null);
-  const seriesRef = useRef<ISeriesApi<keyof typeof ChartType> | null>(null);
+  const seriesRef = useRef<ISeriesApi<keyof typeof CHART_TYPES> | null>(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -37,9 +38,9 @@ export const useStockChart = (
       .timeScale()
       .applyOptions({ timeVisible: true, secondsVisible: false });
 
-    let series: ISeriesApi<keyof typeof ChartType>;
+    let series: ISeriesApi<keyof typeof CHART_TYPES>;
 
-    if (chartType === ChartType.Candlestick) {
+    if (chartType === CHART_TYPES.Candlestick) {
       series = chart.addSeries(CandlestickSeries, {
         upColor: 'red',
         downColor: 'blue',
@@ -49,10 +50,10 @@ export const useStockChart = (
         wickDownColor: 'blue',
       });
     }
-    if (chartType === ChartType.Line) {
+    if (chartType === CHART_TYPES.Line) {
       series = chart.addSeries(LineSeries, { lineWidth: 2 });
     }
-    if (chartType === ChartType.Histogram) {
+    if (chartType === CHART_TYPES.Histogram) {
       series = chart.addSeries(HistogramSeries, { color: '#26a69a' });
     }
     seriesRef.current = series;

@@ -5,6 +5,6 @@ export type {
   DefaultChart,
   CandleChart,
   RealTimeStock,
+  ChartType,
 } from './stock-type';
-export { ChartType } from './stock-type';
-export { STOCKS } from './Stock';
+export { STOCKS, CHART_TYPES } from './Stock';

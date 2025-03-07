@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 
 import {
-  ChartType,
-  type CandleChart,
-  type DefaultChart,
-  type StockChartAPIResponse,
+  CHART_TYPES,
+  CandleChart,
+  DefaultChart,
+  StockChartAPIResponse,
+  type ChartType,
 } from '@/src/entities/stock';
 
 import { useStockChart } from '../model';
@@ -30,13 +31,13 @@ const StockChartItem = ({ data, type }: StockChartItem) => {
 
   useEffect(() => {
     switch (type) {
-      case ChartType.Candlestick:
+      case CHART_TYPES.Candlestick:
         setFormattedData(formatCandleChart(data));
         break;
-      case ChartType.Line:
+      case CHART_TYPES.Line:
         setFormattedData(formatLineChart(data));
         break;
-      case ChartType.Histogram:
+      case CHART_TYPES.Histogram:
         setFormattedData(formatHistogramChart(data));
         break;
       default:

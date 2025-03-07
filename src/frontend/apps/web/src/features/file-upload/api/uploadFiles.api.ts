@@ -1,6 +1,5 @@
 import { clientFetchInstance } from '@/src/shared/services/apis';
-
-import { ResponseChunkFileData } from '../../chat/model';
+import type { ResponseChunkFileData } from '@/src/entities/file-upload';
 
 /**
  * 각 청크 데이터를 개별적으로 업로드하는 함수.

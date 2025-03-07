@@ -1,6 +1,6 @@
-import { uploadFiles } from './uploadFiles.api';
+import type { ResponseChunkFileData } from '@/src/entities/file-upload';
 
-import { ResponseChunkFileData } from '../../chat/model';
+import { uploadFiles } from './uploadFiles.api';
 
 export const uploadChunkWithRetry = async (
   chunk: Blob,
