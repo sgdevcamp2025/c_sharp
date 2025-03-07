@@ -1,4 +1,4 @@
-export { Providers } from './Providers';
+export { Providers } from './providers';
 export {
   StompWebSocketProvider,
   useStompWebSocket,

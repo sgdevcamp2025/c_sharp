@@ -7,7 +7,7 @@ import { SidebarInset, SidebarProvider } from '@workspace/ui/components';
 import { useChatId } from '@/src/shared';
 import { SidebarContainer } from '@/src/features/workspace';
 
-import ChatHeader from './ChatHeader';
+import ChatHeader from './ChatSectionHeader';
 import ChatSection from './ChatSection';
 import { useChatSubscribe } from '../model';
 
