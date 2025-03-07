@@ -1,7 +1,7 @@
 'use client';
-
-import { useUserStore } from '@/src/entities';
 import { useRouter } from 'next/navigation';
+
+import { useUserStore } from '@/src/shared';
 
 export const useLogout = () => {
   const router = useRouter();

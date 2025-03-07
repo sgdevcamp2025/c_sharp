@@ -1,8 +1,9 @@
 'use client';
 
-import { Button } from '@workspace/ui/components';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+
+import { Button } from '@workspace/ui/components';
 
 const LoginButton = () => {
   const router = useRouter();

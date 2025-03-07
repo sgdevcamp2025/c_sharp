@@ -1,7 +1,6 @@
 'use client';
-
-import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 //로그인이 안 되었을 경우 리디렉트용 wrapper
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {

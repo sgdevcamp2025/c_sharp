@@ -1,7 +1,8 @@
 'use client';
 
 import { Button } from '@workspace/ui/components';
-import { useLogout } from '../model/use-logout';
+
+import { useLogout } from '../model';
 
 const LogoutButton = () => {
   const handleLogout = useLogout();

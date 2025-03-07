@@ -1,10 +1,11 @@
 'use client';
-
+import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { requestLogin } from '../api/requestLogin.api';
-import { useUserStore } from '@/src/entities';
+
+import { useUserStore } from '@/src/shared';
+
+import { requestLogin } from '../api';
 
 export const useLoginRedirect = () => {
   const router = useRouter();

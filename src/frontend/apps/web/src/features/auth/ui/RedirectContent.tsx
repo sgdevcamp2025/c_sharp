@@ -1,5 +1,6 @@
 import { Loader2 } from 'lucide-react';
-import { useLoginRedirect } from '../model/use-login-redirect';
+
+import { useLoginRedirect } from '../model';
 
 const RedirectContent = () => {
   useLoginRedirect();

@@ -1,15 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
+
+import type { Alarm } from '@/src/entities/alarm';
 import { webSocketEvent } from '@/src/shared/providers/stomp-websocket-provider';
 import { useToast } from '@workspace/ui/hooks/Toast/use-toast';
-import { ToastAction } from '@workspace/ui/components';
-
-export type Alarm = {
-  userNickname: string;
-  channelName: string;
-  text: string;
-};
 
 export const ToastAlarm = () => {
   const { toast } = useToast();
