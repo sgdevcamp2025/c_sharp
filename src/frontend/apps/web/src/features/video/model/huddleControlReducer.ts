@@ -1,4 +1,4 @@
-import { type HuddleControl } from './huddle-control.type';
+import type { HuddleControl } from '@/src/entities/video';
 
 export type HuddleControlsState = {
   [HuddleControl.Mic]: boolean;

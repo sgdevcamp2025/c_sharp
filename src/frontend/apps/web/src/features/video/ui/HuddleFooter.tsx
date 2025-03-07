@@ -1,6 +1,8 @@
-import { Toggle } from '@workspace/ui/components';
-import HuddleControlsGroup from './huddle-controls-group';
 import { MessageSquareText } from 'lucide-react';
+
+import { Toggle } from '@workspace/ui/components';
+
+import HuddleControlsGroup from './HuddleControlsGroup';
 
 const HuddleFooter = () => {
   return (

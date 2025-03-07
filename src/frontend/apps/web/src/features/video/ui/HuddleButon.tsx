@@ -1,8 +1,8 @@
 'use client';
+import Link from 'next/link';
+import { Headset } from 'lucide-react';
 
 import { Button } from '@workspace/ui/components';
-import { Headset } from 'lucide-react';
-import Link from 'next/link';
 
 const HuddleButon = ({ stockSlug }: { stockSlug: string }) => {
   return (

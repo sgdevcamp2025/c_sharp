@@ -1,5 +1,5 @@
 'use client';
-import { Button, ToggleGroup } from '@workspace/ui/components';
+import { useReducer } from 'react';
 import {
   Mic,
   MicOff,
@@ -8,9 +8,12 @@ import {
   Video,
   VideoOff,
 } from 'lucide-react';
-import { useReducer } from 'react';
-import HuddleControlItem from './huddle-control-item';
-import { HuddleControl, huddleControlReducer } from '../model';
+
+import { Button, ToggleGroup } from '@workspace/ui/components';
+import { HuddleControl } from '@/src/entities/video';
+
+import HuddleControlItem from './HuddleControlItem';
+import { huddleControlReducer } from '../model';
 
 export const controlIconList = {
   [HuddleControl.Mic]: { on: <Mic />, off: <MicOff /> },

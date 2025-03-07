@@ -1,6 +1,9 @@
-import { ToggleGroupItem } from '@workspace/ui/components';
-import { HuddleControl, HuddleControlAction } from '../model';
 import { Dispatch } from 'react';
+
+import { ToggleGroupItem } from '@workspace/ui/components';
+import { HuddleControl } from '@/src/entities/video';
+
+import { HuddleControlAction } from '../model';
 
 type HuddleControlProps = {
   value: HuddleControl;

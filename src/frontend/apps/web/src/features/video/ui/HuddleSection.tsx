@@ -1,4 +1,4 @@
-import HuddleParticipant from './huddle-participant-card';
+import HuddleParticipant from './HuddleParticipantCard';
 
 const HuddleSection = () => {
   return (

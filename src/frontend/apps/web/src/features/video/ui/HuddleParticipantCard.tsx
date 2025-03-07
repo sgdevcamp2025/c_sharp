@@ -1,4 +1,4 @@
-import HuddleParticipantAvatar from './huddle-participant-avatar';
+import HuddleParticipantAvatar from './HuddleParticipantAvatar';
 
 const HuddleParticipantCard = () => {
   // 참여자 카메라 화면 또는 아바타가 보여질 예정
