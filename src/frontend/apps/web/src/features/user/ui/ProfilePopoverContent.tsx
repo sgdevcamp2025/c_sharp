@@ -1,6 +1,7 @@
-import ProfilePicture from './profile-picture';
-import ProfileNickname from './profile-nickname';
-import { LogoutButton } from '../../auth';
+import { LogoutButton } from '@/src/features/auth';
+
+import ProfilePicture from './ProfilePicture';
+import ProfileNickname from './ProfileNickname';
 
 const ProfilePopoverContent = () => {
   return (

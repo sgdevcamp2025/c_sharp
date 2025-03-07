@@ -1,4 +1,5 @@
 'use client';
+import { CircleUserRound } from 'lucide-react';
 
 import {
   Avatar,
@@ -8,9 +9,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components';
-import { CircleUserRound } from 'lucide-react';
-import ProfilePopoverContent from './profile-popover-content';
-import { useUserStore } from '@/src/entities';
+
+import { useUserStore } from '@/src/shared';
+
+import ProfilePopoverContent from './ProfilePopoverContent';
 
 const ProfilePopover = () => {
   const profileImage = useUserStore((state) => state.user?.profileImage ?? '');

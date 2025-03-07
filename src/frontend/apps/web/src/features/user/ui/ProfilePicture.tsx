@@ -1,6 +1,5 @@
 'use client';
 
-import { useUserStore } from '@/src/entities';
 import {
   Avatar,
   AvatarFallback,
@@ -8,6 +7,8 @@ import {
   Button,
   Input,
 } from '@workspace/ui/components';
+
+import { useUserStore } from '@/src/shared';
 
 const ProfilePicture = () => {
   const isPictureEditMode = false;

@@ -1,11 +1,13 @@
 'use client';
-
-import { useUserStore } from '@/src/entities';
-import { Button, Input, Label } from '@workspace/ui/components';
-import { Pencil } from 'lucide-react';
 import { useReducer, useRef, useState } from 'react';
-import { ACTIONS, profileChangeReducer } from '../model/profile-change-reducer';
-import { changeNickname } from '../api/change-nickname.api';
+import { Pencil } from 'lucide-react';
+
+import { Button, Input, Label } from '@workspace/ui/components';
+
+import { useUserStore } from '@/src/shared';
+
+import { ACTIONS, profileChangeReducer } from '../model';
+import { changeNickname } from '../api';
 
 const ProfileNickname = () => {
   const nickname = useUserStore((state) => state.user?.nickname ?? '');
