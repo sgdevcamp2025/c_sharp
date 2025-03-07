@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User } from './user-type';
+import { User } from '../../entities/user/model/user-type';
 
 type UserStore = {
   user: User | null;
