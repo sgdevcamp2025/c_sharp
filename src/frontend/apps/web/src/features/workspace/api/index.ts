@@ -1,8 +1,8 @@
-export { getWorkspaceList } from './get-workspace-list.api';
+export { getWorkspaceList } from './getWorkspaceList.api';
 export type {
   joinChannelResponse,
   unjoinChannelResponse,
   WorkspaceListResponse,
-} from './get-workspace-list.api';
-export { createWorkspace } from './create-channel.api';
-export { joinChannel } from './join-channel.api';
+} from './getWorkspaceList.api';
+export { createChannel } from './createChannel.api';
+export { joinChannel } from './joinChannel.api';

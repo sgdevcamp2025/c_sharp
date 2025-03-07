@@ -2,7 +2,7 @@ export { Providers } from './providers';
 export {
   StompWebSocketProvider,
   useStompWebSocket,
-} from './stomp-websocket-provider';
-export { default as RQProvider } from './rq-provider';
-export { ChatIdProvider, useChatId } from './chat-id-provider';
-export { WebSocketProvider, useWebSocket } from './websocket-provider';
+} from './StompWebSocketProvider';
+export { default as RQProvider } from './RQProvider';
+export { ChatIdProvider, useChatId } from './ChatIdProvider';
+export { WebSocketProvider, useWebSocket } from './WebSocketProvider';

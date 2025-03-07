@@ -1,1 +1,2 @@
-export { default as HuddleContainer } from './ui/huddle-container';
+export * from './model';
+export * from './ui';

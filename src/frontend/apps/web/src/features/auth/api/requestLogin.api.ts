@@ -1,8 +1,7 @@
 'use server';
 
-import { postRequest } from '@/src/shared/services';
-import { AuthToken, User } from '@/src/entities';
-import { setCookie } from '@/src/shared/services/lib';
+import { User, AuthToken } from '@/src/entities';
+import { postRequest, setCookie } from '@/src/shared';
 
 type LoginRes = {
   user: User;

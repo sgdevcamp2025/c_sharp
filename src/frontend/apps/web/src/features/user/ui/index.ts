@@ -1,1 +1,1 @@
-export { default as ProfilePopover } from './profile-popover';
+export { default as ProfilePopover } from './ProfilePopover';
