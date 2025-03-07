@@ -2,7 +2,7 @@ import { getPing } from '../api';
 
 let cachedChunkSize: number | null = null;
 let cachedUploadConcurrency: number | null = null;
-const DEFAULT_CHUNK_SIZE = 10 * 1024 * 1024;
+const DEFAULT_CHUNK_SIZE = 200 * 1024 * 1024;
 
 /**
  * 네트워크 지연 시간에 따라 동적으로 청크 사이즈를 결정합니다.
@@ -27,9 +27,9 @@ export const getDynamicChunkSize = async (): Promise<number> => {
   // console.log('Network latency:', latency);
 
   if (latency > 1000) {
-    cachedChunkSize = 2.5 * 1024 * 1024;
+    cachedChunkSize = 10 * 1024 * 1024;
   } else if (latency > 500) {
-    cachedChunkSize = 5 * 1024 * 1024;
+    cachedChunkSize = 100 * 1024 * 1024;
   } else {
     cachedChunkSize = DEFAULT_CHUNK_SIZE;
   }
