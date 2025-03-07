@@ -29,7 +29,7 @@ import {
 } from '@workspace/ui/components';
 import { RealTimeStock } from '@/src/entities/stock';
 
-import { columns } from '../model';
+import { columns } from './StocksTable.columns';
 
 export const RealTimeDummy: RealTimeStock[] = [
   {
@@ -117,7 +117,7 @@ const StocksListTable = () => {
   // const formatted = stockData.map((data) =>
   //   StockForTable(data.data, data.code),
   // );
-  console.log(RealTimeDummy);
+  // console.log(RealTimeDummy);
   const table = useReactTable({
     data: RealTimeDummy,
     columns,

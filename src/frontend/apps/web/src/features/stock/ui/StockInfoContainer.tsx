@@ -1,5 +1,5 @@
-import StockInfo from './stock-info';
-import StockLogo from './stock-logo';
+import StockInfo from './StockInfo';
+import StockLogo from './StockLogo';
 
 const StockInfoContainer = ({
   stockCode,
