@@ -24,6 +24,17 @@
       "cache": true,
       "persistent": true
     },
+    "test": {
+      "dependsOn": [],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "**/*.test.{js,ts,jsx,tsx}",
+        "vitest.config.ts",
+        "tsconfig.json"
+      ],
+      "outputs": [],
+      "cache": true
+    },
     "build-storybook": {
       "dependsOn": ["^build-storybook"],
       "inputs": ["$TURBO_DEFAULT$"],

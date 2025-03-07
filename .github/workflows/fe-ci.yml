@@ -37,9 +37,10 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
-      - name: Install, Lint, and Build
+      - name: Install, Lint, Build and Test
         working-directory: src/frontend
         run: |
           pnpm install --frozen-lockfile --prefer-offline
           pnpm turbo lint --filter=web --filter=@workspace/ui --parallel 
           pnpm turbo build --filter=web --parallel
+          pnpm turbo test --filter=web --parallel
