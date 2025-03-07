@@ -19,5 +19,5 @@ export function useInvalidateChatHistory(channelId: number) {
     queryClient.invalidateQueries({
       queryKey: QUERY_KEYS.reverseHistory(channelId),
     });
-  }, [channelId, queryClient]); // ✅ 채널 ID가 변경될 때 실행
+  }, [channelId, queryClient]);
 }
