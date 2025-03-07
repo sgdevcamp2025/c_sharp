@@ -2,6 +2,5 @@ export {
   formatCandleChart,
   formatLineChart,
   formatHistogramChart,
-} from './stock-chart.util';
-
-export { StockForTable } from './stock-realtime.util';
+} from './stockChart.util';
+export { StockForTable } from './stockRealTime.util';

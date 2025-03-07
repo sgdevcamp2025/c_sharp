@@ -1,4 +1,4 @@
-import HuddleContainer from '@/src/features/video/ui/huddle-container';
+import HuddleContainer from '@/src/features/video/ui/HuddleContainer';
 
 //허들 테스트를 위한 임시페이지(삭제예정)
 const HuddleTest = () => {

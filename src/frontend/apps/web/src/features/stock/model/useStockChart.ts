@@ -9,7 +9,12 @@ import {
   LineSeries,
   HistogramSeries,
 } from 'lightweight-charts';
-import { CandleChart, ChartType, DefaultChart } from './chart.types';
+
+import {
+  ChartType,
+  type CandleChart,
+  type DefaultChart,
+} from '@/src/entities/stock';
 
 export const useStockChart = (
   chartType: ChartType,

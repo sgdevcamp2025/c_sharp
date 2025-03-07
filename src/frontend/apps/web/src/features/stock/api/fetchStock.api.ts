@@ -1,6 +1,6 @@
 'use server';
 import { serverFetchInstance } from '@/src/shared';
-import { StockChartAPIResponse } from '../model';
+import { StockChartAPIResponse } from '@/src/entities/stock';
 
 type Res = {
   code: string;

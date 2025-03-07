@@ -1,7 +1,9 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { RealTimeStock } from './stock.types';
-import { Button } from '@workspace/ui/components';
 import { ArrowUpDown } from 'lucide-react';
+
+import { Button } from '@workspace/ui/components';
+
+import type { RealTimeStock } from '@/src/entities/stock';
 
 export const columns: ColumnDef<RealTimeStock>[] = [
   {

@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/src/shared/services';
 import { dummyStockData } from '../model/stock.mock';
-import { fetchStock } from '../api/fetch-stock';
+import { fetchStock } from '../api/fetchStock.api';
 const StockChartContainer = ({ stockCode }: { stockCode: string }) => {
   const { subscribe } = useStockWebSocket();
 

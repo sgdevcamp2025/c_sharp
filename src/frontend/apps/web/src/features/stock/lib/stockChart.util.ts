@@ -1,5 +1,10 @@
 import { Time, UTCTimestamp } from 'lightweight-charts';
-import { CandleChart, DefaultChart, StockChartAPIResponse } from '../model';
+
+import {
+  CandleChart,
+  DefaultChart,
+  StockChartAPIResponse,
+} from '@/src/entities/stock';
 
 const formatTimeForChart = (
   businessDate: string,
