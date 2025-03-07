@@ -1,6 +1,16 @@
 export const formatDate = (date: Date | string) => {
   const parsedDate = typeof date === 'string' ? new Date(date) : date;
 
+  if (isNaN(parsedDate.getTime())) {
+    return {
+      year: NaN,
+      month: NaN,
+      day: NaN,
+      hour: NaN,
+      minute: NaN,
+    };
+  }
+
   const formattedDate = new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
     month: '2-digit',

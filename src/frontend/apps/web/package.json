@@ -8,8 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest",
-    "test:run": "vitest run"
+    "test": "vitest --coverage",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.2",
@@ -36,6 +37,7 @@
     "@types/react": "19.0.7",
     "@types/react-dom": "19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^3.0.8",
     "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
     "jsdom": "^26.0.0",
