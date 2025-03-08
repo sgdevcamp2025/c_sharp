@@ -36,7 +36,7 @@ jobs:
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: node_modules
           path: src/frontend/node_modules
@@ -72,7 +72,7 @@ jobs:
         run: pnpm turbo build --filter=web --parallel
 
   test:
-    needs: build
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
