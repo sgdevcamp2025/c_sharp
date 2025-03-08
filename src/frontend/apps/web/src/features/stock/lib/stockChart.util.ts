@@ -6,7 +6,7 @@ import {
   StockChartAPIResponse,
 } from '@/src/entities/stock';
 
-const formatTimeForChart = (
+export const formatTimeForChart = (
   businessDate: string,
   tradingTime: string,
 ): Time | null => {
@@ -30,7 +30,7 @@ const formatTimeForChart = (
   return Math.floor(dateObj.getTime() / 1000) as UTCTimestamp;
 };
 
-const formatChartData = <T>(
+export const formatChartData = <T>(
   response: StockChartAPIResponse[],
   formatFn: (item: StockChartAPIResponse, time: Time) => T,
 ): T[] => {
