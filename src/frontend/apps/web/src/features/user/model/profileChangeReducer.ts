@@ -12,5 +12,7 @@ export const profileChangeReducer = (state: any, action: any) => {
       return { ...state, isError: true };
     case ACTIONS.RESET_ERROR:
       return { ...state, isError: false };
+    default:
+      return state;
   }
 };
