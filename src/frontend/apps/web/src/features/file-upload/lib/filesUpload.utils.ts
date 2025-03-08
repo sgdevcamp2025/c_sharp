@@ -2,7 +2,7 @@ import type { ProcessedFile } from '@/src/entities/file-upload';
 
 import { validateFileSize } from './validateFiles.utils';
 
-const blobUrlCache = new Map<string, string>();
+export const blobUrlCache = new Map<string, string>();
 
 export const generateVideoThumbnail = async (
   file: File,
@@ -93,7 +93,7 @@ export const generateVideoThumbnail = async (
   });
 };
 
-const processedFiles = new Map<string, ProcessedFile>();
+export const processedFiles = new Map<string, ProcessedFile>();
 
 export async function processFile(file: File): Promise<ProcessedFile | null> {
   if (!validateFileSize(file)) return null;
@@ -110,11 +110,8 @@ export async function processFile(file: File): Promise<ProcessedFile | null> {
       processedFile = { file, thumbnailFile };
     } catch (err) {
       console.error('Failed to generate video thumbnail:', err);
-      // 썸네일 실패 시 null
     }
   }
-  // 이미지 파일이면 thumbnailFile은 null 그대로
-
   processedFiles.set(file.name, processedFile);
   return processedFile;
 }
