@@ -77,7 +77,7 @@ jobs:
 
       - name: Run Lint
         working-directory: src/frontend
-        run: pnpm exec turbo lint --filter=web --filter=@workspace/ui --parallel
+        run: pnpm run turbo lint --filter=web --filter=@workspace/ui --parallel
 
   build:
     needs: setup
@@ -108,7 +108,7 @@ jobs:
 
       - name: Run Build
         working-directory: src/frontend
-        run: pnpm exec turbo build --filter=web --parallel
+        run: pnpm run turbo build --filter=web --parallel
 
   test:
     needs: setup
@@ -139,4 +139,4 @@ jobs:
 
       - name: Run Tests
         working-directory: src/frontend
-        run: pnpm exec turbo test --filter=web --parallel
+        run: pnpm run turbo test --filter=web --parallel
