@@ -1,13 +1,14 @@
 import { getPing } from '../api';
 
-let cachedChunkSize: number | null = null;
-let cachedUploadConcurrency: number | null = null;
-const DEFAULT_CHUNK_SIZE = 200 * 1024 * 1024;
+export let cachedChunkSize: number | null = null;
+export let cachedUploadConcurrency: number | null = null;
+export const DEFAULT_CHUNK_SIZE = 200 * 1024 * 1024;
 
-/**
- * 네트워크 지연 시간에 따라 동적으로 청크 사이즈를 결정합니다.
- * @returns {Promise<number>} 결정된 청크 사이즈 (바이트 단위)
- */
+export const resetCache = () => {
+  cachedChunkSize = null;
+  cachedUploadConcurrency = null;
+};
+
 export const getDynamicChunkSize = async (): Promise<number> => {
   if (cachedChunkSize !== null) {
     // console.log('Using cached chunk size:', cachedChunkSize);
@@ -37,11 +38,6 @@ export const getDynamicChunkSize = async (): Promise<number> => {
   return cachedChunkSize;
 };
 
-/**
- * 네트워크 지연 시간에 따라 병렬 업로드 개수를 결정합니다.
- * 빠른 네트워크에서는 5개, 중간이면 3개, 느리면 1개로 조절합니다.
- * @returns {Promise<number>} 동시에 전송할 청크 개수
- */
 export const getUploadConcurrency = async (): Promise<number> => {
   if (cachedUploadConcurrency !== null) {
     // console.log('Using cached upload concurrency:', cachedUploadConcurrency);
@@ -74,11 +70,6 @@ export const getUploadConcurrency = async (): Promise<number> => {
   return cachedUploadConcurrency;
 };
 
-/**
- * 파일을 동적 청크 사이즈에 따라 청크로 분리합니다.
- * @param file 분리할 파일
- * @returns {Promise<Blob[]>} 파일 청크들의 배열
- */
 export const createChunks = async (file: File): Promise<Blob[]> => {
   const chunkSize = await getDynamicChunkSize();
   const chunks: Blob[] = [];
@@ -96,13 +87,6 @@ export const createChunks = async (file: File): Promise<Blob[]> => {
   return chunks;
 };
 
-/**
- * 임시 파일 식별자를 생성합니다.
- * @param userId 사용자 ID
- * @param timestamp 파일 선택 시점의 타임스탬프 (밀리초)
- * @param fileIndex 파일의 인덱스
- * @returns {string} 생성된 임시 파일 식별자
- */
 export const generateTempFileIdentifier = (
   userId: number,
   timestamp: number,
