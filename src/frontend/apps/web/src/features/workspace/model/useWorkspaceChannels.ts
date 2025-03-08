@@ -10,7 +10,8 @@ import {
   joinChannelResponse,
   unjoinChannelResponse,
 } from '../api';
-import { useWorkspaceMessages, useWorkspaceSubscription } from '.';
+import { useWorkspaceMessages } from './useWorkspaceMessages';
+import { useWorkspaceSubscription } from './useWorkspaceSubscription';
 
 type Action =
   | { type: 'SET_INITIAL_DATA'; payload: WorkspaceListResponse }
