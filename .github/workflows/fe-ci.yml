@@ -10,7 +10,7 @@ on:
       - 'src/frontend/**'
   push:
     branches:
-      - fe-refac/fe-ci
+      - fe-refac/more-ci
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
