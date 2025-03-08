@@ -22,7 +22,7 @@
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": ["./apps/web/.next/**"],
       "cache": true,
-      "persistent": true
+      "persistent": false
     },
     "test": {
       "dependsOn": [],

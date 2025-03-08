@@ -7,13 +7,14 @@ const cookieOptions = {
 
 export async function setCookie(key: string, value: string | number) {
   const storedValue = typeof value === 'string' ? value : String(value);
-  cookies().set(key, storedValue, cookieOptions);
+  (await cookies()).set(key, storedValue, cookieOptions);
 }
 
 export async function getCookie(key: string) {
-  return cookies().get(key)?.value || null;
+  const allCookies = await cookies();
+  return allCookies.get(key)?.value || null;
 }
 
 export async function removeCookie(key: string) {
-  cookies().delete(key);
+  (await cookies()).delete(key);
 }
