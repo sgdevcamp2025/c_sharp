@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  workspace-ui:
+  lint:
     if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -41,9 +41,9 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Run Lint
         working-directory: src/frontend
-        run: pnpm turbo lint --filter=@workspace/ui --parallel
+        run: pnpm turbo lint --filter=web --filter=@workspace/ui --parallel
 
-  web:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -66,4 +66,29 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Run Build
         working-directory: src/frontend
-        run: pnpm turbo build test lint --filter=web --parallel
+        run: pnpm turbo build --filter=web --parallel
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+      - name: Install Dependencies
+        working-directory: src/frontend
+        run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Run Tests
+        working-directory: src/frontend
+        run: pnpm turbo test --filter=web --parallel
