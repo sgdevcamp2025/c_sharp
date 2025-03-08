@@ -44,7 +44,6 @@ jobs:
         run: pnpm turbo lint --filter=web --filter=@workspace/ui --parallel
 
   build:
-    needs: lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -70,7 +69,6 @@ jobs:
         run: pnpm turbo build --filter=web --parallel
 
   test:
-    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
