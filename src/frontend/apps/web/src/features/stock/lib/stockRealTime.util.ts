@@ -1,4 +1,4 @@
-const formatRealTimeStock = (data: string) => {
+export const formatRealTimeStock = (data: string) => {
   const stock = data.split('^');
   return {
     businessDate: stock[33] || '',
