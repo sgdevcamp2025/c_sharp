@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  formatRealTimeStock,
-  StockForTable,
-  STOCKS,
-} from './stockRealTime.util';
+import { formatRealTimeStock, StockForTable } from './stockRealTime.util';
 
 describe('formatRealTimeStock', () => {
   it('should correctly parse the stock data from the string', () => {

@@ -13,7 +13,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './'),
+      '@workspace/ui': resolve(__dirname, '../../packages/ui/src'),
+      '@': resolve(__dirname, '.'),
     },
   },
 });
