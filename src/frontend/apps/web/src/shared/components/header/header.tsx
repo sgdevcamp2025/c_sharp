@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components';
+import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui';
 import Link from 'next/link';
 
 //로고 이미지 경로 변경 필요
