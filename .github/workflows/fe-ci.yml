@@ -10,7 +10,7 @@ on:
       - 'src/frontend/**'
   push:
     branches:
-      - fe-refac/more-ci
+      - fe-refac/fe-ci
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -19,8 +19,9 @@ concurrency:
 jobs:
   setup:
     runs-on: ubuntu-latest
-    outputs:
-      artifactName: ${{ steps.upload_artifact.outputs.artifactName }}
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Seoul
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -41,8 +42,7 @@ jobs:
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
 
-      - name: Upload Node Modules Artifact
-        id: upload_artifact
+      - name: Upload Dependencies
         uses: actions/upload-artifact@v4
         with:
           name: node_modules
@@ -54,24 +54,16 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.12.3
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
-      - name: Download Node Modules Artifact
+
+      - name: Download Dependencies
         uses: actions/download-artifact@v4
         with:
           name: node_modules
           path: src/frontend
+
       - name: Run Lint
         working-directory: src/frontend
-        run: pnpm turbo lint --filter=web --filter=@workspace/ui --parallel
+        run: pnpm exec turbo lint --filter=web --filter=@workspace/ui --parallel
 
   build:
     needs: setup
@@ -79,24 +71,16 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.12.3
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
-      - name: Download Node Modules Artifact
+
+      - name: Download Dependencies
         uses: actions/download-artifact@v4
         with:
           name: node_modules
           path: src/frontend
+
       - name: Run Build
         working-directory: src/frontend
-        run: pnpm turbo build --filter=web --parallel
+        run: pnpm exec turbo build --filter=web --parallel
 
   test:
     needs: setup
@@ -104,21 +88,13 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.12.3
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
-      - name: Download Node Modules Artifact
+
+      - name: Download Dependencies
         uses: actions/download-artifact@v4
         with:
           name: node_modules
           path: src/frontend
+
       - name: Run Tests
         working-directory: src/frontend
-        run: pnpm turbo test --filter=web --parallel
+        run: pnpm exec turbo test --filter=web --parallel
