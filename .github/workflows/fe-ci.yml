@@ -17,12 +17,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    if: ${{ github.actor != 'l10nbot' }}
+  setup:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      TZ: Asia/Seoul
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -39,56 +35,53 @@ jobs:
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: node_modules
+          path: src/frontend/node_modules
+
+  lint:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Download Dependencies
+        uses: actions/download-artifact@v3
+        with:
+          name: node_modules
+          path: src/frontend
       - name: Run Lint
         working-directory: src/frontend
         run: pnpm turbo lint --filter=web --filter=@workspace/ui --parallel
 
   build:
+    needs: setup
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      TZ: Asia/Seoul
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Download Dependencies
+        uses: actions/download-artifact@v3
         with:
-          version: 9.12.3
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
-      - name: Install Dependencies
-        working-directory: src/frontend
-        run: pnpm install --frozen-lockfile --prefer-offline
+          name: node_modules
+          path: src/frontend
       - name: Run Build
         working-directory: src/frontend
         run: pnpm turbo build --filter=web --parallel
 
   test:
+    needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      TZ: Asia/Seoul
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Download Dependencies
+        uses: actions/download-artifact@v3
         with:
-          version: 9.12.3
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
-      - name: Install Dependencies
-        working-directory: src/frontend
-        run: pnpm install --frozen-lockfile --prefer-offline
+          name: node_modules
+          path: src/frontend
       - name: Run Tests
         working-directory: src/frontend
         run: pnpm turbo test --filter=web --parallel
