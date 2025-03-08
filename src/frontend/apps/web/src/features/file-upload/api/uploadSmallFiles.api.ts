@@ -1,10 +1,6 @@
 import { serverFetchInstance } from '@/src/shared/services/apis';
 import type { ResponseChunkFileData } from '@/src/entities/file-upload';
 
-/**
- * 각 청크 데이터를 개별적으로 업로드하는 함수.
- * 이 함수는 하나의 청크(ChunkInfo 객체)를 API로 전송합니다.
- */
 export async function uploadSmallFiles({
   channelId,
   workspaceId,
@@ -15,11 +11,6 @@ export async function uploadSmallFiles({
   formData.append('channelId', channelId.toString());
   formData.append('workspaceId', workspaceId.toString());
   formData.append('file', file);
-
-  // 디버깅용: formData의 모든 키-값 출력
-  // for (const [key, value] of formData.entries()) {
-  //   console.log('debugging', key, value);
-  // }
 
   try {
     console.log('start upload');
