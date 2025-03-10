@@ -1,0 +1,79 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "NEXT_PUBLIC_MODE",
+    "NEXT_PUBLIC_BASE_URL",
+    "NEXT_PUBLIC_GATEWAY_SERVER_PORT",
+    "NEXT_PUBLIC_AUTH_SERVER_PORT",
+    "NEXT_PUBLIC_STOCK_SERVER_PORT",
+    "NEXT_PUBLIC_FILE_SERVER_PORT",
+    "NEXT_PUBLIC_CHAT_SERVER1_PORT",
+    "NEXT_PUBLIC_CHAT_SERVER2_PORT",
+    "NEXT_PUBLIC_HISTORY_SERVER_PORT",
+    "NEXT_PUBLIC_WORKSPACE_SERVER_PORT",
+    "NEXT_PUBLIC_PUSH_SERVER_PORT",
+    "NEXT_PUBLIC_STATE_SERVER_PORT",
+    "NEXT_PUBLIC_SIGNALING_SERVER_PORT"
+  ],
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["./apps/web/.next/**"],
+      "cache": true,
+      "persistent": false
+    },
+    "test": {
+      "dependsOn": [],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "**/*.test.{js,ts,jsx,tsx}",
+        "vitest.config.ts",
+        "tsconfig.json"
+      ],
+      "outputs": [],
+      "cache": true
+    },
+    "build-storybook": {
+      "dependsOn": ["^build-storybook"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["./packages/ui/storybook-static/**"],
+      "cache": true,
+      "persistent": false
+    },
+    "storybook": {
+      "dependsOn": ["^storybook"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["./packages/ui/storybook-static/**"],
+      "cache": true,
+      "persistent": false
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx}"],
+      "cache": true,
+      "persistent": false
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "format": {
+      "dependsOn": ["^format"],
+      "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx,json,md}"],
+      "cache": false,
+      "persistent": false
+    },
+    "typescript": {
+      "dependsOn": ["^typescript"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "tsconfig.json",
+        "packages/**/tsconfig.json"
+      ],
+      "cache": true,
+      "persistent": false
+    }
+  }
+}

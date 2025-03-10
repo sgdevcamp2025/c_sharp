@@ -1,0 +1,14 @@
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVER}
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+topic:
+  push: jootalkpia.push.prd.message
+group:
+  push: notification-handle-consumer-group
+
+server:
+  port: ${PUSH_PORT}

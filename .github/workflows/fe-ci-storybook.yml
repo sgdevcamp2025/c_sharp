@@ -1,0 +1,52 @@
+name: FRONTEND-CI-STORYBOOK
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - dev
+      - main
+    paths:
+      - 'src/frontend/packages/ui/**'
+      - '../workflows/fe-ci-storybook.yml'
+  push:
+    branches:
+      - fe-refac/fe-ci
+    # paths:
+    #   - 'src/frontend/packages/ui/**'
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    if: "${{ github.actor != 'l10nbot' }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          # 캐시 옵션 제거 (pnpm 캐시는 별도로 설치 단계에서 관리)
+          # cache: 'pnpm'
+          # cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.3
+
+      - name: Install dependencies
+        working-directory: src/frontend
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Build Storybook
+        working-directory: src/frontend
+        run: pnpm turbo build-storybook --parallel
