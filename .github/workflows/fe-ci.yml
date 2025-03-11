@@ -9,6 +9,9 @@ on:
     paths:
       - 'src/frontend/**'
       - './fe-ci.yml'
+  push:
+    branches:
+      - fe-test/ci-test
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -17,7 +20,7 @@ concurrency:
 jobs:
   lint:
     if: ${{ github.actor != 'l10nbot' }}
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
