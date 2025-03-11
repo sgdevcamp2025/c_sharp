@@ -18,12 +18,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  lint-test:
     if: ${{ github.actor != 'l10nbot' }}
-    runs-on: macos-13
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
+    strategy:
+      matrix:
+        task: [lint, test]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -40,11 +43,17 @@ jobs:
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
-      - name: Run Lint
+      - name: Run Task
         working-directory: src/frontend
-        run: pnpm turbo lint --filter=web --filter=@workspace/ui --parallel
+        run: |
+          if [ "${{ matrix.task }}" = "lint" ]; then
+            pnpm turbo lint --filter=web --filter=@workspace/ui --parallel
+          elif [ "${{ matrix.task }}" = "test" ]; then
+            pnpm turbo test --filter=web --parallel
+          fi
 
   build:
+    if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -68,28 +77,3 @@ jobs:
       - name: Run Build
         working-directory: src/frontend
         run: pnpm turbo build --filter=web --parallel
-
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      TZ: Asia/Seoul
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.12.3
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
-      - name: Install Dependencies
-        working-directory: src/frontend
-        run: pnpm install --frozen-lockfile --prefer-offline
-      - name: Run Tests
-        working-directory: src/frontend
-        run: pnpm turbo test --filter=web --parallel
