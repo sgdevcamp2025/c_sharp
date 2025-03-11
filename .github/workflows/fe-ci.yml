@@ -64,6 +64,7 @@ jobs:
         with:
           path: src/frontend/.turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-turbo-${{ github.sha }}
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
@@ -119,7 +120,7 @@ jobs:
         with:
           path: src/frontend/.turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-turbo-
+          restore-keys: ${{ runner.os }}-turbo-${{ github.sha }}
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
