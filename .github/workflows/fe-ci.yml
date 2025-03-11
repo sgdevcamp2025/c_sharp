@@ -102,7 +102,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Run Build with Cache
         working-directory: src/frontend
-        run: pnpm turbo build --filter=web --parallel --concurrency=2 --cache-dir=.turbo
+        run: pnpm turbo build --filter=web --parallel --cache-dir=.turbo
       - name: Save Turbo cache
         if: always()
         uses: actions/cache@v4

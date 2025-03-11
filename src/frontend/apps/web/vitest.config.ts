@@ -46,6 +46,7 @@ export default defineConfig({
         'src/features/video',
         '**/index.ts',
       ],
+      reporter: ['text-summary'],
     },
   },
   resolve: {
