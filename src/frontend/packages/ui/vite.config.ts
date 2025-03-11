@@ -7,6 +7,7 @@ export default defineConfig({
   base: '/',
   plugins: [react()],
   build: {
+    outDir: 'dist',
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: '@workspace/ui',
