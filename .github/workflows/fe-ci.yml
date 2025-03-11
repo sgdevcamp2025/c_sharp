@@ -9,9 +9,6 @@ on:
     paths:
       - 'src/frontend/**'
       - './fe-ci.yml'
-  push:
-    branches:
-      - fe-test/ci-test
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
