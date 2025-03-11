@@ -70,12 +70,12 @@ jobs:
           elif [ "${{ matrix.task }}" = "test" ]; then
             pnpm turbo test --filter=web --parallel --cache-dir=.turbo
           fi
-      - name: Save Turbo cache
-        if: always()
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
+      # - name: Save Turbo cache
+      #   if: always()
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: src/frontend/.turbo
+      #     key: ${{ runner.os }}-turbo-${{ github.sha }}
 
   build:
     if: ${{ github.actor != 'l10nbot' }}
