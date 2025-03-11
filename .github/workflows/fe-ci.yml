@@ -70,6 +70,12 @@ jobs:
           elif [ "${{ matrix.task }}" = "test" ]; then
             pnpm turbo test --filter=web --parallel --cache-dir=.turbo
           fi
+      - name: Save Turbo cache for ui
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/packages/ui/.turbo
+          key: ${{ runner.os }}-turbo-ui-${{ github.sha }}
 
   build:
     if: ${{ github.actor != 'l10nbot' }}
@@ -97,21 +103,21 @@ jobs:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-pnpm-
-      - name: Restore Turbo cache
+      - name: Restore Turbo cache for web
         uses: actions/cache@v4
         with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-turbo-
+          path: src/frontend/apps/web/.turbo
+          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-turbo-web-
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Run Build with Cache
         working-directory: src/frontend
         run: pnpm turbo build --filter=web --parallel --cache-dir=.turbo
-      - name: Save Turbo cache
+      - name: Save Turbo cache for web
         if: always()
         uses: actions/cache@v4
         with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          path: src/frontend/apps/web/.turbo
+          key: ${{ runner.os }}-turbo-web-${{ github.sha }}
