@@ -20,7 +20,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["./apps/web/.next/**"],
+      "outputs": ["./apps/web/.next/**", "./packages/ui/storybook-static/**"],
       "cache": true,
       "persistent": false
     },
