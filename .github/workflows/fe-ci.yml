@@ -52,7 +52,9 @@ jobs:
         with:
           path: src/frontend/.turbo
           key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-turbo-
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.sha }}
+            ${{ runner.os }}-turbo-
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
@@ -60,7 +62,7 @@ jobs:
         working-directory: src/frontend
         run: |
           if [ "${{ matrix.task }}" = "lint" ]; then
-            pnpm turbo lint --parallel --cache-dir=.turbo
+            pnpm turbo lint --filter=web --filter=@workspace/ui --parallel --cache-dir=.turbo
           elif [ "${{ matrix.task }}" = "test" ]; then
             pnpm turbo test --filter=web --parallel --cache-dir=.turbo
           fi
@@ -95,14 +97,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-turbo-
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.sha }}
+            ${{ runner.os }}-turbo-
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Run Build with Cache
         working-directory: src/frontend
-        run: pnpm turbo build --parallel --cache-dir=.turbo
+        run: pnpm turbo build --filter=web --parallel --cache-dir=.turbo
       - name: Save Turbo cache
         if: always()
         uses: actions/cache@v4
