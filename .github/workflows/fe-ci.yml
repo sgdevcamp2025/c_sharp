@@ -20,7 +20,7 @@ concurrency:
 jobs:
   lint:
     if: ${{ github.actor != 'l10nbot' }}
-    runs-on: macos-latest
+    runs-on: macos-13
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
