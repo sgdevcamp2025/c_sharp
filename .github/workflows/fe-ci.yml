@@ -58,6 +58,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
+      TURBO_CACHE_DIR: ./src/frontend/.turbo # Turbo 캐시 디렉토리 설정
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -71,9 +72,18 @@ jobs:
           node-version: 20
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+      - name: Cache Turbo Build
+        id: turbo-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
-      - name: Run Build
+      - name: Run Build with Cache
         working-directory: src/frontend
-        run: pnpm turbo build --filter=web --parallel
+        run: pnpm turbo build --filter=web --parallel --cache-dir=.turbo
