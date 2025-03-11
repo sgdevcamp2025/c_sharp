@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest --threads=false",
+    "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
