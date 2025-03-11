@@ -66,15 +66,21 @@ jobs:
         working-directory: src/frontend
         run: |
           if [ "${{ matrix.task }}" = "lint" ]; then
-            pnpm turbo lint --filter=web --filter=@workspace/ui --parallel --cache-dir=.turbo
+            pnpm turbo lint --parallel --cache-dir=.turbo
           elif [ "${{ matrix.task }}" = "test" ]; then
             pnpm turbo test --filter=web --parallel --cache-dir=.turbo
           fi
+      - name: Save Turbo cache for web
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/apps/web/.turbo
+          key: ${{ runner.os }}-turbo-web-${{ github.sha }}
       - name: Save Turbo cache for ui
         if: always()
         uses: actions/cache@v4
         with:
-          path: src/frontend/packages/ui/.turbo
+          path: src/frontend/apps/ui/.turbo
           key: ${{ runner.os }}-turbo-ui-${{ github.sha }}
 
   build:
@@ -103,21 +109,21 @@ jobs:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-pnpm-
-      - name: Restore Turbo cache for web
+      - name: Restore Turbo cache
         uses: actions/cache@v4
         with:
-          path: src/frontend/apps/web/.turbo
-          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-turbo-web-
+          path: src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-turbo-
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Run Build with Cache
         working-directory: src/frontend
-        run: pnpm turbo build --filter=web --parallel --cache-dir=.turbo
-      - name: Save Turbo cache for web
+        run: pnpm turbo build --parallel --cache-dir=.turbo
+      - name: Save Turbo cache
         if: always()
         uses: actions/cache@v4
         with:
-          path: src/frontend/apps/web/.turbo
-          key: ${{ runner.os }}-turbo-web-${{ github.sha }}
+          path: src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
