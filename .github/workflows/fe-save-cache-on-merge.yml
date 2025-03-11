@@ -6,9 +6,9 @@ on:
     branches:
       - main
       - dev
-  push:
-    branches:
-      - fe-test/ci-test
+  # push:
+  #   branches:
+  #     - fe-test/ci-test
 
 jobs:
   save-cache:
