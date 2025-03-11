@@ -95,7 +95,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: ${{ runner.os }}-turbo-
       - name: Install Dependencies
         working-directory: src/frontend
