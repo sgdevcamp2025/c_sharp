@@ -9,6 +9,9 @@ on:
     paths:
       - 'src/frontend/**'
       - './fe-ci.yml'
+  push:
+    branches:
+      - fe-fix/ci-bug
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -21,7 +24,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
-      TURBO_CACHE_DIR: ./src/frontend/.turbo
+      TURBO_CACHE_DIR: ./src/frontend/.turbo/cache
     strategy:
       matrix:
         task: [lint, test]
@@ -52,9 +55,11 @@ jobs:
         id: restore_turbo_cache
         uses: actions/cache@v4
         with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-turbo
+          path: src/frontend/.turbo/cache
+          key: ${{ runner.os }}-turbo-${{ github.sha }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.sha }}
+            ${{ runner.os }}-turbo-
 
       - name: Install Dependencies
         working-directory: src/frontend
@@ -64,9 +69,9 @@ jobs:
         working-directory: src/frontend
         run: |
           if [ "${{ matrix.task }}" = "lint" ]; then
-            pnpm turbo lint --parallel --cache-dir=.turbo
+            pnpm turbo lint --parallel --cache-dir=.turbo/cache
           elif [ "${{ matrix.task }}" = "test" ]; then
-            pnpm turbo test --filter=web --parallel --cache-dir=.turbo
+            pnpm turbo test --filter=web --parallel --cache-dir=.turbo/cache
           fi
 
   build:
@@ -75,7 +80,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
-      TURBO_CACHE_DIR: ./src/frontend/.turbo
+      TURBO_CACHE_DIR: ./src/frontend/.turbo/cache
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -103,9 +108,11 @@ jobs:
         id: restore_turbo_build_cache
         uses: actions/cache@v4
         with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-turbo-
+          path: src/frontend/.turbo/cache
+          key: ${{ runner.os }}-turbo-${{ github.sha }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.sha }}
+            ${{ runner.os }}-turbo-
 
       - name: Install Dependencies
         working-directory: src/frontend
@@ -113,11 +120,10 @@ jobs:
 
       - name: Run Build with Cache
         working-directory: src/frontend
-        run: pnpm turbo build --parallel --cache-dir=.turbo
+        run: pnpm turbo build --parallel --cache-dir=.turbo/cache
 
       - name: Save Turbo cache
-        if: always() && steps.restore_turbo_build_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v4
         with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          path: src/frontend/.turbo/cache
+          key: ${{ runner.os }}-turbo-${{ github.sha }}-${{ github.run_id }}
