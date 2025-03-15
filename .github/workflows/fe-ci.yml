@@ -44,6 +44,13 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
+
       - name: Restore Turbo cache
         uses: actions/cache@v4
         with:
@@ -86,6 +93,13 @@ jobs:
           node-version: 20
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
 
       - name: Restore Turbo cache
         uses: actions/cache@v4

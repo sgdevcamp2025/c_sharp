@@ -29,6 +29,13 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-turbo-
+
       - name: Install dependencies
         run: |
           cd src/frontend
