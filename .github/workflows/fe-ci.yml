@@ -25,6 +25,7 @@ jobs:
     env:
       TZ: Asia/Seoul
       TURBO_CACHE_DIR: src/frontend/.turbo
+      PNPM_STORE_PATH: /home/runner/.pnpm-store
     strategy:
       matrix:
         task: [lint, test]
@@ -44,27 +45,29 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
+      - name: Debug pnpm Store Path
+        run: |
+          echo "pnpm store path: $(pnpm store path)"
+          mkdir -p $PNPM_STORE_PATH
+          ls -la $PNPM_STORE_PATH
+
       - name: Restore pnpm store cache
         id: pnpm-cache
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
+          path: /home/runner/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      - name: Restore Turbo cache
-        id: turbo-cache
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/turbo.json', 'src/frontend/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Debug pnpm Store After Install
+        run: |
+          echo "pnpm store path after install: $(pnpm store path)"
+          ls -la $PNPM_STORE_PATH
 
       - name: Run Task with Cache
         working-directory: src/frontend
@@ -82,6 +85,7 @@ jobs:
     env:
       TZ: Asia/Seoul
       TURBO_CACHE_DIR: src/frontend/.turbo
+      PNPM_STORE_PATH: /home/runner/.pnpm-store
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -98,27 +102,29 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
+      - name: Debug pnpm Store Path
+        run: |
+          echo "pnpm store path: $(pnpm store path)"
+          mkdir -p $PNPM_STORE_PATH
+          ls -la $PNPM_STORE_PATH
+
       - name: Restore pnpm store cache
         id: pnpm-cache
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
+          path: /home/runner/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      - name: Restore Turbo cache
-        id: turbo-cache
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/turbo.json', 'src/frontend/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Debug pnpm Store After Install
+        run: |
+          echo "pnpm store path after install: $(pnpm store path)"
+          ls -la $PNPM_STORE_PATH
 
       - name: Run Build with Cache
         working-directory: src/frontend
@@ -128,7 +134,7 @@ jobs:
         if: steps.pnpm-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: ~/.pnpm-store
+          path: /home/runner/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
 
       - name: Save Turbo cache
