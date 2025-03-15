@@ -1,0 +1,52 @@
+name: Save Cache on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+      - dev
+  push:
+    branches:
+      - fe-fix/ci-bug
+
+jobs:
+  save-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+
+      - name: Install dependencies
+        run: |
+          cd src/frontend
+          pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
+          pnpm add turbo --save-dev -w
+
+      - name: Build for updating .turbo cache (optional)
+        run: |
+          cd src/frontend
+          pnpm turbo build --parallel
+
+      - name: Ensure caching directories exist
+        run: |
+          mkdir -p ~/.pnpm-store
+
+      - name: Save pnpm store cache
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
