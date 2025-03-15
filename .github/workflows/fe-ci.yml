@@ -77,7 +77,6 @@ jobs:
 
   build:
     if: ${{ github.actor != 'l10nbot' }}
-    needs: lint-test
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
