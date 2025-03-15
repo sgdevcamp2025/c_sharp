@@ -53,13 +53,12 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Restore Turbo cache
-        id: restore_turbo_cache
+        id: restore_turbo_build_cache
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}-${{ github.run_id }}
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/.turbo') }}
           restore-keys: |
-            ${{ runner.os }}-turbo-${{ github.sha }}
             ${{ runner.os }}-turbo-
 
       - name: Install Dependencies
@@ -111,9 +110,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}-${{ github.run_id }}
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/.turbo') }}
           restore-keys: |
-            ${{ runner.os }}-turbo-${{ github.sha }}
             ${{ runner.os }}-turbo-
 
       - name: Install Dependencies
@@ -128,4 +126,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}-${{ github.run_id }}
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/.turbo') }}
+
+      - name: Save pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
