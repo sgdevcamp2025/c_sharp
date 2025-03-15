@@ -114,7 +114,12 @@ jobs:
 
       - name: Run Build with Cache
         working-directory: src/frontend
-        run: pnpm turbo build --parallel --cache-dir=.turbo
+        run: |
+          pnpm turbo build --parallel --cache-dir=.turbo
+          echo "Checking UI output:"
+          ls -R packages/ui/dist || echo "No dist folder found in packages/ui"
+          echo "Checking Web output:"
+          ls -R apps/web/.next || echo "No .next folder found in apps/web"
 
       - name: Save Turbo cache
         if: always()
