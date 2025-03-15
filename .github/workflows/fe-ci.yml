@@ -112,10 +112,13 @@ jobs:
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
 
+      - name: Clear Turbo cache
+        working-directory: src/frontend
+        run: rm -rf .turbo
       - name: Run Build with Cache
         working-directory: src/frontend
         run: |
-          pnpm turbo build --parallel --cache-dir=.turbo
+          pnpm turbo build --parallel --cache-dir=.turbo --log-level=verbose
           echo "Checking UI output:"
           ls -R packages/ui/dist || echo "No dist folder found in packages/ui"
           echo "Checking Web output:"
