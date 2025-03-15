@@ -60,6 +60,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
+      - name: Restore Turbo cache
+        id: turbo-cache
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/turbo.json', 'src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
@@ -116,6 +125,15 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
+
+      - name: Restore Turbo cache
+        id: turbo-cache
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/turbo.json', 'src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
       - name: Install Dependencies
         working-directory: src/frontend
