@@ -100,7 +100,7 @@ jobs:
 
       - name: Run Build with Cache
         working-directory: src/frontend
-        run: pnpm turbo build --parallel --cache-dir=.turbo
+        run: pnpm turbo build --filter=web --filter=@workspace/ui --parallel --cache-dir=.turbo
 
       - name: Save Turbo cache
         if: always()
