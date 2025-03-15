@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
-      TURBO_CACHE_DIR: ./src/frontend/.turbo/cache
+      TURBO_CACHE_DIR: src/frontend/.turbo
     strategy:
       matrix:
         task: [lint, test]
@@ -49,13 +49,14 @@ jobs:
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
       - name: Restore Turbo cache
         id: restore_turbo_cache
         uses: actions/cache@v4
         with:
-          path: src/frontend/.turbo/cache
+          path: src/frontend/.turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-turbo-${{ github.sha }}
@@ -69,9 +70,9 @@ jobs:
         working-directory: src/frontend
         run: |
           if [ "${{ matrix.task }}" = "lint" ]; then
-            pnpm turbo lint --parallel --cache-dir=.turbo/cache
+            pnpm turbo lint --parallel --cache-dir=.turbo
           elif [ "${{ matrix.task }}" = "test" ]; then
-            pnpm turbo test --filter=web --parallel --cache-dir=.turbo/cache
+            pnpm turbo test --filter=web --parallel --cache-dir=.turbo
           fi
 
   build:
@@ -80,7 +81,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
-      TURBO_CACHE_DIR: ./src/frontend/.turbo/cache
+      TURBO_CACHE_DIR: src/frontend/.turbo
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -102,13 +103,14 @@ jobs:
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
       - name: Restore Turbo cache
         id: restore_turbo_build_cache
         uses: actions/cache@v4
         with:
-          path: src/frontend/.turbo/cache
+          path: src/frontend/.turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-turbo-${{ github.sha }}
@@ -120,10 +122,10 @@ jobs:
 
       - name: Run Build with Cache
         working-directory: src/frontend
-        run: pnpm turbo build --parallel --cache-dir=.turbo/cache
+        run: pnpm turbo build --parallel --cache-dir=.turbo
 
       - name: Save Turbo cache
         uses: actions/cache@v4
         with:
-          path: src/frontend/.turbo/cache
+          path: src/frontend/.turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}-${{ github.run_id }}
