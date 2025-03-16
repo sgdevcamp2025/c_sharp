@@ -112,9 +112,6 @@ jobs:
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
 
-      - name: Clear Turbo cache
-        working-directory: src/frontend
-        run: rm -rf .turbo
       - name: Run Build with Cache
         working-directory: src/frontend
         run: |

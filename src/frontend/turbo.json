@@ -38,14 +38,14 @@
     "build-storybook": {
       "dependsOn": ["^build-storybook"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["./packages/ui/storybook-static/**"],
+      "outputs": ["storybook-static/**"],
       "cache": true,
       "persistent": false
     },
     "storybook": {
       "dependsOn": ["^storybook"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["./packages/ui/storybook-static/**"],
+      "outputs": ["storybook-static/**"],
       "cache": true,
       "persistent": false
     },
