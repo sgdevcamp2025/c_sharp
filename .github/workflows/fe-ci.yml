@@ -11,7 +11,7 @@ on:
       - './fe-ci.yml'
   push:
     branches:
-      - fe-fix/ci-bug
+      - fe-test/ci-test
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -55,7 +55,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-turbo-
 
       - name: Install Dependencies
@@ -108,28 +108,14 @@ jobs:
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: ${{ runner.os }}-turbo-
 
-      - name: Restore Turbo cache for web
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/apps/web/.turbo
-          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-turbo-web-
-      - name: Restore Turbo cache for ui
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/packages/ui/.turbo
-          key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-turbo-ui-
-
       - name: Install Dependencies
         working-directory: src/frontend
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Run Build with Cache
         working-directory: src/frontend
-        run: |
-          export TURBO_LOG_VERBOSITY=verbose
-          pnpm turbo build --filter=web --filter=@workspace/ui --parallel --cache-dir=.turbo
+        run: pnpm turbo build --parallel --cache-dir=.turbo
+
       - name: Save Turbo cache
         if: always()
         uses: actions/cache@v4
