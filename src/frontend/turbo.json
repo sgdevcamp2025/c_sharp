@@ -18,9 +18,9 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": [],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["apps/web/.next/**/*", "packages/ui/dist/**/*"],
+      "outputs": [".next/**", "dist/**"],
       "cache": true,
       "persistent": false
     },
