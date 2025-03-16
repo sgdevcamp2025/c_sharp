@@ -6,9 +6,9 @@ on:
     branches:
       - main
       - dev
-  push:
-    branches:
-      - fe-fix/ci-bug
+  # push:
+  #   branches:
+  #     - fe-fix/ci-bug
 
 jobs:
   save-cache:
@@ -77,16 +77,16 @@ jobs:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
 
-      - name: Save Turborepo cache for web app
-        if: always()
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/apps/web/.turbo
-          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+      # - name: Save Turborepo cache for web app
+      #   if: always()
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: src/frontend/apps/web/.turbo
+      #     key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
 
-      - name: Save Turborepo cache for ui package
-        if: always()
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/packages/ui/.turbo
-          key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+      # - name: Save Turborepo cache for ui package
+      #   if: always()
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: src/frontend/packages/ui/.turbo
+      #     key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
