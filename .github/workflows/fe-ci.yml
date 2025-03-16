@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
-      TURBO_CACHE_DIR: ./src/frontend/.turbo # Turbo 캐시 디렉토리 설정
+      TURBO_CACHE_DIR: ./src/frontend/.turbo
     strategy:
       matrix:
         task: [lint, test]
@@ -118,11 +118,7 @@ jobs:
       - name: Run Build with Cache
         working-directory: src/frontend
         run: |
-          pnpm turbo build --parallel --cache-dir=.turbo --log-level=verbose
-          echo "Checking UI output:"
-          ls -R packages/ui/dist || echo "No dist folder found in packages/ui"
-          echo "Checking Web output:"
-          ls -R apps/web/.next || echo "No .next folder found in apps/web"
+          pnpm turbo build --parallel --cache-dir=.turbo
 
       - name: Save Turbo cache
         if: always()
