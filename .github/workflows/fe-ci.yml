@@ -115,7 +115,8 @@ jobs:
       - name: Run Build with Cache
         working-directory: src/frontend
         run: |
-          pnpm turbo build --filter=web --filter=@workspace/ui --parallel --cache-dir=.turbo -- --log-level=debug
+          export TURBO_LOG_VERBOSITY=verbose
+          pnpm turbo build --filter=web --filter=@workspace/ui --parallel --cache-dir=.turbo
       - name: Save Turbo cache
         if: always()
         uses: actions/cache@v4
