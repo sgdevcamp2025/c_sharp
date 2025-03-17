@@ -136,12 +136,12 @@ jobs:
 
       - name: Run Build with Cache (Web)
         if: matrix.package == 'web'
-        working-directory: apps/web
+        working-directory: src/frontend/apps/web
         run: |
           pnpm run turbo build --filter=web --parallel
 
       - name: Run Build with Cache (@workspace/ui)
         if: matrix.package == '@workspace/ui'
-        working-directory: packages/ui
+        working-directory: src/frontend/packages/ui
         run: |
           pnpm run turbo build --filter=@workspace/ui --parallel
