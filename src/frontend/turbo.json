@@ -1,6 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "cacheDir": ".turbo/cache",
   "globalEnv": [
+    "NEXT_PUBLIC_REAL_BASE_URL",
     "NEXT_PUBLIC_MODE",
     "NEXT_PUBLIC_BASE_URL",
     "NEXT_PUBLIC_GATEWAY_SERVER_PORT",
@@ -18,11 +20,10 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": [],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["apps/web/.next/**/*", "packages/ui/dist/**/*"],
-      "cache": true,
-      "persistent": false
+      "outputs": [".next/**", "dist/**", "!.next/cache/**", "build/**"],
+      "cache": true
     },
     "test": {
       "dependsOn": [],
@@ -38,14 +39,14 @@
     "build-storybook": {
       "dependsOn": ["^build-storybook"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["./packages/ui/storybook-static/**"],
+      "outputs": ["storybook-static/**"],
       "cache": true,
       "persistent": false
     },
     "storybook": {
       "dependsOn": ["^storybook"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": ["./packages/ui/storybook-static/**"],
+      "outputs": ["storybook-static/**"],
       "cache": true,
       "persistent": false
     },
@@ -58,22 +59,6 @@
     "dev": {
       "cache": false,
       "persistent": true
-    },
-    "format": {
-      "dependsOn": ["^format"],
-      "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx,json,md}"],
-      "cache": false,
-      "persistent": false
-    },
-    "typescript": {
-      "dependsOn": ["^typescript"],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "tsconfig.json",
-        "packages/**/tsconfig.json"
-      ],
-      "cache": true,
-      "persistent": false
     }
   }
 }

@@ -9,10 +9,13 @@ on:
     paths:
       - 'src/frontend/**'
       - './fe-ci.yml'
+  push:
+    branches:
+      - fe-fix/ci-bug
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   lint-test:
@@ -21,7 +24,6 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
-      TURBO_CACHE_DIR: ./src/frontend/.turbo
     strategy:
       matrix:
         task: [lint, test]
@@ -46,27 +48,31 @@ jobs:
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
       - name: Restore Turbo cache
-        id: restore_turbo_cache
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
           key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-turbo
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
-      - name: Install Dependencies
+      - name: Install Dependencies (if necessary)
         working-directory: src/frontend
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: |
+          if [ ! -d "node_modules" ]; then
+            pnpm install --frozen-lockfile --prefer-offline
+          fi
 
       - name: Run Task with Cache
         working-directory: src/frontend
         run: |
           if [ "${{ matrix.task }}" = "lint" ]; then
-            pnpm turbo lint --parallel --cache-dir=.turbo
+            pnpm exec turbo lint --parallel
           elif [ "${{ matrix.task }}" = "test" ]; then
-            pnpm turbo test --filter=web --parallel --cache-dir=.turbo
+            pnpm exec turbo test --filter=web --parallel
           fi
 
   build:
@@ -75,7 +81,10 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
-      TURBO_CACHE_DIR: ./src/frontend/.turbo
+    strategy:
+      matrix:
+        package: ['web', '@workspace/ui']
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -97,27 +106,39 @@ jobs:
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
       - name: Restore Turbo cache
-        id: restore_turbo_build_cache
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-turbo-
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Restore Next.js cache (for web)
+        if: matrix.package == 'web'
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/apps/web/.next
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-
 
       - name: Install Dependencies
         working-directory: src/frontend
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: |
+          pnpm install --frozen-lockfile --prefer-offline
 
-      - name: Run Build with Cache
+      - name: Run Build with Cache (Web)
+        if: matrix.package == 'web'
         working-directory: src/frontend
-        run: pnpm turbo build --parallel --cache-dir=.turbo
+        run: |
+          pnpm run build --filter=web --parallel
 
-      - name: Save Turbo cache
-        if: always() && steps.restore_turbo_build_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
+      - name: Run Build with Cache (@workspace/ui)
+        if: matrix.package == '@workspace/ui'
+        working-directory: src/frontend
+        run: |
+          pnpm run build --filter=@workspace/ui --parallel
