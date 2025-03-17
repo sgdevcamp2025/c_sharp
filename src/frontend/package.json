@@ -8,7 +8,7 @@
     "build:ui": "turbo build --filter=@workspace/ui",
     "dev": "turbo dev",
     "test": "turbo run test --filter=web",
-    "lint": "turbo lint",
+    "lint": "turbo lint --filter=web --filter=@workspace/ui",
     "format": "turbo run format",
     "storybook": "turbo run storybook --filter=@workspace/ui",
     "build-storybook": "turbo run build-storybook --filter=@workspace/ui",
