@@ -126,12 +126,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-
 
-      - name: Install Dependencies (if necessary)
+      - name: Install Dependencies
         working-directory: src/frontend
         run: |
           pnpm install --frozen-lockfile --prefer-offline
 
-      - name: Run Build with Cache
-        working-directory: ${{ github.workspace }}
+      - name: Check Turbo Installation
+        run: pnpm list turbo
+
+      - name: Run Build with Cache (Web)
+        if: matrix.package == 'web'
+        working-directory: apps/web
         run: |
-          pnpm run turbo build --filter=${{ matrix.package }} --parallel
+          pnpm exec turbo build --filter=web --parallel
+
+      - name: Run Build with Cache (@workspace/ui)
+        if: matrix.package == '@workspace/ui'
+        working-directory: packages/ui
+        run: |
+          pnpm exec turbo build --filter=@workspace/ui --parallel
