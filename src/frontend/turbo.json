@@ -1,7 +1,13 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "cacheDir": ".turbo/cache",
-  "globalEnv": [".env/**", ".env.local/**"],
+  "globalEnv": [
+    "NEXT_PUBLIC_MODE",
+    "NEXT_PUBLIC_REAL_BASE_URL",
+    "NEXT_PUBLIC_KAKAO_CLIENT_ID",
+    "NEXT_PUBLIC_KAKAO_REDIRECT_URI",
+    "NEXT_PUBLIC_S3_BUCKET_NAME"
+  ],
   "ui": "tui",
   "tasks": {
     "build:web": {
