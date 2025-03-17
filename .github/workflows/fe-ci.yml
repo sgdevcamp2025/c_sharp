@@ -83,7 +83,7 @@ jobs:
       TZ: Asia/Seoul
     strategy:
       matrix:
-        package: [apps/web, packages/ui]
+        package: ['web', '@workspace/ui']
 
     steps:
       - name: Checkout Code
