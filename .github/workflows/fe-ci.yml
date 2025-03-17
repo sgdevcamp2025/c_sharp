@@ -41,8 +41,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.15.0
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Restore pnpm store cache
         uses: actions/cache@v4
@@ -96,12 +96,24 @@ jobs:
         with:
           version: 10.6.4
 
+      - name: List src/frontend directory
+        working-directory: src/frontend
+        run: ls -la
+
+      - name: Show pnpm-lock.yaml contents (first 50 lines)
+        working-directory: src/frontend
+        run: head -n 50 pnpm-lock.yaml
+
+      - name: Print hash of pnpm-lock.yaml
+        working-directory: src/frontend
+        run: sha256sum pnpm-lock.yaml
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.15.0
-          cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Restore pnpm store cache
         uses: actions/cache@v4
