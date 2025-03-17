@@ -24,6 +24,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
+      TURBO_LOG_VERBOSITY: debug
     strategy:
       matrix:
         task: [lint, test]
@@ -81,6 +82,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
+      TURBO_LOG_VERBOSITY: debug
     strategy:
       matrix:
         package: ['web', '@workspace/ui']
@@ -130,9 +132,6 @@ jobs:
         working-directory: src/frontend
         run: |
           pnpm install --frozen-lockfile --prefer-offline
-
-      # - name: Check Turbo Installation
-      #   run: pnpm exec turbo --version
 
       - name: Run Build with Cache (Web)
         if: matrix.package == 'web'
