@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": false,
   "scripts": {
-    "build": "turbo build --affected",
+    "build": "turbo build",
     "build:web": "turbo build --affected --filter=web",
     "build:ui": "turbo build --affected --filter=@workspace/ui",
     "dev": "turbo dev",
