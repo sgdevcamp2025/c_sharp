@@ -86,6 +86,14 @@ jobs:
         package: ['web', '@workspace/ui']
 
     steps:
+      - name: Debug Environment Variables
+        run: |
+          echo "NEXT_PUBLIC_REAL_BASE_URL=${NEXT_PUBLIC_REAL_BASE_URL}"
+          echo "NEXT_PUBLIC_MODE=${NEXT_PUBLIC_MODE}"
+          echo "NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}"
+          echo "NEXT_PUBLIC_GATEWAY_SERVER_PORT=${NEXT_PUBLIC_GATEWAY_SERVER_PORT}"
+          echo "NEXT_PUBLIC_AUTH_SERVER_PORT=${NEXT_PUBLIC_AUTH_SERVER_PORT}"
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
