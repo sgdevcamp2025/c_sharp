@@ -83,7 +83,7 @@ jobs:
       TZ: Asia/Seoul
     strategy:
       matrix:
-        package: ['web', '@workspace/ui']
+        package: [apps/web, packages/ui]
 
     steps:
       - name: Checkout Code
@@ -134,5 +134,6 @@ jobs:
           fi
 
       - name: Run Build with Cache
+        working-directory: ${{ github.workspace }}
         run: |
           pnpm exec turbo build --filter=${{ matrix.package }} --parallel
