@@ -20,18 +20,13 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": [
-        ".next/**",
-        "dist/**",
-        "!.next/cache/**",
-        "!.turbo/turbo-build.log"
-      ],
+      "outputs": [".next/**", "dist/**", "!.next/cache/**"],
       "cache": true
     },
     "test": {
-      "dependsOn": ["^test"],
+      "dependsOn": [],
       "inputs": [
         "$TURBO_DEFAULT$",
         "**/*.test.{js,ts,jsx,tsx}",
