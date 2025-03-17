@@ -44,10 +44,6 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
-      # - name: Ensure caching directories exist
-      #   run: |
-      #     mkdir -p ~/.pnpm-store
-
       - name: Restore pnpm store cache
         uses: actions/cache@v4
         with:
@@ -68,7 +64,7 @@ jobs:
         working-directory: src/frontend
         run: |
           if [ ! -d "node_modules" ]; then
-            pnpm install --frozen-lockfile --prefer-offline
+            pnpm install --no-frozen-lockfile --prefer-offline
           fi
 
       - name: Run Task with Cache
@@ -135,7 +131,7 @@ jobs:
       - name: Install Dependencies
         working-directory: src/frontend
         run: |
-          pnpm install --frozen-lockfile --prefer-offline
+          pnpm install --no-frozen-lockfile --prefer-offline
 
       - name: Run Build with Cache (Web)
         if: matrix.package == 'web'
