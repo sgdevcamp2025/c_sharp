@@ -112,7 +112,7 @@ jobs:
       - name: Restore Turbo cache
         uses: actions/cache@v4
         with:
-          path: .turbo
+          path: src/frontend/.turbo
           key: ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-turbo-
@@ -121,7 +121,7 @@ jobs:
         if: matrix.package == 'web'
         uses: actions/cache@v4
         with:
-          path: apps/web/.next
+          path: src/frontend/apps/web/.next
           key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-
