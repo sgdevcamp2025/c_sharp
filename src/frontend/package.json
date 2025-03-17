@@ -4,8 +4,8 @@
   "private": false,
   "scripts": {
     "build": "turbo build",
-    "build:web": "turbo build --affected --filter=web",
-    "build:ui": "turbo build --affected --filter=@workspace/ui",
+    "build:web": "turbo build --filter=web",
+    "build:ui": "turbo build --filter=@workspace/ui",
     "dev": "turbo dev",
     "test": "turbo run test --filter=web",
     "lint": "turbo lint",

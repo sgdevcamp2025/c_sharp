@@ -75,6 +75,17 @@ jobs:
             pnpm exec turbo test --filter=web --parallel
           fi
 
+      - name: Ensure caching directories exist
+        run: |
+          mkdir -p ~/.pnpm-store
+
+      - name: Save pnpm store cache
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+
   build:
     if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
