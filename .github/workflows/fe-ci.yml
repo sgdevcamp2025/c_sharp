@@ -24,6 +24,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
+      PNPM_STORE: /home/runner/setup-pnpm/node_modules/.bin/store/v3
     strategy:
       matrix:
         task: [lint, test]
@@ -43,21 +44,14 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
-      - name: Ensure caching directories exist
-        run: |
-          mkdir -p ~/.pnpm-store
-
-      - name: Get PNPM Store Path
-        id: get-pnpm-store
-        run: |
-          PNPM_STORE=$(pnpm store path --silent)
-          echo "PNPM_STORE=$PNPM_STORE" >> $GITHUB_ENV
-          echo "PNPM_STORE is: $PNPM_STORE"
+      # - name: Ensure caching directories exist
+      #   run: |
+      #     mkdir -p ~/.pnpm-store
 
       - name: Restore pnpm store cache
         uses: actions/cache@v4
         with:
-          path: /home/runner/setup-pnpm/node_modules/.pnpm-store
+          path: ${{ env.PNPM_STORE }}
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
@@ -92,6 +86,7 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
+      PNPM_STORE: /home/runner/setup-pnpm/node_modules/.bin/store/v3
     strategy:
       matrix:
         package: ['web', '@workspace/ui']
@@ -115,7 +110,7 @@ jobs:
       - name: Restore pnpm store cache
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
+          path: ${{ env.PNPM_STORE }}
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
