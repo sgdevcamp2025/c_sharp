@@ -27,13 +27,21 @@ jobs:
         with:
           version: 9.12.3
 
-      - name: Install dependencies
-        working-directory: src/frontend
-        run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
-      - name: Build for updating .turbo cache
-        working-directory: src/frontend
-        run: pnpm turbo build --filter=web --filter=@workspace/ui --parallel
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
       - name: Ensure caching directories exist
         run: |
@@ -54,5 +62,4 @@ jobs:
           path: src/frontend/.turbo
           key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}-
             ${{ runner.os }}-turbo-
