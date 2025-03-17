@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "cacheDir": ".turbo/cache",
-  "globalDependencies": [".env.local", "tsconfig.json"],
+  "globalDependencies": [".env", ".env.local", "tsconfig.json"],
   "ui": "tui",
   "tasks": {
     "build:web": {
