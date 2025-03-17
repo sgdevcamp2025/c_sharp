@@ -81,6 +81,10 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
+    strategy:
+      matrix:
+        package: [web, '@workspace/ui']
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -95,32 +99,36 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
-          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+          cache-dependency-path: 'pnpm-lock.yaml'
 
       - name: Restore pnpm store cache
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
       - name: Restore Turbo cache
         uses: actions/cache@v4
         with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Install Dependencies (if necessary)
-        working-directory: src/frontend
-        run: |
-          if [ ! -d "node_modules" ]; then
-            pnpm install --frozen-lockfile --prefer-offline
-          fi
+      - name: Restore Next.js cache (for web)
+        if: matrix.package == 'web'
+        uses: actions/cache@v4
+        with:
+          path: apps/web/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Run Build with Cache
-        working-directory: src/frontend
         run: |
-          pnpm exec turbo build --filter=web --filter=@workspace/ui --parallel
+          pnpm exec turbo build --filter=${{ matrix.package }} --parallel
