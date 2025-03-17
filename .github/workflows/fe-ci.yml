@@ -11,7 +11,7 @@ on:
       - './fe-ci.yml'
   push:
     branches:
-      - fe-fix/ci-bug
+      - fe-refac/bundle
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
