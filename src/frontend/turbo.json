@@ -8,12 +8,7 @@
       "cache": true,
       "dependsOn": [],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "!.next/BUILD_ID",
-        "!.next/trace/**"
-      ],
+      "outputs": [".next/**", "!.next/cache/**"],
       "persistent": false
     },
     "build:ui": {
