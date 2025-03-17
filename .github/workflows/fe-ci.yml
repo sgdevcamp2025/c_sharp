@@ -15,7 +15,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   lint-test:
@@ -129,9 +129,7 @@ jobs:
       - name: Install Dependencies (if necessary)
         working-directory: src/frontend
         run: |
-          if [ ! -d "node_modules" ]; then
-            pnpm install --frozen-lockfile --prefer-offline
-          fi
+          pnpm install --frozen-lockfile --prefer-offline
 
       - name: Run Build with Cache
         working-directory: ${{ github.workspace }}
