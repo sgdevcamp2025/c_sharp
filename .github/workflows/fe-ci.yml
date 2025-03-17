@@ -43,10 +43,21 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
+      - name: Ensure caching directories exist
+        run: |
+          mkdir -p ~/.pnpm-store
+
+      - name: Get PNPM Store Path
+        id: get-pnpm-store
+        run: |
+          PNPM_STORE=$(pnpm store path --silent)
+          echo "PNPM_STORE=$PNPM_STORE" >> $GITHUB_ENV
+          echo "PNPM_STORE is: $PNPM_STORE"
+
       - name: Restore pnpm store cache
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
+          path: /home/runner/setup-pnpm/node_modules/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
@@ -74,17 +85,6 @@ jobs:
           elif [ "${{ matrix.task }}" = "test" ]; then
             pnpm exec turbo test --filter=web --parallel
           fi
-
-      - name: Ensure caching directories exist
-        run: |
-          mkdir -p ~/.pnpm-store
-
-      - name: Save pnpm store cache
-        if: always()
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
 
   build:
     if: ${{ github.actor != 'l10nbot' }}
@@ -146,10 +146,10 @@ jobs:
         if: matrix.package == 'web'
         working-directory: src/frontend
         run: |
-          pnpm run build --affected --filter=web --parallel
+          pnpm run build --filter=web --parallel
 
       - name: Run Build with Cache (@workspace/ui)
         if: matrix.package == '@workspace/ui'
         working-directory: src/frontend
         run: |
-          pnpm run build --affected --filter=@workspace/ui --parallel
+          pnpm run build --filter=@workspace/ui --parallel
