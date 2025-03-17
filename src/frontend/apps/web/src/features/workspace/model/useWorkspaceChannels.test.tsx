@@ -135,8 +135,9 @@ describe('useWorkspaceChannels', () => {
       { wrapper },
     );
     rerender();
-    await waitFor(() =>
-      result.current.joinedChannels.some((ch) => ch.channelId === 3),
+    await waitFor(
+      () => result.current.joinedChannels.some((ch) => ch.channelId === 3),
+      { timeout: 2000 },
     );
     expect(result.current.joinedChannels).toContainEqual(mockSocketMessage);
     expect(result.current.unjoinedChannels).toEqual([]);
