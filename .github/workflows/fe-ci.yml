@@ -65,6 +65,7 @@ jobs:
         run: |
           if [ ! -d "node_modules" ]; then
             pnpm install --frozen-lockfile --prefer-offline
+            pnpm approve-builds
           fi
 
       - name: Run Task with Cache
@@ -144,6 +145,7 @@ jobs:
         working-directory: src/frontend
         run: |
           pnpm install --frozen-lockfile --prefer-offline
+          pnpm approve-builds
 
       - name: Run Build with Cache (Web)
         if: matrix.package == 'web'
