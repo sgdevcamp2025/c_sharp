@@ -27,7 +27,7 @@
       "persistent": false
     },
     "test": {
-      "dependsOn": [],
+      "dependsOn": ["^test"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "**/*.test.{js,ts,jsx,tsx}",

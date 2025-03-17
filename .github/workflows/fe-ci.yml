@@ -24,7 +24,6 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
-      TURBO_LOG_VERBOSITY: debug
     strategy:
       matrix:
         task: [lint, test]
@@ -82,7 +81,6 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Seoul
-      TURBO_LOG_VERBOSITY: debug
     strategy:
       matrix:
         package: ['web', '@workspace/ui']
