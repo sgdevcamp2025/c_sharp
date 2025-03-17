@@ -20,9 +20,9 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": [],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": [".next/**", "dist/**", "!.next/cache/**"],
+      "outputs": [".next/**", "dist/**"],
       "cache": true
     },
     "test": {
