@@ -55,7 +55,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml', 'src/frontend/turbo.json', 'src/frontend/package.json') }}
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-turbo-
 
@@ -75,12 +75,6 @@ jobs:
             pnpm exec turbo test --filter=web --parallel
           fi
 
-      - name: Save Turbo cache
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml', 'src/frontend/turbo.json', 'src/frontend/package.json') }}
-
   build:
     if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
@@ -90,6 +84,7 @@ jobs:
     strategy:
       matrix:
         package: ['web', '@workspace/ui']
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -118,7 +113,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml', 'src/frontend/turbo.json', 'src/frontend/package.json') }}
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-turbo-
 
@@ -127,7 +122,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src/frontend/apps/web/.next
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('src/frontend/apps/web/**') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-
 
@@ -147,16 +142,3 @@ jobs:
         working-directory: src/frontend
         run: |
           pnpm run build --filter=@workspace/ui --parallel
-
-      - name: Save Turbo cache
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/.turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml', 'src/frontend/turbo.json', 'src/frontend/package.json') }}
-
-      - name: Save Next.js cache (for web)
-        if: matrix.package == 'web'
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/apps/web/.next
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('src/frontend/apps/web/**') }}
