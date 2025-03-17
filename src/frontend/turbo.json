@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "cacheDir": ".turbo/cache",
   "globalEnv": [
     "NEXT_PUBLIC_MODE",
     "NEXT_PUBLIC_BASE_URL",

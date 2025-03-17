@@ -70,9 +70,9 @@ jobs:
         working-directory: src/frontend
         run: |
           if [ "${{ matrix.task }}" = "lint" ]; then
-            pnpm turbo lint --parallel
+            pnpm exec turbo lint --parallel
           elif [ "${{ matrix.task }}" = "test" ]; then
-            pnpm turbo test --filter=web --parallel
+            pnpm exec turbo test --filter=web --parallel
           fi
 
   build:
@@ -113,8 +113,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
+      - name: Install Dependencies (if necessary)
+        working-directory: src/frontend
+        run: |
+          if [ ! -d "node_modules" ]; then
+            pnpm install --frozen-lockfile --prefer-offline
+          fi
+
       - name: Run Build with Cache
         working-directory: src/frontend
         run: |
-          export TURBO_LOG_VERBOSITY=verbose
-          pnpm turbo build --filter=web --filter=@workspace/ui --parallel
+          pnpm exec turbo build --filter=web --filter=@workspace/ui --parallel
