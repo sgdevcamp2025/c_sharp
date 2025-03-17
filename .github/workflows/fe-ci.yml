@@ -131,17 +131,17 @@ jobs:
         run: |
           pnpm install --frozen-lockfile --prefer-offline
 
-      - name: Check Turbo Installation
-        run: pnpm exec turbo --version
+      # - name: Check Turbo Installation
+      #   run: pnpm exec turbo --version
 
       - name: Run Build with Cache (Web)
         if: matrix.package == 'web'
-        working-directory: ${{ github.workspace }}
+        working-directory: src/frontend
         run: |
           pnpm run build --filter=web --parallel
 
       - name: Run Build with Cache (@workspace/ui)
         if: matrix.package == '@workspace/ui'
-        working-directory: ${{ github.workspace }}
+        working-directory: src/frontend
         run: |
           pnpm run build --filter=@workspace/ui --parallel
