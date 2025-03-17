@@ -134,4 +134,4 @@ jobs:
       - name: Run Build with Cache
         working-directory: ${{ github.workspace }}
         run: |
-          pnpm exec turbo build --filter=${{ matrix.package }} --parallel
+          pnpm run turbo build --filter=${{ matrix.package }} --parallel
