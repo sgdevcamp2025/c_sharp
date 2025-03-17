@@ -71,9 +71,9 @@ jobs:
         working-directory: src/frontend
         run: |
           if [ "${{ matrix.task }}" = "lint" ]; then
-            pnpm exec turbo lint --parallel
+            pnpm run turbo lint --parallel
           elif [ "${{ matrix.task }}" = "test" ]; then
-            pnpm exec turbo test --filter=web --parallel
+            pnpm run turbo test --filter=web --parallel
           fi
 
   build:
