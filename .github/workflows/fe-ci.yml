@@ -121,7 +121,7 @@ jobs:
         if: matrix.package == 'web'
         uses: actions/cache@v4
         with:
-          path: apps/web/.next/cache
+          path: apps/web/.next
           key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-
