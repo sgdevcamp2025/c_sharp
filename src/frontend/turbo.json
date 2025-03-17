@@ -1,14 +1,19 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "cacheDir": ".turbo/cache",
-  "globalDependencies": [".env", ".env.local", "tsconfig.json"],
+  "globalEnv": [".env/**", ".env.local/**"],
   "ui": "tui",
   "tasks": {
     "build:web": {
       "cache": true,
       "dependsOn": [],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": [".next/**", "!.next/cache/**"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/BUILD_ID",
+        "!.next/trace"
+      ],
       "persistent": false
     },
     "build:ui": {
