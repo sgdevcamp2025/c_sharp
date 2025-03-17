@@ -131,7 +131,7 @@ jobs:
       - name: Install Dependencies
         working-directory: src/frontend
         run: |
-          pnpm install --frozen-lockfile --prefer-offline
+          pnpm install --no-frozen-lockfile --prefer-offline
 
       - name: Run Build with Cache (Web)
         if: matrix.package == 'web'
