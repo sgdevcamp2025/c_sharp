@@ -58,22 +58,6 @@
     "dev": {
       "cache": false,
       "persistent": true
-    },
-    "format": {
-      "dependsOn": ["^format"],
-      "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx,json,md}"],
-      "cache": false,
-      "persistent": false
-    },
-    "typescript": {
-      "dependsOn": ["^typescript"],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "tsconfig.json",
-        "packages/**/tsconfig.json"
-      ],
-      "cache": true,
-      "persistent": false
     }
   }
 }

@@ -23,27 +23,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9.12.3
 
       - name: Install dependencies
-        run: |
-          cd src/frontend
-          pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
-          pnpm add turbo --save-dev -w
-      - name: Build for updating .turbo cache (optional)
-        run: |
-          cd src/frontend
-          pnpm turbo build --parallel
-      # 디렉터리 존재 여부 보장: 캐시 저장 전에 해당 경로가 없으면 생성
+        working-directory: src/frontend
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Build for updating .turbo cache
+        working-directory: src/frontend
+        run: pnpm turbo build --filter=web --filter=@workspace/ui --parallel
+
       - name: Ensure caching directories exist
         run: |
           mkdir -p ~/.pnpm-store
-          mkdir -p src/frontend/apps/web/.turbo
-          mkdir -p src/frontend/packages/ui/.turbo
+          mkdir -p src/frontend/.turbo
+
       - name: Save pnpm store cache
         if: always()
         uses: actions/cache@v4
@@ -51,16 +51,12 @@ jobs:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
 
-      - name: Save Turborepo cache for web app
+      - name: Save Turborepo main cache
         if: always()
         uses: actions/cache@v4
         with:
-          path: src/frontend/apps/web/.turbo
-          key: ${{ runner.os }}-turbo-web-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
-
-      - name: Save Turborepo cache for ui package
-        if: always()
-        uses: actions/cache@v4
-        with:
-          path: src/frontend/packages/ui/.turbo
-          key: ${{ runner.os }}-turbo-ui-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          path: src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-turbo-
