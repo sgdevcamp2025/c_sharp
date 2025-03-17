@@ -135,10 +135,10 @@ jobs:
         if: matrix.package == 'web'
         working-directory: src/frontend
         run: |
-          pnpm run build --filter=web --parallel
+          pnpm run build --affected --filter=web --parallel
 
       - name: Run Build with Cache (@workspace/ui)
         if: matrix.package == '@workspace/ui'
         working-directory: src/frontend
         run: |
-          pnpm run build --filter=@workspace/ui --parallel
+          pnpm run build --affected --filter=@workspace/ui --parallel
