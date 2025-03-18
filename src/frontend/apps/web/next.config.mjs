@@ -11,34 +11,8 @@ const nextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (!isServer && mode === 'production') {
-      // 커스텀 splitChunks 설정
       config.optimization.splitChunks = {
         chunks: 'all',
-        minSize: 20000,
-        maxSize: 0,
-        minChunks: 1,
-        maxAsyncRequests: 30,
-        maxInitialRequests: 30,
-        automaticNameDelimiter: '~',
-        cacheGroups: {
-          reactVendors: {
-            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-            name: 'react-vendors',
-            chunks: 'all',
-            priority: 20,
-          },
-          vendors: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: -10,
-          },
-          default: {
-            minChunks: 2,
-            priority: -20,
-            reuseExistingChunk: true,
-          },
-        },
       };
 
       config.optimization.minimizer = [
