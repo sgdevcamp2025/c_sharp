@@ -1,7 +1,4 @@
 // import withBundleAnalyzer from '@next/bundle-analyzer';
-import TerserPlugin from 'terser-webpack-plugin';
-
-const mode = process.env.NEXT_NODE_ENV;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -14,18 +11,6 @@ const nextConfig = {
     splitChunks: {
       chunks: 'all',
     },
-    minimizer:
-      mode === 'production'
-        ? [
-            new TerserPlugin({
-              terserOptions: {
-                compress: {
-                  drop_console: true,
-                },
-              },
-            }),
-          ]
-        : [],
   },
 };
 
