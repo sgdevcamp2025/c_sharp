@@ -1,4 +1,4 @@
-import withBundleAnalyzer from '@next/bundle-analyzer';
+// import withBundleAnalyzer from '@next/bundle-analyzer';
 import TerserPlugin from 'terser-webpack-plugin';
 
 const mode = process.env.NODE_ENV || 'development';
@@ -55,4 +55,5 @@ const nextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+// export default withBundleAnalyzer(nextConfig);
+export default nextConfig;
