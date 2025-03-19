@@ -5,6 +5,8 @@ import com.jootalkpia.file_server.exception.common.ErrorCode;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class FileTypeDetector {
         }
     }
 
-    private String detectFileType(Object file) throws IOException {
+    public String detectFileType(Object file) throws IOException {
         String mimeType = detectMimeType(file);
 
         if (mimeType.startsWith("image/")) {
@@ -46,17 +48,44 @@ public class FileTypeDetector {
 
     public String detectMimeType(Object file) {
         try {
+            String mimeType;
             if (file instanceof InputStream) {
-                return tika.detect((InputStream) file);
+                mimeType = tika.detect((InputStream) file);
             } else if (file instanceof File) {
-                return tika.detect((File) file);
+                mimeType = tika.detect((File) file);
             } else {
                 throw new IllegalArgumentException("Unsupported file type for detection");
             }
+
+            log.info("파일 MIME 타입: {}", mimeType);
+            return mimeType;
         } catch (IOException e) {
             log.warn("MIME 타입 감지 실패, 기본값 사용: binary/octet-stream", e);
             throw new CustomException(ErrorCode.MIMETYPE_DETECTION_FAILED.getCode(), ErrorCode.MIMETYPE_DETECTION_FAILED.getMsg());
         }
     }
+
+
+    public File convertMultipartToFile(MultipartFile multipartFile) {
+        try {
+            File tempFile = File.createTempFile("temp_", multipartFile.getOriginalFilename());
+            multipartFile.transferTo(tempFile);
+            return tempFile;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String detectFileTypeFromS3(String s3Key, String bucketName) {
+        try {
+            URL url = new URL("https://" + bucketName + ".s3.amazonaws.com/" + s3Key);
+            URLConnection connection = url.openConnection();
+            return connection.getContentType();
+        } catch (IOException e) {
+            log.error("파일 타입 감지 실패: {}", s3Key, e);
+            return "application/octet-stream";
+        }
+    }
+
 
 }
