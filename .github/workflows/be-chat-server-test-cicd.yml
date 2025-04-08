@@ -64,14 +64,14 @@ jobs:
     steps:
       - name: Debug Secrets
         run: |
-          echo "SERVER_IP=${{ secrets.CHAT_SERVER_IP }}"
-          echo "SERVER_USER=${{ secrets.SERVER_USER }}"
+          echo "SERVER_IP=52.79.186.238"
+          echo "SERVER_USER=ubuntu"
           echo "SERVER_KEY Length=$(echo -n "${{ secrets.CHAT_SERVER_SECRET_KEY }}" | wc -c)"
           
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SERVER_IP }}
+          host: 52.79.186.238
           username: ubuntu
           key: ${{ secrets.SECRET_KEY }}
           script: |
