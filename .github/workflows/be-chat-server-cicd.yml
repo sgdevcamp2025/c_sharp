@@ -1,4 +1,4 @@
-name: BACKEND-CICD
+name: BACKEND-CHAT-SERVER-TEST-CICD
 
 on:
   push:
