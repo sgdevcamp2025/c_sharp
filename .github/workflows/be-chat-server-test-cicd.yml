@@ -73,7 +73,7 @@ jobs:
         with:
           host: 52.79.186.238
           username: ubuntu
-          key: ${{ secrets.SECRET_KEY }}
+          key: ${{ secrets.CHAT_SERVER_SECRET_KEY }}
           script: |
             cd ~
             ./deploy.sh
