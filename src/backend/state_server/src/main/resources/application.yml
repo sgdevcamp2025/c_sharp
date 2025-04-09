@@ -18,6 +18,17 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, info
+  metrics:
+    tags:
+      application: state:server
+  server:
+    address: 0.0.0.0
+
 topic:
   chat: jootalkpia.chat.prd.message
 group:
