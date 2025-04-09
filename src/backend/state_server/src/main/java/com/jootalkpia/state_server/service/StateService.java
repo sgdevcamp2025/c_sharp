@@ -32,18 +32,24 @@ public class StateService {
     }
 
     public Set<String> findNotificationTargets(String channelId, String userId) {
-        Set<String> subscriber = findSubscribers(channelId);
-        Set<String> onlineSessions = findOnlineSessions(userId, subscriber);
-        Set<String> activeSessions = findActiveSessions(channelId, subscriber, userId);
+        Set<String> testSessions = stringOperRedisTemplate.opsForSet().members("user:sessions");
 
-        log.info("[Notification Targets] Channel: {}", channelId);
-        log.info("├── Online Sessions: {}", onlineSessions);
-        log.info("├── Active Sessions: {}", activeSessions);
+        log.info(testSessions.toString());
 
-        onlineSessions.removeAll(activeSessions);
-        log.info("└── Target Sessions: {}", onlineSessions);
+        return testSessions;
 
-        return onlineSessions;
+//        Set<String> subscriber = findSubscribers(channelId);
+//        Set<String> onlineSessions = findOnlineSessions(userId, subscriber);
+//        Set<String> activeSessions = findActiveSessions(channelId, subscriber, userId);
+//
+//        log.info("[Notification Targets] Channel: {}", channelId);
+//        log.info("├── Online Sessions: {}", onlineSessions);
+//        log.info("├── Active Sessions: {}", activeSessions);
+//
+//        onlineSessions.removeAll(activeSessions);
+//        log.info("└── Target Sessions: {}", onlineSessions);
+//
+//        return onlineSessions;
     }
 
     private Set<String> findSubscribers(String channelId) {

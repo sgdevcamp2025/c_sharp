@@ -42,7 +42,7 @@ public class ChatService {
     }
 
     private CommonResponse createCommonData(Long userId, Long channelId){
-        User user = userRepository.findByUserId(userId);
+//        User user = userRepository.findByUserId(userId);
 
         Long threadId = snowflakeIdGenerator.nextId();
 
@@ -54,9 +54,9 @@ public class ChatService {
                 .channelId(channelId)
                 .threadId(threadId)
                 .threadDateTime(DateTimeUtil.formatDateTime(now))
-                .userId(user.getUserId())
-                .userNickname(user.getNickname())
-                .userProfileImage(user.getProfileImage())
+//                .userId(user.getUserId())
+//                .userNickname(user.getNickname())
+//                .userProfileImage(user.getProfileImage())
                 .build();
     }
 
