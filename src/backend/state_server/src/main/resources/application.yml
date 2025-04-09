@@ -26,8 +26,6 @@ management:
   metrics:
     tags:
       application: state:server
-  server:
-    address: 0.0.0.0
 
 topic:
   chat: jootalkpia.chat.prd.message
@@ -36,4 +34,3 @@ group:
 
 server:
   port: ${STATE_PORT}
-  

@@ -38,8 +38,6 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-  server:
-    address: 0.0.0.0
 
 logging:
   level:
