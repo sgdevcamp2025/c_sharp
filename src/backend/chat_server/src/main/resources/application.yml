@@ -30,6 +30,15 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, info
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
 logging:
   level:
     com.jootalkpia.chat_server: DEBUG  # 또는 INFO
