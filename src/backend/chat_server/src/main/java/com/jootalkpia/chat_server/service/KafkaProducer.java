@@ -24,11 +24,11 @@ public class KafkaProducer {
 
     public void sendChatMessage(ChatMessageToKafka chatMessageToKafka, Long channelId) {
         try {
-            int partitionNumber = ThreadLocalRandom.current().nextInt(0, 3);
+            String partitionNumber = String.valueOf(ThreadLocalRandom.current().nextInt(0, 3));
             String jsonChatMessage = objectMapper.writeValueAsString(chatMessageToKafka);
 
             ProducerRecord<String, String> record =
-                    new ProducerRecord<>(topicChat, partitionNumber, null, jsonChatMessage);
+                    new ProducerRecord<>(topicChat, partitionNumber, jsonChatMessage);
 
             kafkaTemplate.send(record)
                     .whenComplete((result, ex) -> { //키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
