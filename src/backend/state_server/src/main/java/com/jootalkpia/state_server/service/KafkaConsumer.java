@@ -21,7 +21,8 @@ public class KafkaConsumer {
 
     @KafkaListener(
             topics = "${topic.chat}",
-            groupId = "${group.status}"
+            groupId = "${group.status}",
+            concurrency = "3"
     )
     public void processState(String kafkaMessage) {
         log.info("message ===> " + kafkaMessage);

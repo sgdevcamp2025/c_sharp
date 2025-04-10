@@ -41,7 +41,7 @@ public class KafkaConsumer {
     @KafkaListener(
             topics = "${topic.chat}",
             groupId = "${group.chat}",
-            concurrency = "2"
+            concurrency = "3"
     )
     public void processChatMessage(@Header(KafkaHeaders.RECEIVED_KEY) String channelId, String kafkaMessage) {
         log.info("Received Kafka chat message ===> channelId: {}, message: {}", channelId, kafkaMessage);
@@ -59,8 +59,7 @@ public class KafkaConsumer {
 
     @KafkaListener(
             topics = "${topic.push}",
-            groupId = "${group.push}",
-            concurrency = "2"
+            groupId = "${group.push}"
     )
     public void processPushMessage(String kafkaMessage) {
         log.info("message ===> " + kafkaMessage);
