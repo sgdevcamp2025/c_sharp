@@ -59,7 +59,7 @@ public class KafkaConsumer {
     @KafkaListener(
             topics = "${topic.push}",
             groupId = "${group.push}",
-            concurrency = "3"
+            concurrency = "5"
     )
     public void processPushMessage(String kafkaMessage) {
         log.info("message ===> " + kafkaMessage);
