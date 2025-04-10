@@ -52,7 +52,7 @@ topic:
 
 group:
   minute: minute-price-save-consumer-group-${SERVER_PORT}
-  chat: chat-message-handle-consumer-group-${SERVER_PORT}
+  chat: chat-message-handle-consumer-group
   push: push-message-handle-consumer-group-${SERVER_PORT}
   huddle: huddle-status-handle-consumer-group-${SERVER_PORT}
   workspace: workspace-channel-handle-consumer-group-${SERVER_PORT}

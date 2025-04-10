@@ -30,7 +30,7 @@ management:
 topic:
   chat: jootalkpia.chat.prd.message
 group:
-  status: user-status-handle-consumer-group
+  status: user-status-consumer-group
 
 server:
   port: ${STATE_PORT}
