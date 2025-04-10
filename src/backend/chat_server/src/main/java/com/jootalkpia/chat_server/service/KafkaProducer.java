@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jootalkpia.chat_server.dto.ChatMessageToKafka;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,13 @@ public class KafkaProducer {
 
     public void sendChatMessage(ChatMessageToKafka chatMessageToKafka, Long channelId) {
         try {
-            String randomKey = String.valueOf(ThreadLocalRandom.current().nextInt(1, 4));
-
+            int partitionNumber = ThreadLocalRandom.current().nextInt(0, 3);
             String jsonChatMessage = objectMapper.writeValueAsString(chatMessageToKafka);
-            kafkaTemplate.send(topicChat, randomKey, jsonChatMessage)
+
+            ProducerRecord<String, String> record =
+                    new ProducerRecord<>(topicChat, partitionNumber, null, jsonChatMessage);
+
+            kafkaTemplate.send(record)
                     .whenComplete((result, ex) -> { //키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
                         if (ex == null) {
                             log.info("Kafka message sent: {}", result.toString());
