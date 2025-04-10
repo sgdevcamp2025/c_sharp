@@ -32,7 +32,6 @@ public class ChatService {
     private final FileRepository fileRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
 
-    @Transactional
     public void processChatMessage(ChatMessageRequest request, Long channelId) {
         CommonResponse commonData = createCommonData(request.userId(), channelId);
         List<MessageResponse> messageData = createMessageData(request.content(), request.attachmentList());
