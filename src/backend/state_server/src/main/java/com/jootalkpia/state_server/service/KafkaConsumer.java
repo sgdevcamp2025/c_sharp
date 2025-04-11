@@ -24,8 +24,6 @@ public class KafkaConsumer {
             groupId = "${group.status}"
     )
     public void processState(String kafkaMessage) {
-        log.info("message ===> " + kafkaMessage);
-
         ObjectMapper mapper = new ObjectMapper();
 
         try {

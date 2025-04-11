@@ -43,14 +43,11 @@ public class KafkaConsumer {
             groupId = "${group.chat}"
     )
     public void processChatMessage(@Header(KafkaHeaders.RECEIVED_KEY) String channelId, String kafkaMessage) {
-        log.info("Received Kafka chat message ===> channelId: {}, message: {}", channelId, kafkaMessage);
         try {
             ChatMessageToKafka chatMessage = objectMapper.readValue(kafkaMessage, ChatMessageToKafka.class);
             String chatDataJson = objectMapper.writeValueAsString(chatMessage);
 
             messagingTemplate.convertAndSend("/subscribe/chat." + channelId, chatDataJson);
-            log.info("Broadcasted chat message via WebSocket: {}", chatDataJson);
-
         } catch (Exception ex) {
             log.error("Error processing chat message: {}", ex.getMessage(), ex);
         }
@@ -62,8 +59,6 @@ public class KafkaConsumer {
             concurrency = "5"
     )
     public void processPushMessage(String kafkaMessage) {
-        log.info("message ===> " + kafkaMessage);
-
         try {
             PushMessageToKafka pushMessageToKafka = objectMapper.readValue(kafkaMessage, PushMessageToKafka.class);
             String cleanSessionId = pushMessageToKafka.sessionId().replace("\"", "");
@@ -74,9 +69,6 @@ public class KafkaConsumer {
 
             messagingTemplate.convertAndSend("/subscribe/notification." + cleanSessionId, pushMessage);
             messagingTemplate.convertAndSend("/subscribe/notification." + cleanSessionId + "/workspace." + workspaceId, readCountMessage);
-
-            log.info("/subscribe/notification." + cleanSessionId + "/workspace." + workspaceId);
-            log.info("dto ===> " + pushMessageToKafka);
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex); // 추후에 GlobalException 처리
         }
