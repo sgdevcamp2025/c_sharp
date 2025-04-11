@@ -15,11 +15,6 @@ spring:
       acks: all # 멱등성 프로듀서를 위해 all로 설정, 0 또는 1이면 enable.idempotence=true 불가
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      batch-size: 65536  # 64KB
-      properties:
-        linger.ms: 20    # 20ms
-        buffer.memory: 67108864  # 64MB로 버퍼 메모리도 증가
-        compression.type: snappy
     bootstrap-servers: ${KAFKA_SERVER}
   datasource:
     driver-class-name: org.postgresql.Driver
