@@ -21,8 +21,7 @@ public class KafkaConsumer {
 
     @KafkaListener(
             topics = "${topic.chat}",
-            groupId = "${group.status}",
-            concurrency = "3"
+            groupId = "${group.status}"
     )
     public void processState(String kafkaMessage) {
         ObjectMapper mapper = new ObjectMapper();
