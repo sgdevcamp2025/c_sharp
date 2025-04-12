@@ -32,11 +32,7 @@ public class StateService {
     }
 
     public Set<String> findNotificationTargets(String channelId, String userId) {
-        Set<String> testSessions = stringOperRedisTemplate.opsForSet().members("user:sessions");
-
-        log.info(testSessions.toString());
-
-        return testSessions;
+        return stringOperRedisTemplate.opsForSet().members("user:sessions");
 
 //        Set<String> subscriber = findSubscribers(channelId);
 //        Set<String> onlineSessions = findOnlineSessions(userId, subscriber);
