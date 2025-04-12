@@ -40,8 +40,7 @@ public class KafkaConsumer {
 
     @KafkaListener(
             topics = "${topic.chat}",
-            groupId = "${group.chat}",
-            concurrency = "8"
+            groupId = "${group.chat}"
     )
     public void processChatMessage(@Header(KafkaHeaders.RECEIVED_KEY) String channelId, String kafkaMessage) {
         try {
