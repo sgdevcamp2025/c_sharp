@@ -24,11 +24,9 @@ public class KafkaProducer {
 
     public void sendChatMessage(ChatMessageToKafka chatMessageToKafka, Long channelId) {
         try {
-            String randomKey = String.valueOf(ThreadLocalRandom.current().nextInt(1, 6));
-
             String jsonChatMessage = objectMapper.writeValueAsString(chatMessageToKafka);
 
-            kafkaTemplate.send(topicChat, randomKey, jsonChatMessage)
+            kafkaTemplate.send(topicChat, jsonChatMessage)
                     .whenComplete((result, ex) -> { //키 값 설정으로 순서 보장, 실시간성이 떨어짐, 고민해봐야 할 부분
                         if (ex == null) {
                             log.info("Kafka message sent: {}", result.toString());
