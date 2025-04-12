@@ -8,10 +8,10 @@ spring:
       acks: 0
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      batch-size: 131072  # 128KB (기존 64KB의 2배)
+      batch-size: 65536  # 64KB
       properties:
-        linger.ms: 50     # 50ms (기존 20ms보다 지연 시간 증가)
-        buffer.memory: 134217728  # 128MB (버퍼 메모리 증가)
+        linger.ms: 20    # 20ms
+        buffer.memory: 67108864  # 64MB로 버퍼 메모리도 증가
         compression.type: snappy
   data:
     redis:
