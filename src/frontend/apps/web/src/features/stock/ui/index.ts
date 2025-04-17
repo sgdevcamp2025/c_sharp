@@ -1,2 +1,2 @@
-export { default as StockDetailLayout } from './stock-detail-layout';
-export { default as StocksList } from './stocks-list-table';
+export { default as StockDetailLayout } from './StockDetailLayout';
+export { default as StocksList } from './StocksListTable';

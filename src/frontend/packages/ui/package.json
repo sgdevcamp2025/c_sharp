@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint . --max-warnings 50",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static"
+    "build-storybook": "storybook build -o storybook-static",
+    "build": "tsc && vite build"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.2",
@@ -60,6 +61,7 @@
     "vite": "^6.0.9"
   },
   "exports": {
+    ".": "./src/index.ts",
     "./globals.css": "./src/styles/globals.css",
     "./postcss.config": "./postcss.config.mjs",
     "./tailwind.config": "./tailwind.config.ts",

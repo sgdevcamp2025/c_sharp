@@ -8,69 +8,137 @@ on:
       - main
     paths:
       - 'src/frontend/**'
-      - '!src/frontend/packages/ui/**'
-      - '../workflows/fe-ci.yml'
-  # push:
-  #   branches:
-  #     - fe-feat/ci-storybook
-  #   paths:
-  #     - '!src/frontend/packages/ui/**'
+      - './fe-ci.yml'
+  push:
+    branches:
+      - fe-fix/ci-bug
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  changes:
-    if: ${{ github.actor != 'l10nbot' }} # Avoid running for 'l10nbot'
+  lint-test:
+    if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Seoul
+    strategy:
+      matrix:
+        task: [lint, test]
     steps:
-      - name: Check out code
+      - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          fetch-depth: 2
+          version: 9.12.3
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
 
-      - uses: pnpm/action-setup@v3
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
         with:
-          version: 8
-
-      - name: Cache dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.pnpm-store
-            **/node_modules
-            src/frontend/node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
-      - name: Install dependencies
+      - name: Install Dependencies (if necessary)
+        working-directory: src/frontend
         run: |
-          cd src/frontend
-          pnpm install --strict-peer-dependencies=false --no-frozen-lockfile
-          pnpm add turbo --save-dev -w
+          if [ ! -d "node_modules" ]; then
+            pnpm install --frozen-lockfile --prefer-offline
+          fi
 
-      - name: CI
+      - name: Run Task with Cache
+        working-directory: src/frontend
         run: |
-          cd src/frontend
-          pnpm turbo typescript lint format build --parallel
+          if [ "${{ matrix.task }}" = "lint" ]; then
+            pnpm exec turbo lint --parallel
+          elif [ "${{ matrix.task }}" = "test" ]; then
+            pnpm exec turbo test --filter=web --parallel
+          fi
 
-  required:
-    needs: [changes]
-    if: always()
+  build:
+    if: ${{ github.actor != 'l10nbot' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Seoul
+    strategy:
+      matrix:
+        package: ['web', '@workspace/ui']
+
     steps:
-      - name: fail if conditional jobs failed
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'skipped') || contains(needs.*.result, 'cancelled')
-        run: exit 1
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: 'src/frontend/pnpm-lock.yaml'
+
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/.turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Restore Next.js cache (for web)
+        if: matrix.package == 'web'
+        uses: actions/cache@v4
+        with:
+          path: src/frontend/apps/web/.next
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('src/frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-
+
+      - name: Install Dependencies
+        working-directory: src/frontend
+        run: |
+          pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Run Build with Cache (Web)
+        if: matrix.package == 'web'
+        working-directory: src/frontend
+        run: |
+          pnpm run build --filter=web --parallel
+
+      - name: Run Build with Cache (@workspace/ui)
+        if: matrix.package == '@workspace/ui'
+        working-directory: src/frontend
+        run: |
+          pnpm run build --filter=@workspace/ui --parallel

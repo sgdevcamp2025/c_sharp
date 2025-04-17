@@ -1,6 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "cacheDir": ".turbo/cache",
   "globalEnv": [
+    "NEXT_PUBLIC_REAL_BASE_URL",
     "NEXT_PUBLIC_MODE",
     "NEXT_PUBLIC_BASE_URL",
     "NEXT_PUBLIC_GATEWAY_SERVER_PORT",
@@ -19,19 +21,31 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**"]
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": [".next/**", "dist/**", "!.next/cache/**", "build/**"],
+      "cache": true
+    },
+    "test": {
+      "dependsOn": [],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "**/*.test.{js,ts,jsx,tsx}",
+        "vitest.config.ts",
+        "tsconfig.json"
+      ],
+      "outputs": [],
+      "cache": true
     },
     "build-storybook": {
       "dependsOn": ["^build-storybook"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "inputs": ["$TURBO_DEFAULT$"],
       "outputs": ["storybook-static/**"],
       "cache": true,
       "persistent": false
     },
     "storybook": {
       "dependsOn": ["^storybook"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "inputs": ["$TURBO_DEFAULT$"],
       "outputs": ["storybook-static/**"],
       "cache": true,
       "persistent": false
@@ -39,28 +53,12 @@
     "lint": {
       "dependsOn": ["^lint"],
       "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx}"],
-      "cache": false,
+      "cache": true,
       "persistent": false
     },
     "dev": {
       "cache": false,
       "persistent": true
-    },
-    "format": {
-      "dependsOn": ["^format"],
-      "inputs": ["$TURBO_DEFAULT$", "**/*.{js,ts,jsx,tsx,json,md}"],
-      "cache": false,
-      "persistent": true
-    },
-    "typescript": {
-      "dependsOn": ["^typescript"],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "tsconfig.json",
-        "packages/**/tsconfig.json"
-      ],
-      "cache": true,
-      "persistent": false
     }
   }
 }

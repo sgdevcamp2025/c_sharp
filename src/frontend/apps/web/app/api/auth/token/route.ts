@@ -7,11 +7,12 @@ const allowedOrigins = [
 ];
 
 export async function GET() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get('accessToken')?.value || '';
 
-  const origin = allowedOrigins.includes(headers().get('origin') || '')
-    ? headers().get('origin')
+  const headersList = await headers();
+  const origin = allowedOrigins.includes(headersList.get('origin') || '')
+    ? headersList.get('origin')
     : allowedOrigins[0];
 
   const response = NextResponse.json({ token });

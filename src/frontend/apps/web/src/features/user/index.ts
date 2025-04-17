@@ -1,1 +1,1 @@
-export { ProfilePopover } from './ui';
+export * from './ui';

@@ -3,4 +3,5 @@ export const TAG_KEYS = {
     ['workspace-channels', `workspace-${workspaceId}`] as const,
   CHAT_HISTORY: (channelId: number) =>
     ['chat-history', `channel-${channelId}`] as const,
+  CHANNEL_MEMBER: (channelId: number) => `channel-member-${channelId}`,
 };

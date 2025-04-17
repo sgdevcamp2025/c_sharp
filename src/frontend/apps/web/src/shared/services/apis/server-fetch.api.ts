@@ -9,6 +9,6 @@ export async function serverFetchInstance<TResponse, TBody = JsonValue>(
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
   options: FetchOptions<TBody> = {},
 ): Promise<TResponse> {
-  const accessToken = cookies().get('accessToken')?.value;
+  const accessToken = (await cookies()).get('accessToken')?.value;
   return Fetch<TResponse, TBody>(url, method, options, accessToken);
 }

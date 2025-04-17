@@ -87,7 +87,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       </Comp>
     );
 
-    createPortal(modalContent, document.body);
+    return createPortal(modalContent, document.body);
   },
 );
 Modal.displayName = 'Modal';

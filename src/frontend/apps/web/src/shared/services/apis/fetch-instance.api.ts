@@ -17,7 +17,7 @@ export async function fetchInstance<TResponse, TBody = JsonValue>(
   options: FetchOptions<TBody> = {},
 ): Promise<TResponse> {
   try {
-    const accessToken = cookies().get('accessToken')?.value;
+    const accessToken = (await cookies()).get('accessToken')?.value;
 
     // 🟢 options 객체에서 필요한 값들을 구조 분해 할당
     const {
