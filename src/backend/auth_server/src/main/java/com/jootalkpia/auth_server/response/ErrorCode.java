@@ -25,6 +25,7 @@ public enum ErrorCode {
 
 
     //403 Forbidden
+    FORBIDDEN("A40300", HttpStatus.FORBIDDEN, "접근이 거부되었습니다."),
 
     // 404 Not Found
     NOT_FOUND_END_POINT("A40400", HttpStatus.NOT_FOUND, "존재하지 않는 API입니다."),
