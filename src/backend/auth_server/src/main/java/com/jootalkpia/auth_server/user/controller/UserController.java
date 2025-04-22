@@ -18,50 +18,52 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class UserController implements UserControllerDocs {
+public class UserController  implements UserControllerDocs {
 
     private final UserService userService;
 
     @GetMapping("/api/v1/user/me")
-    public ResponseEntity<UserInfo> getUserInfo(@CurrentUser UserInfo userInfo) {
+    public Mono<ResponseEntity<UserInfo>> getUserInfo(@CurrentUser UserInfo userInfo) {
         log.info("📢 [Controller] Received UserInfo: {}", userInfo);
-
         if (userInfo == null) {
             log.error("[Controller] UserInfo is NULL!");
-            return ResponseEntity.badRequest().build();
+            return Mono.just(ResponseEntity.badRequest().build());
         }
-
-        return ResponseEntity.ok().body(userInfo);
+        return Mono.just(ResponseEntity.ok(userInfo));
     }
 
     @Override
     @PostMapping("api/v1/user/login")
-    public ResponseEntity<LoginResponse> login(
+    public Mono<ResponseEntity<LoginResponse>> login(
             @RequestParam final String authorizationCode,
             @RequestBody final UserLoginRequest loginRequest
     ) {
-        return ResponseEntity.ok().body(userService.create(authorizationCode, loginRequest));
+        return userService.create(authorizationCode, loginRequest)
+                .map(ResponseEntity::ok);
     }
 
     @Override
     @GetMapping("api/v1/user/token-refresh")
-    public ResponseEntity<GetAccessTokenResponse> refreshToken(
+    public Mono<ResponseEntity<GetAccessTokenResponse>> refreshToken(
             @RequestParam final String token
     ) {
-        return ResponseEntity.ok().body(userService.refreshToken(token));
+        return userService.refreshToken(token)
+                .map(ResponseEntity::ok);
     }
 
     @Override
     @PatchMapping("api/v1/user/profile")
-    public ResponseEntity<UpdateNicknameResponse> updateNickname (
+    public Mono<ResponseEntity<UpdateNicknameResponse>> updateNickname (
             @RequestBody final UpdateNicknameRequest request,
             Principal principal
     ) {
-        Long userId = Long.valueOf(principal.getName());//JootalkpiaAuthenticationContext.getUserInfo().userId();
-        return ResponseEntity.ok().body(userService.updateNickname(request.nickname(), userId));
+        Long userId = Long.valueOf(principal.getName());
+        return userService.updateNickname(request.nickname(), userId)
+                .map(ResponseEntity::ok);
     }
 }
