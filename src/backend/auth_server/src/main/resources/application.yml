@@ -1,27 +1,16 @@
 server:
-  port: ${AUTH_PORT} 
+  port: ${AUTH_PORT}
 
 spring:
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
   data:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-      
-
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
 
 jwt:
   secret: ${JWT_SECRET}
@@ -30,3 +19,7 @@ kakao:
   clientId: ${KAKAO_CLIENTID}
 
 default_image: ${DEFAULT_IMAGE_S3}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
