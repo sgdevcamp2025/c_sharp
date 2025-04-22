@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -29,38 +30,42 @@ public class KakaoSocialService implements SocialService {
 
     @Transactional
     @Override
-    public UserInfoResponse login(
+    public Mono<UserInfoResponse> login(
             final String authorizationCode,
             final UserLoginRequest loginRequest
     ) {
-        String accessToken;
-        try {
-            // 인가 코드로 Access Token + Refresh Token 받아오기
-            accessToken = getOAuth2Authentication(authorizationCode, loginRequest.redirectUri());
-        } catch (FeignException e) {
-            throw new CustomException(ErrorCode.AUTHENTICATION_CODE_EXPIRED);
-        }
-        // Access Token으로 유저 정보 불러오기
-        return getLoginDto(loginRequest.platform(), getUserInfo(accessToken));
+        return getOAuth2Authentication(authorizationCode, loginRequest.redirectUri())
+                .flatMap(accessToken ->
+                        getUserInfo(accessToken)
+                                .map(userResponse -> getLoginDto(loginRequest.platform(), userResponse))
+                )
+                .onErrorMap(FeignException.class, e -> {
+                    log.error("Authentication code expired: {}", e.getMessage());
+                    return new CustomException(ErrorCode.AUTHENTICATION_CODE_EXPIRED);
+                });
     }
 
-    private String getOAuth2Authentication(
+
+    private Mono<String> getOAuth2Authentication(
             final String authorizationCode,
             final String redirectUri
     ) {
-        KakaoAccessTokenResponse response = kakaoAuthApiClient.getOAuth2AccessToken(
-                AUTH_CODE,
-                clientId,
-                redirectUri,
-                authorizationCode
+        return Mono.fromCallable(() ->
+                kakaoAuthApiClient.getOAuth2AccessToken(
+                        AUTH_CODE,
+                        clientId,
+                        redirectUri,
+                        authorizationCode
+                ).accessToken()
         );
-        return response.accessToken();
     }
 
-    private KakaoUserResponse getUserInfo(
+    private Mono<KakaoUserResponse> getUserInfo(
             final String accessToken
     ) {
-        return kakaoApiClient.getUserInformation("Bearer " + accessToken);
+        return Mono.fromCallable(() ->
+                kakaoApiClient.getUserInformation("Bearer " + accessToken)
+        );
     }
 
     private UserInfoResponse getLoginDto(
