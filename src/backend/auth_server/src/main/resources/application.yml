@@ -2,6 +2,9 @@ server:
   port: ${AUTH_PORT}
 
 spring:
+  main:
+    web-application-type: reactive
+
   r2dbc:
     url: r2dbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USER}
