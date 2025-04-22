@@ -1,42 +1,35 @@
 package com.jootalkpia.auth_server.user.domain;
 
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.relational.core.mapping.Column;
+import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-
-@Entity
 @Getter
 @Table(name = "users")
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class User extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
     private Long socialId;
 
     private String email;
 
-    @Enumerated(EnumType.STRING)
+    @Column("platform")
     private Platform platform;
 
     private String nickname;
 
     private String profileImage;
 
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
     public static User of(
             final Long socialId,
@@ -51,10 +44,13 @@ public class User extends BaseTimeEntity {
                 .platform(platform)
                 .nickname(socialNickname)
                 .profileImage(profileImage)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 
     public void updateNickname(final String newNickname) {
         this.nickname = newNickname;
+        this.updatedAt = LocalDateTime.now();
     }
 }
