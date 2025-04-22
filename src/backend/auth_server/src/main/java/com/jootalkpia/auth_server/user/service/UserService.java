@@ -1,12 +1,11 @@
 package com.jootalkpia.auth_server.user.service;
 
-import static com.jootalkpia.auth_server.jwt.JwtValidationType.EXPIRED_JWT_TOKEN;
-
 import com.jootalkpia.auth_server.client.dto.UserInfoResponse;
 import com.jootalkpia.auth_server.client.dto.UserLoginRequest;
 import com.jootalkpia.auth_server.client.kakao.KakaoSocialService;
 import com.jootalkpia.auth_server.exception.CustomException;
 import com.jootalkpia.auth_server.jwt.JwtTokenProvider;
+import com.jootalkpia.auth_server.jwt.JwtValidationType;
 import com.jootalkpia.auth_server.jwt.TokenService;
 import com.jootalkpia.auth_server.response.ErrorCode;
 import com.jootalkpia.auth_server.security.UserAuthentication;
@@ -60,19 +59,27 @@ public class UserService {
     }
 
     public Mono<GetAccessTokenResponse> refreshToken(String refreshToken) {
-        if (jwtTokenProvider.validateToken(refreshToken) == EXPIRED_JWT_TOKEN) {
+        if (!isValidJwt(jwtTokenProvider.validateToken(refreshToken))) {
             return Mono.error(new CustomException(ErrorCode.REFRESH_TOKEN_EXPIRED));
         }
 
         Long userId = jwtTokenProvider.getUserFromJwt(refreshToken);
-        if (!userId.equals(tokenService.findIdByRefreshToken(refreshToken))) {
-            return Mono.error(new CustomException(ErrorCode.TOKEN_INCORRECT_ERROR));
-        }
 
-        UserAuthentication auth = new UserAuthentication(userId.toString(), null, null);
-        return userRepository.findByUserId(userId)
-                .switchIfEmpty(Mono.error(new CustomException(ErrorCode.USER_NOT_FOUND)))
-                .map(user -> GetAccessTokenResponse.of(jwtTokenProvider.issueAccessToken(auth)));
+        return tokenService.findIdByRefreshToken(refreshToken)
+                .flatMap(idFromToken -> {
+                    if (!userId.equals(idFromToken)) {
+                        return Mono.error(new CustomException(ErrorCode.TOKEN_INCORRECT_ERROR));
+                    }
+
+                    UserAuthentication auth = new UserAuthentication(userId.toString(), null, null);
+                    return userRepository.findByUserId(userId)
+                            .switchIfEmpty(Mono.error(new CustomException(ErrorCode.USER_NOT_FOUND)))
+                            .map(user -> GetAccessTokenResponse.of(jwtTokenProvider.issueAccessToken(auth)));
+                });
+    }
+
+    public boolean isValidJwt(JwtValidationType type) {
+        return type == JwtValidationType.VALID_JWT;
     }
 
     public Mono<UpdateNicknameResponse> updateNickname(String nickname, Long userId) {
