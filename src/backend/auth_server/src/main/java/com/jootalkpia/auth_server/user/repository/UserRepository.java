@@ -14,9 +14,4 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
     Mono<Boolean> existsByNickname(String nickname);
 
     Mono<User> findBySocialIdAndPlatform(Long socialId, Platform platform);
-
-    default Mono<User> findByUserIdOrThrow(Long id) {
-        return findByUserId(id)
-                .switchIfEmpty(Mono.error(new CustomException(ErrorCode.USER_NOT_FOUND)));
-    }
 }

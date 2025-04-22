@@ -9,7 +9,6 @@ import com.jootalkpia.auth_server.response.ErrorCode;
 import com.jootalkpia.auth_server.user.domain.Platform;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -18,9 +17,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RequiredArgsConstructor
 public class KakaoSocialService implements SocialService {
-
-    private static final String AUTH_CODE = "authorization_code";
-
 
     private final KakaoApiClient kakaoApiClient;
     private final KakaoAuthWebClientService kakaoAuthWebClientService;
