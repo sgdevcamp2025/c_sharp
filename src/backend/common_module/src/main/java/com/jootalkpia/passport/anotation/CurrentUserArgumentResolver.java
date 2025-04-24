@@ -2,19 +2,17 @@ package com.jootalkpia.passport.anotation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jootalkpia.passport.component.UserInfo;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.support.WebDataBinderFactory;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.reactive.BindingContext;
+import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
-@Slf4j
 @Component
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final ObjectMapper objectMapper; // JSON 파싱을 위한 ObjectMapper 추가
+    private final ObjectMapper objectMapper;
 
     public CurrentUserArgumentResolver(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -22,27 +20,26 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(CurrentUser.class) != null &&
-                parameter.getParameterType().equals(UserInfo.class);
+        return parameter.hasParameterAnnotation(CurrentUser.class)
+                && parameter.getParameterType().equals(UserInfo.class);
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        String userJson = webRequest.getHeader("X-Passport-User");
+    public Mono<Object> resolveArgument(MethodParameter parameter,
+                                        BindingContext bindingContext,
+                                        ServerWebExchange exchange) {
+
+        String userJson = exchange.getRequest().getHeaders().getFirst("X-Passport-User");
 
         if (userJson == null) {
-            throw new RuntimeException("Missing X-Passport-User header");
+            return Mono.empty();
         }
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             UserInfo userInfo = objectMapper.readValue(userJson, UserInfo.class);
-            return userInfo;
+            return Mono.just(userInfo);
         } catch (Exception e) {
-            throw new RuntimeException("Invalid X-Passport-User header format", e);
+            return Mono.error(new RuntimeException("Invalid X-Passport-User header", e));
         }
     }
-
-
 }
