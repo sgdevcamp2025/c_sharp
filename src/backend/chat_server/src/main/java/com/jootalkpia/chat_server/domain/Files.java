@@ -14,8 +14,12 @@ public class Files extends BaseTimeEntity {
     private Long fileId;
 
     private String url;
+    
     private String urlThumbnail;
+    
     private String fileType;
+    
     private Long fileSize;
+    
     private String mimeType;
 }
