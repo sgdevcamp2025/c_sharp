@@ -14,6 +14,7 @@ import java.security.Principal;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import reactor.core.publisher.Mono;
 
 @Tag(name = "User", description = "User 관련 API")
 public interface UserControllerDocs {
@@ -30,7 +31,7 @@ public interface UserControllerDocs {
                     @ApiResponse(responseCode = "A40104", description = "해당 유저의 리프레시 토큰이 존재하지 않습니다.")
             }
     )
-    ResponseEntity<LoginResponse> login(
+    Mono<ResponseEntity<LoginResponse>> login(
             @RequestParam final String authorizationCode,
             @RequestBody final UserLoginRequest loginRequest
     );
@@ -44,7 +45,7 @@ public interface UserControllerDocs {
                     @ApiResponse(responseCode = "A50000", description = "서버 내부 오류입니다.")
             }
     )
-    ResponseEntity<GetAccessTokenResponse> refreshToken(
+    Mono<ResponseEntity<GetAccessTokenResponse>> refreshToken(
             @RequestParam final String refreshToken
     );
 
@@ -55,7 +56,7 @@ public interface UserControllerDocs {
                     @ApiResponse(responseCode = "400", description = "이미 존재하는 닉네임입니다."),
             }
     )
-    ResponseEntity<UpdateNicknameResponse> updateNickname (
+    Mono<ResponseEntity<UpdateNicknameResponse>> updateNickname (
             @RequestBody final UpdateNicknameRequest request,
             Principal principal
     );

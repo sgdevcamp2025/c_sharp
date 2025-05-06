@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,10 +16,12 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final PassportGenerator passportGenerator;
 
-
     @PostMapping("/auth/validate")
-    public Passport validateJwt(@RequestHeader("Authorization") String token) {
-        Long userId = jwtTokenProvider.getUserFromJwt(token.replace("Bearer ", ""));
-        return passportGenerator.generatePassport(userId);
+    public Mono<Passport> validateJwt(@RequestHeader("Authorization") String token) {
+        return Mono.fromCallable(() -> {
+            String jwt = token.replace("Bearer ", "");
+            Long userId = jwtTokenProvider.getUserFromJwt(jwt);
+            return passportGenerator.generatePassport(userId);
+        });
     }
 }

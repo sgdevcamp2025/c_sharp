@@ -2,14 +2,28 @@ package com.jootalkpia.auth_server.client.kakao;
 
 
 import com.jootalkpia.auth_server.client.kakao.response.KakaoUserResponse;
-import org.springframework.cloud.openfeign.FeignClient;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-@FeignClient(name = "kakaoApiClient", url = "https://kapi.kakao.com")
-public interface KakaoApiClient {
+@Service
+@RequiredArgsConstructor
+public class KakaoApiClient {
 
-    @GetMapping(value = "/v2/user/me")
-    KakaoUserResponse getUserInformation(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken);
+    private final WebClient webClient = WebClient.builder()
+            .baseUrl("https://kapi.kakao.com")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
+
+    public Mono<KakaoUserResponse> getUserInfo(String accessToken) {
+        return webClient.get()
+                .uri("/v2/user/me")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .retrieve()
+                .bodyToMono(KakaoUserResponse.class);
+    }
 }
+

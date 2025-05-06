@@ -4,23 +4,14 @@ import com.jootalkpia.auth_server.exception.CustomException;
 import com.jootalkpia.auth_server.response.ErrorCode;
 import com.jootalkpia.auth_server.user.domain.Platform;
 import com.jootalkpia.auth_server.user.domain.User;
-import feign.Param;
-import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Mono;
 
-public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
+public interface UserRepository extends ReactiveCrudRepository<User, Long> {
 
-    @Query("SELECT u FROM User u WHERE u.socialId = :socialId AND u.platform = :platform")
-    Optional<User> findUserByPlatformAndSocialId(@Param("socialId") Long socialId,
-                                                   @Param("platform") Platform platform);
+    Mono<User> findByUserId(Long userId); // JPA가 아님 → 직접 커스텀 쿼리 필요 시 @Query 필요
 
-    Optional<User> findByUserId(Long userId);
+    Mono<Boolean> existsByNickname(String nickname);
 
-    default User findByUserIdOrThrow(Long id) {
-        return findByUserId(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-    }
-
-    boolean existsByNickname(String nickname);
+    Mono<User> findBySocialIdAndPlatform(Long socialId, Platform platform);
 }
