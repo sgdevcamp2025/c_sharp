@@ -3,8 +3,9 @@ import { MessageSquareText } from 'lucide-react';
 import { Toggle } from '@workspace/ui/components';
 
 import HuddleControlsGroup from './HuddleControlsGroup';
+import { HuddleProps } from '../model/huddle.type';
 
-const HuddleFooter = () => {
+const HuddleFooter = ({ huddleProps }: { huddleProps: HuddleProps }) => {
   return (
     <div className="relative w-full h-full min-w-0 min-h-0 flex flex-row justify-center items-center">
       <HuddleControlsGroup />
