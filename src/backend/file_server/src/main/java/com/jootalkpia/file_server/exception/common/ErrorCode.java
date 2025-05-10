@@ -33,6 +33,8 @@ public enum ErrorCode {
     CHUNK_PROCESSING_FAILED("F50008", "청크 처리 중 오류가 발생했습니다."),
     CHUNK_MERGING_FAILED("F50007", "청크 병합 중 오류가 발생했습니다."),
     MIMETYPE_DETECTION_FAILED("F50009", "mimetype 감지에 실패했습니다."),
+    CHUNK_INITIALIZE_FAILED("F50010", "chunk 업로드 초기화가 되어있지 않습니다."),
+    CONTENT_TYPE_SETTING_FAILED("F50011", "Content-Type 설정에 실패하였습니다. "),
     UNEXPECTED_ERROR("F50006", "예상치 못한 오류가 발생했습니다.");
 
     private final String code;

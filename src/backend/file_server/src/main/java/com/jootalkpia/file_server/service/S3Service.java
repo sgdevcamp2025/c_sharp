@@ -1,21 +1,30 @@
 package com.jootalkpia.file_server.service;
 
+import static com.jootalkpia.file_server.controller.FileController.RESPONSE_TIMES;
+import static com.jootalkpia.file_server.controller.FileController.UPLOAD_TIME_TRACKER;
+
+import com.jootalkpia.file_server.entity.FilesEntity;
 import com.jootalkpia.file_server.exception.common.CustomException;
 import com.jootalkpia.file_server.exception.common.ErrorCode;
+import com.jootalkpia.file_server.repository.FileRepository;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +35,159 @@ import java.util.List;
 public class S3Service {
 
     private final S3Client s3Client;
+    private final S3AsyncClient s3AsyncClient;
     private final FileTypeDetector fileTypeDetector;
+    private final FileRepository fileRepository;
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;
 
     @Value("${spring.cloud.aws.region.static}")
     private String region;
+
+    public String makeKey(Long fileId, String mimeType) {
+        String filePath;
+        if (mimeType.startsWith("video/")) {
+            filePath = "videos/";
+        } else filePath = "images/";
+        return filePath + fileId;
+    }
+
+    public String initiateMultipartUpload(Long fileId, String mimeType) {
+
+        String s3Key = makeKey(fileId, mimeType);
+
+        log.info("initialized with s3key : {}", s3Key);
+
+        CreateMultipartUploadRequest createRequest = CreateMultipartUploadRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        try {
+            CompletableFuture<CreateMultipartUploadResponse> createResponse = s3AsyncClient.createMultipartUpload(createRequest);
+            String uploadId = createResponse.join().uploadId();
+            log.info("S3 멀티파트 업로드 초기화: {}, uploadId: {}", fileId, uploadId);
+            return uploadId;
+        } catch (Exception e) {
+            log.error("S3 멀티파트 업로드 초기화 실패: {}", fileId, e);
+            throw new CustomException(ErrorCode.FILE_PROCESSING_FAILED.getCode(), "S3 멀티파트 업로드 초기화 실패");
+        }
+    }
+
+    public CompletableFuture<CompletedPart> asyncUploadPartToS3(Long fileId, String uploadId, int partNumber, byte[] chunkData, String s3Key) {
+        UploadPartRequest uploadPartRequest = UploadPartRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .uploadId(uploadId)
+                .partNumber(partNumber)
+                .build();
+
+        return s3AsyncClient.uploadPart(uploadPartRequest, AsyncRequestBody.fromBytes(chunkData))
+                .thenApply(uploadPartResponse -> {
+                    CompletedPart completedPart = CompletedPart.builder()
+                            .partNumber(partNumber)
+                            .eTag(uploadPartResponse.eTag())
+                            .build();
+                    log.info("청크 업로드 완료 - 파트 번호: {}", partNumber);
+                    return completedPart;
+                }).exceptionally(ex -> {
+                    log.error("청크 업로드 실패 - 파트 번호: {}, 이유: {}", partNumber, ex.getMessage(), ex);
+                    throw new CustomException(ErrorCode.FILE_PROCESSING_FAILED.getCode(), "청크 업로드 실패");
+                });
+    }
+
+    public void completeMultipartUpload(Long fileId, String uploadId, List<CompletedPart> completedParts, String mimeType) {
+        String s3Key = makeKey(fileId, mimeType);
+
+        completedParts.sort(Comparator.comparingInt(CompletedPart::partNumber));
+
+        CompletedMultipartUpload completedMultipartUpload = CompletedMultipartUpload.builder()
+                .parts(completedParts)
+                .build();
+
+        CompleteMultipartUploadRequest completeRequest = CompleteMultipartUploadRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .uploadId(uploadId)
+                .multipartUpload(completedMultipartUpload)
+                .build();
+
+        s3AsyncClient.completeMultipartUpload(completeRequest)
+                .thenAccept(completeMultipartUploadResponse -> {
+                    log.info("S3 멀티파트 업로드 완료: {}", s3Key);
+                    log.info("source {}", bucketName + s3Key);
+
+                    // Content-Type 설정을 위한 CopyObjectRequest 추가
+                    CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
+                            .sourceBucket(bucketName)
+                            .sourceKey(s3Key)
+                            .destinationBucket(bucketName)
+                            .destinationKey(s3Key)
+                            .contentType(mimeType)
+                            .metadataDirective(MetadataDirective.REPLACE.toString())
+                            .build();
+
+                    s3AsyncClient.copyObject(copyObjectRequest)
+                            .thenAccept(copyObjectResponse -> {
+                                log.info("S3 Content-Type 설정 완료: {}, 타입: {}", s3Key, mimeType);
+
+                                // FilesEntity 가져오기 및 URL 업데이트
+                                FilesEntity filesEntity = fileRepository.findById(fileId)
+                                        .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND.getCode(), "해당 ID의 파일을 찾을 수 없습니다."));
+
+                                filesEntity.setUrl(completeMultipartUploadResponse.location());
+                                fileRepository.save(filesEntity);
+
+                                // ✅ 업로드 완료 시간 기록
+                                long endTime = System.currentTimeMillis();
+                                log.info("✅ 파일 병합 완료 시간 (Unix Timestamp): {}, fileId: {}", endTime / 1000, fileId);
+                                log.info("✅ 파일 병합 완료 시간 (UTC): {}", java.time.Instant.now());
+
+                                // ✅ 시작 시간 가져오기 및 총 소요 시간 계산
+                                Long startTime = UPLOAD_TIME_TRACKER.get(fileId);
+                                if (startTime != null) {
+                                    long totalTime = endTime - startTime;
+                                    double totalTimeInSeconds = totalTime / 1000.0;
+                                    log.info("\n--- 결과 요약 ---");
+                                    log.info("총 소요 시간: {} 초, fileId: {}", totalTimeInSeconds, fileId);
+
+                                    // ✅ 응답 시간 통계 계산
+                                    double averageResponseTime = RESPONSE_TIMES.stream().mapToLong(Long::longValue).average().orElse(0.0);
+                                    long maxResponseTime = RESPONSE_TIMES.stream().mapToLong(Long::longValue).max().orElse(0L);
+                                    long minResponseTime = RESPONSE_TIMES.stream().mapToLong(Long::longValue).min().orElse(0L);
+
+                                    // ✅ 성공률 및 실패율 계산 (파일 1개 기준)
+                                    int totalRequests = RESPONSE_TIMES.size();
+                                    int successCount = totalRequests;
+                                    int failureCount = 0;
+                                    double successRate = (successCount / (double) totalRequests) * 100;
+                                    double failureRate = (failureCount / (double) totalRequests) * 100;
+
+                                    // ✅ 결과 요약 출력
+                                    log.info("\n--- 결과 요약 ---");
+                                    log.info("총 소요 시간: {} 초", totalTimeInSeconds);
+                                    log.info("성공률: {}%", successRate);
+                                    log.info("실패율: {}%", failureRate);
+
+                                    // ✅ UPLOAD_TIME_TRACKER 및 RESPONSE_TIMES 초기화
+                                    UPLOAD_TIME_TRACKER.remove(fileId);
+                                    RESPONSE_TIMES.clear();
+                                } else {
+                                    log.warn("❌ 시작 시간 정보 없음 - fileId: {}", fileId);
+                                }
+                            }).exceptionally(ex -> {
+                                log.error("S3 Content-Type 설정 실패: {}", s3Key, ex);
+                                throw new CustomException(ErrorCode.CONTENT_TYPE_SETTING_FAILED.getCode(), "Content-Type 설정 실패");
+                            });
+
+                }).exceptionally(ex -> {
+                    log.error("S3 멀티파트 업로드 병합 실패: {}", s3Key, ex);
+                    throw new CustomException(ErrorCode.CHUNK_MERGING_FAILED.getCode(), ErrorCode.CHUNK_MERGING_FAILED.getMsg());
+                });
+    }
+
+
 
     // 멀티파트 업로드 방식으로 S3에 파일 업로드
     public String uploadFileMultipart(File file, String folder, Long fileId) {
@@ -122,15 +277,18 @@ public class S3Service {
 
 
     public String uploadFile(MultipartFile file, String folder, Long fileId) {
-        Path tempFile = null;
+        java.nio.file.Path tempPath = null;
         log.info("Ready to upload file to S3 bucket: {}", bucketName);
         try {
             // S3에 저장될 파일 키 생성
             String key = folder + fileId;
 
-            // 임시 파일 생성
-            tempFile = Files.createTempFile("temp-", ".tmp");
-            file.transferTo(tempFile.toFile());
+            // 임시 파일 생성 (Path -> File 변환)
+            tempPath = java.nio.file.Files.createTempFile("temp-", ".tmp");
+            java.io.File tempFile = tempPath.toFile();
+
+            // MultipartFile -> File 전송
+            file.transferTo(tempFile);
 
             // S3에 업로드
             s3Client.putObject(
@@ -139,7 +297,7 @@ public class S3Service {
                             .key(key)
                             .contentType(file.getContentType())
                             .build(),
-                    tempFile);
+                    tempPath);
 
             log.info("파일 업로드 완료 - S3 Key: {}", "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + key);
             return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + key;
@@ -159,15 +317,16 @@ public class S3Service {
         } finally {
             // 임시 파일 삭제
             try {
-                if (tempFile != null && Files.exists(tempFile)) {
-                    Files.delete(tempFile);
-                    log.info("임시 파일 삭제 완료: {}", tempFile);
+                if (tempPath != null && java.nio.file.Files.exists(tempPath)) {
+                    java.nio.file.Files.delete(tempPath);
+                    log.info("임시 파일 삭제 완료: {}", tempPath);
                 }
             } catch (IOException e) {
                 log.warn("임시 파일 삭제 실패: {}", e.getMessage(), e);
             }
         }
     }
+
 
     public ResponseInputStream<GetObjectResponse> downloadFile(String folder, Long fileId) {
         String key = folder + "/" + fileId;
