@@ -1,7 +1,10 @@
 ---
 name: Feature Proposal
 about: Tell us how Copybara Action can serve you better
-labels: enhancement
+title: ''
+labels: ''
+assignees: ''
+
 ---
 
 <!---

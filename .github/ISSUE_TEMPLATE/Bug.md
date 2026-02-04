@@ -1,7 +1,10 @@
 ---
 name: Bug Report
 about: Report an issue you found with Copybara Action
-labels: bug
+title: ''
+labels: ''
+assignees: ''
+
 ---
 
 <!---
@@ -33,15 +36,6 @@ bug and fix it quickly - This is very important
 --->
 
 <!-- project-bug -->
-
-### Environment
-
-<!---
-Please include any relevant details about the version of Copybara Action you
-are using, your operating system, browser, etc.
---->
-
-- Version:
 
 ### Possible fix
 
